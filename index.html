@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-03 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-03/3 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -280,6 +280,12 @@ body.reorder .sec-head .count{margin-left:auto}
 .mv-row button.solid{background:var(--ink);color:#fff}
 .mv-row button:hover{opacity:.85}
 .mv-note{font-size:12px;color:var(--ink-mute);margin-top:10px;line-height:1.45}
+.syncdot{font:500 11.5px/1 "IBM Plex Sans",sans-serif;padding:4px 7px;border-radius:99px;border:1px solid var(--rule);color:var(--ink-soft);white-space:nowrap}
+.syncdot[data-s="ok"]{color:#1E6B3A;border-color:#9CCBAE}
+.syncdot[data-s="work"]{color:var(--ink-soft)}
+.syncdot[data-s="err"]{color:#9B2226;border-color:#E0A0A2}
+.sy-in label{display:block;font:500 12px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink-soft);margin:9px 0 3px}
+.sy-in input{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;border:1px solid var(--rule);border-radius:var(--radius);padding:9px 8px;background:var(--paper);color:var(--ink)}
 /* --- отрезки дня --- */
 .seg{border:1px solid var(--rule);border-radius:var(--radius);padding:10px;margin:0 0 8px;background:var(--card)}
 .seg.on{border-color:var(--grass);background:var(--grass-bg)}
@@ -316,6 +322,7 @@ body.reorder .sec-head .count{margin-left:auto}
       <h1>Вахтенный лист</h1>
       <span class="week" id="week-label"></span>
       <button type="button" class="ordbtn" id="btn-order" aria-pressed="false">⇅ порядок</button>
+      <span class="syncdot" id="sync-dot" hidden></span>
     </div>
     <nav class="watch" id="watch" aria-label="Выбор дня"></nav>
   </div>
@@ -460,6 +467,7 @@ body.reorder .sec-head .count{margin-left:auto}
     <button class="grow" id="btn-copy">Отчёт за день</button>
     <button class="ghost" id="btn-week">Неделя</button>
     <button class="ghost" id="btn-move">Загрузить</button>
+    <button class="ghost" id="btn-sync">Синхр.</button>
     <button class="ghost" id="btn-reset">Сброс</button>
   </div>
 </div>
@@ -474,6 +482,30 @@ body.reorder .sec-head .count{margin-left:auto}
       <button type="button" id="mv-close">Закрыть</button>
     </div>
     <p class="mv-note">Состояние недели встанет из блока. Пункты, которых в этой версии нет, отбрасываются молча. Если здесь уже что-то введено — спросит подтверждение.</p>
+  </div>
+</div>
+
+<div class="mv" id="sy" data-open="0">
+  <div class="mv-in sy-in">
+    <h3>Синхронизация между устройствами</h3>
+    <p class="mv-hint">Отметки хранятся файлом в твоём приватном репозитории на GitHub. Открыл на другом устройстве — подтянется само. Ключ доступа остаётся в этом браузере и в публичный файл не попадает.</p>
+    <label for="sy-owner">Владелец репозитория — твой логин на GitHub</label>
+    <input id="sy-owner" spellcheck="false" autocomplete="off" placeholder="username">
+    <label for="sy-repo">Приватный репозиторий для данных</label>
+    <input id="sy-repo" spellcheck="false" autocomplete="off" placeholder="vahta-data">
+    <label for="sy-path">Имя файла в нём</label>
+    <input id="sy-path" spellcheck="false" autocomplete="off" placeholder="state.json">
+    <label for="sy-token">Ключ доступа</label>
+    <input id="sy-token" type="password" spellcheck="false" autocomplete="off" placeholder="github_pat_...">
+    <div class="mv-row">
+      <button type="button" class="solid" id="sy-save">Проверить и включить</button>
+      <button type="button" id="sy-now">Синхронизировать</button>
+    </div>
+    <div class="mv-row">
+      <button type="button" id="sy-off">Отключить</button>
+      <button type="button" id="sy-close">Закрыть</button>
+    </div>
+    <p class="mv-note" id="sy-note">Правило: отмечай на одном устройстве за раз. Если открыть страницу сразу на двух и править в обеих, сохранённое позже затрёт раннее — страница предупредит, но разрешить конфликт придётся тебе.</p>
   </div>
 </div>
 
@@ -505,7 +537,7 @@ const W = '__week__';
 let store = {};
 try { store = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ store = {}; }
 
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){} }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){} if(typeof syncTouch === "function") syncTouch(); }
 
 /* Данные вносит только пользователь. Никаких предзаполненных значений в файле нет:
    иначе версия файла начинает конкурировать с тем, что реально введено в браузере. */
@@ -661,7 +693,7 @@ try {
   const saved = JSON.parse(localStorage.getItem(ORDER_KEY));
   if(saved && saved.secs && saved.secs.length) ORDER = Object.assign({secs:[], items:{}}, saved);
 } catch(e){}
-function saveOrder(){ try { localStorage.setItem(ORDER_KEY, JSON.stringify(ORDER)); } catch(e){} }
+function saveOrder(){ try { localStorage.setItem(ORDER_KEY, JSON.stringify(ORDER)); } catch(e){} if(typeof syncTouch === "function") syncTouch(); }
 
 /* Список в сохранённом порядке + всё новое, чего в нём ещё нет */
 function merged(saved, def){
@@ -1895,6 +1927,219 @@ function toast(msg){
 }
 
 renderAll();
+
+/* ================= СИНХРОНИЗАЦИЯ МЕЖДУ УСТРОЙСТВАМИ =================
+   Состояние лежит одним файлом в приватном репозитории на GitHub.
+   Ключ доступа хранится только в этом браузере и в синхронизируемые данные не входит. */
+const SYNC_CFG  = 'vahta_sync_cfg';
+const SYNC_META = 'vahta_sync_meta';
+const SYNC_SKIP = [SYNC_CFG, SYNC_META];
+
+function syncCfg(){
+  try { const o = JSON.parse(localStorage.getItem(SYNC_CFG) || 'null');
+        return (o && o.owner && o.repo && o.token) ? o : null; } catch(e){ return null; }
+}
+function syncMeta(){
+  try { return JSON.parse(localStorage.getItem(SYNC_META) || '{}') || {}; } catch(e){ return {}; }
+}
+function setMeta(m){ try { localStorage.setItem(SYNC_META, JSON.stringify(m)); } catch(e){} }
+
+function syncDot(state, text){
+  const el = document.getElementById('sync-dot');
+  if(!el) return;
+  if(!state){ el.hidden = true; return; }
+  el.hidden = false; el.dataset.s = state; el.textContent = text;
+}
+function hhmm(ts){
+  const d = new Date(ts);
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function b64enc(str){
+  const b = new TextEncoder().encode(str);
+  let out = '';
+  for(let i = 0; i < b.length; i += 0x8000) out += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+  return btoa(out);
+}
+function b64dec(b){
+  const bin = atob(String(b).replace(/\s/g, ''));
+  const a = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(a);
+}
+
+/* Всё хранилище вахты, кроме настроек самой синхронизации */
+function collectAll(){
+  const data = {};
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(k && k.indexOf('vahta') === 0 && SYNC_SKIP.indexOf(k) < 0) data[k] = localStorage.getItem(k);
+  }
+  return data;
+}
+function applyAll(data){
+  const keep = {};
+  SYNC_SKIP.forEach(k => { const v = localStorage.getItem(k); if(v !== null) keep[k] = v; });
+  for(let i = localStorage.length - 1; i >= 0; i--){
+    const k = localStorage.key(i);
+    if(k && k.indexOf('vahta') === 0 && SYNC_SKIP.indexOf(k) < 0) localStorage.removeItem(k);
+  }
+  Object.keys(data).forEach(k => { try { localStorage.setItem(k, data[k]); } catch(e){} });
+  Object.keys(keep).forEach(k => { try { localStorage.setItem(k, keep[k]); } catch(e){} });
+}
+
+function ghUrl(c){
+  return 'https://api.github.com/repos/' + encodeURIComponent(c.owner) + '/' +
+         encodeURIComponent(c.repo) + '/contents/' + (c.path || 'state.json').split('/').map(encodeURIComponent).join('/');
+}
+function ghHead(c){
+  return {'Authorization':'Bearer ' + c.token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28'};
+}
+
+async function ghGet(c){
+  const r = await fetch(ghUrl(c) + '?ref=' + encodeURIComponent(c.branch || 'main') + '&t=' + Date.now(),
+                        {headers: ghHead(c), cache:'no-store'});
+  if(r.status === 404) return {missing:true};
+  if(!r.ok) throw new Error(r.status === 401 ? 'Ключ не принят' : (r.status === 403 ? 'Нет прав на репозиторий' : 'Сервер ответил ' + r.status));
+  const j = await r.json();
+  let body = null;
+  try { body = JSON.parse(b64dec(j.content)); } catch(e){ throw new Error('Файл на сервере повреждён'); }
+  return {sha: j.sha, body: body};
+}
+
+async function ghPut(c, obj, sha){
+  const payload = {message:'вахта ' + new Date().toISOString(), content: b64enc(JSON.stringify(obj)), branch: c.branch || 'main'};
+  if(sha) payload.sha = sha;
+  const r = await fetch(ghUrl(c), {method:'PUT', headers: Object.assign({'Content-Type':'application/json'}, ghHead(c)), body: JSON.stringify(payload)});
+  if(r.status === 409 || r.status === 422) return {conflict:true};
+  if(!r.ok) throw new Error(r.status === 401 ? 'Ключ не принят' : (r.status === 403 ? 'Нет прав на запись' : 'Сервер ответил ' + r.status));
+  const j = await r.json();
+  return {sha: j.content && j.content.sha};
+}
+
+let syncBusy = false, syncTimer = null;
+
+async function syncPush(force){
+  const c = syncCfg(); if(!c || syncBusy) return;
+  syncBusy = true; syncDot('work', 'отправка…');
+  try {
+    const m = syncMeta();
+    const ts = Date.now();
+    const obj = {vahta_sync:1, ts: ts, data: collectAll()};
+    let res = await ghPut(c, obj, m.sha);
+    if(res.conflict){
+      const cur = await ghGet(c);
+      if(!cur.missing && cur.body && cur.body.ts > (m.ts || 0) && !force){
+        syncBusy = false; syncDot('err', 'конфликт');
+        if(confirm('На сервере более свежая версия с другого устройства (' + hhmm(cur.body.ts) + ').\nOK — взять серверную, здешние правки пропадут.\nОтмена — оставить здешнюю и затереть серверную.')){
+          applyAll(cur.body.data); setMeta({sha: cur.sha, ts: cur.body.ts, dirty:false}); location.reload();
+        } else { await syncPush(true); }
+        return;
+      }
+      res = await ghPut(c, obj, cur.missing ? null : cur.sha);
+    }
+    setMeta({sha: res.sha, ts: ts, dirty:false});
+    syncDot('ok', '✓ ' + hhmm(ts));
+  } catch(e){ syncDot('err', '✕ ' + (e.message || 'сбой')); }
+  syncBusy = false;
+}
+
+async function syncPull(silent){
+  const c = syncCfg(); if(!c || syncBusy) return;
+  syncBusy = true; syncDot('work', 'проверка…');
+  try {
+    const m = syncMeta();
+    const res = await ghGet(c);
+    if(res.missing){ syncBusy = false; await syncPush(true); return; }
+    if(res.body.ts === m.ts){ syncDot('ok', '✓ ' + hhmm(m.ts || Date.now())); syncBusy = false; return; }
+    if(res.body.ts > (m.ts || 0)){
+      if(m.dirty && !confirm('На сервере более свежая версия с другого устройства (' + hhmm(res.body.ts) + ').\nЗдешние неотправленные правки будут заменены. Взять серверную?')){
+        syncBusy = false; await syncPush(true); return;
+      }
+      applyAll(res.body.data); setMeta({sha: res.sha, ts: res.body.ts, dirty:false});
+      syncBusy = false; location.reload(); return;
+    }
+    syncBusy = false; await syncPush(true); return;
+  } catch(e){ syncDot('err', '✕ ' + (e.message || 'сбой')); }
+  syncBusy = false;
+}
+
+/* Вызывается при каждом сохранении: помечает изменения и отправляет с задержкой */
+function syncTouch(){
+  if(!syncCfg()) return;
+  const m = syncMeta(); m.dirty = true; setMeta(m);
+  syncDot('work', 'не отправлено');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(function(){ syncPush(false); }, 4000);
+}
+
+/* Панель настройки */
+const sy = document.getElementById('sy');
+function syOpen(on){
+  sy.dataset.open = on ? '1' : '0';
+  if(on){
+    const c = syncCfg() || {};
+    document.getElementById('sy-owner').value = c.owner || '';
+    document.getElementById('sy-repo').value  = c.repo  || '';
+    document.getElementById('sy-path').value  = c.path  || 'state.json';
+    document.getElementById('sy-token').value = c.token || '';
+  }
+}
+document.getElementById('btn-sync').onclick = () => syOpen(true);
+document.getElementById('sy-close').onclick = () => syOpen(false);
+sy.onclick = e => { if(e.target === sy) syOpen(false); };
+
+document.getElementById('sy-save').onclick = async () => {
+  const c = {
+    owner: document.getElementById('sy-owner').value.trim(),
+    repo:  document.getElementById('sy-repo').value.trim(),
+    path:  document.getElementById('sy-path').value.trim() || 'state.json',
+    token: document.getElementById('sy-token').value.trim(),
+    branch:'main'
+  };
+  if(!c.owner || !c.repo || !c.token){ toast('Заполни логин, репозиторий и ключ'); return; }
+  const note = document.getElementById('sy-note');
+  note.textContent = 'Проверяю доступ…';
+  try {
+    localStorage.setItem(SYNC_CFG, JSON.stringify(c));
+    const res = await ghGet(c);
+    if(res.missing){
+      note.textContent = 'Доступ есть, файла ещё нет — сейчас создам из здешних данных.';
+      await syncPush(true); syOpen(false); toast('Синхронизация включена'); return;
+    }
+    note.textContent = 'Доступ есть. На сервере версия от ' + hhmm(res.body.ts) + '.';
+    syOpen(false); await syncPull(false); toast('Синхронизация включена');
+  } catch(e){
+    localStorage.removeItem(SYNC_CFG);
+    note.textContent = 'Не вышло: ' + (e.message || 'сбой') + '. Проверь логин, имя репозитория и права ключа.';
+  }
+};
+document.getElementById('sy-now').onclick = () => { if(!syncCfg()){ toast('Синхронизация не настроена'); return; } syncPull(false); };
+document.getElementById('sy-off').onclick = () => {
+  if(!confirm('Отключить синхронизацию на этом устройстве? Данные останутся и здесь, и на сервере.')) return;
+  localStorage.removeItem(SYNC_CFG); localStorage.removeItem(SYNC_META);
+  syncDot(null); syOpen(false); toast('Синхронизация отключена');
+};
+
+/* Подтягивание при открытии и при возврате на вкладку */
+if(syncCfg()){
+  syncDot('work', 'проверка…');
+  syncPull(true);
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'visible') syncPull(true);
+    else if(syncMeta().dirty){ clearTimeout(syncTimer); syncPush(false); }
+  });
+  window.addEventListener('focus', function(){ if(!syncBusy) syncPull(true); });
+}
+
+</script>
+<script>
+/* Офлайн-режим: страница открывается без связи. Данные и так лежат в браузере. */
+if('serviceWorker' in navigator && location.protocol === 'https:'){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
