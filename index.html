@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-04 13:40 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-04 19:40 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -110,14 +110,21 @@ section{margin:0 0 20px}
 .row.is-done{background:linear-gradient(90deg,var(--sea-bg) 0 3px,transparent 3px)}
 .row.is-fail{background:linear-gradient(90deg,var(--signal-bg) 0 3px,transparent 3px)}
 .row.is-wip{background:linear-gradient(90deg,var(--amber-bg) 0 3px,transparent 3px)}
-.row-main{display:flex;align-items:flex-start;gap:10px}
-.row-text{flex:1;min-width:0}
-.row-name{font-size:14.5px;line-height:1.35}
+.row-main{display:flex;flex-wrap:wrap;align-items:center;gap:7px 8px}
+.row-text{flex:1 1 100%;order:-1}
+.row-main > :not(.row-text){margin-left:0}
+.row-main .grip{order:9}
+@media (min-width:680px){
+  .row-main{flex-wrap:nowrap;align-items:flex-start}
+  .row-text{flex:1 1 auto;order:0}
+}
+.row-text{min-width:0}
+.row-name{font-size:14.5px;line-height:1.3}
 .row.is-done .row-name{color:var(--ink-soft)}
-.row-meta{font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-mute);margin-top:3px}
+.row-meta{font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-mute);margin-top:2px;line-height:1.3}
 .row-meta .closed{color:var(--sea)}
-.acts{display:grid;grid-template-columns:repeat(2,34px);gap:3px;flex-shrink:0;align-items:center;justify-content:end}
-.acts button{width:34px;height:34px;border:1px solid var(--rule);background:#fff;border-radius:var(--radius);cursor:pointer;
+.acts{display:flex;gap:4px;flex-shrink:0;align-items:center}
+.acts button{width:32px;height:32px;border:1px solid var(--rule);background:#fff;border-radius:var(--radius);cursor:pointer;
   color:var(--ink-mute);font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .12s}
 .acts button:hover{border-color:var(--ink-mute)}
 .acts button:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
@@ -126,9 +133,9 @@ section{margin:0 0 20px}
 .acts .wip[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#fff}
 .acts .note[data-has="1"]{border-color:var(--ink-soft);color:var(--ink)}
 .tally{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.tally .val{font-family:'Oswald',sans-serif;font-size:15px;min-width:38px;text-align:center;font-variant-numeric:tabular-nums}
+.tally .val{font-family:'Oswald',sans-serif;font-size:15px;min-width:30px;text-align:center;font-variant-numeric:tabular-nums}
 .tally .val.hit{color:var(--sea)}
-.tally button{width:34px;height:34px;border:1px solid var(--rule);background:#fff;border-radius:var(--radius);cursor:pointer;
+.tally button{width:32px;height:32px;border:1px solid var(--rule);background:#fff;border-radius:var(--radius);cursor:pointer;
   color:var(--ink-mute);font-size:15px;display:flex;align-items:center;justify-content:center}
 .tally button.plus{background:var(--ink);border-color:var(--ink);color:#fff;font-size:17px}
 .tally button:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
@@ -197,7 +204,7 @@ body.reorder .mode{display:none}
   cursor:pointer;color:var(--ink-mute);font-size:14px}
 body.reorder .phrase-wrap{opacity:.45;pointer-events:none}
 
-.pin{flex-shrink:0;width:36px;height:36px;border:1px solid var(--rule);background:#fff;border-radius:var(--radius);
+.pin{flex-shrink:0;width:32px;height:32px;margin-left:auto;border:1px solid var(--rule);background:#fff;border-radius:var(--radius);
   cursor:pointer;color:var(--ink-mute);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}
 .pin[data-on="1"]{background:var(--amber-bg);border-color:var(--amber);color:var(--ink)}
 body.reorder .pin{display:none}
@@ -405,18 +412,7 @@ body.reorder .sec-head .count{margin-left:auto}
     </div>
     <div class="seg-hint">Нажми на квадрат — 🟢 работал на цели · 🟡 наполовину · 🔴 потерял. Поле раскрывается при нажатии, диктуй голосом.</div>
 
-    <div class="soul" id="soul">
-      <div class="soul-top">
-        <span class="soul-ttl">Практика</span>
-        <button type="button" class="step" id="pract-minus">−</button>
-        <input class="num" type="number" min="0" max="600" step="5" inputmode="numeric" id="pract">
-        <span class="soul-unit">мин</span>
-        <button type="button" class="step" id="pract-plus">+</button>
-        <span class="soul-chain" id="soul-chain">цепочка 0</span>
-      </div>
-      <div class="soul-week" id="soul-week"></div>
-      <div class="soul-note">Сфера 7 «Душа» · вне счёта привычек, на зачёт недели не влияет · временно, 21 день</div>
-    </div>
+    <div id="daymeas"></div>
 
     <div class="grp" data-id="g-sleep"><div class="grp-body">
     <div class="line">
@@ -547,7 +543,7 @@ body.reorder .sec-head .count{margin-left:auto}
 const CAT_KEY = 'vahta_catalog_v1';
 /* Состав недели, рычаги, задачи и коды в файле не хранятся: файл лежит публично.
    Каталог живёт в браузере и заливается блоком {"vahtacat":1,...} через кнопку переноса. */
-const EMPTY_CAT = {"WEEK": "каталог не загружен", "DAYS": [{"id": "p1", "label": "Вс", "date": ""}, {"id": "p2", "label": "Пн", "date": ""}, {"id": "p3", "label": "Вт", "date": ""}, {"id": "p4", "label": "Ср", "date": ""}, {"id": "p5", "label": "Чт", "date": ""}, {"id": "p6", "label": "Пт", "date": ""}, {"id": "p7", "label": "Сб", "date": ""}], "LEVERS": [], "SECTIONS": [{"key": "habits", "type": "habit", "title": "Ежедневные привычки", "zone": "z-steel", "tag": "7 в счёт", "items": []}, {"key": "tasks", "type": "task", "title": "Задачи недели", "zone": "z-red", "tag": "лимит 7 · зачёт при 6", "items": []}, {"key": "trig", "type": "task", "title": "Триггерные — в лимит недели не входят", "zone": "z-amber", "tag": "ждут события", "items": []}, {"key": "queue", "type": "task", "title": "Очередь", "zone": "z-amber", "tag": "входит при закрытии задачи", "items": []}, {"key": "weekmeas", "type": "meas", "title": "Замер за неделю", "zone": "z-steel", "tag": "один раз за неделю", "items": []}, {"key": "rituals", "type": "ritual", "title": "Ритуалы недели", "zone": "z-amber", "tag": "счётчик за неделю", "items": []}, {"key": "rituals_long", "type": "ritual", "title": "Ритуалы длинного такта", "zone": "z-steel", "tag": "копится, недельным нулём не считается", "items": []}], "CODE": {}};
+const EMPTY_CAT = {"WEEK": "каталог не загружен", "DAYS": [{"id": "p1", "label": "Вс", "date": ""}, {"id": "p2", "label": "Пн", "date": ""}, {"id": "p3", "label": "Вт", "date": ""}, {"id": "p4", "label": "Ср", "date": ""}, {"id": "p5", "label": "Чт", "date": ""}, {"id": "p6", "label": "Пт", "date": ""}, {"id": "p7", "label": "Сб", "date": ""}], "LEVERS": [], "SECTIONS": [{"key": "habits", "type": "habit", "title": "Ежедневные привычки", "zone": "z-steel", "tag": "7 в счёт", "items": []}, {"key": "tasks", "type": "task", "title": "Задачи недели", "zone": "z-red", "tag": "лимит 7 · зачёт при 6", "items": []}, {"key": "trig", "type": "task", "title": "Триггерные — в лимит недели не входят", "zone": "z-amber", "tag": "ждут события", "items": []}, {"key": "queue", "type": "task", "title": "Очередь", "zone": "z-amber", "tag": "входит при закрытии задачи", "items": []}, {"key": "weekmeas", "type": "meas", "title": "Замер за неделю", "zone": "z-steel", "tag": "один раз за неделю", "items": []}, {"key": "rituals", "type": "ritual", "title": "Ритуалы недели", "zone": "z-amber", "tag": "счётчик за неделю", "items": []}, {"key": "rituals_long", "type": "ritual", "title": "Ритуалы длинного такта", "zone": "z-steel", "tag": "копится, недельным нулём не считается", "items": []}], "CODE": {}, "DAYMEAS": []};
 let CAT = null;
 try { const _r = localStorage.getItem(CAT_KEY); if(_r) CAT = JSON.parse(_r); } catch(e){ CAT = null; }
 const CAT_LOADED = !!(CAT && Array.isArray(CAT.DAYS) && CAT.DAYS.length && Array.isArray(CAT.SECTIONS) && CAT.SECTIONS.length);
@@ -557,6 +553,7 @@ const DAYS    = CAT.DAYS;
 const LEVERS  = CAT.LEVERS || [];
 const SECTIONS = CAT.SECTIONS;
 const CODE    = CAT.CODE || {};
+const DAYMEAS = CAT.DAYMEAS || [];   /* числовые замеры дня — состав задаётся каталогом, не движком */
 const code = id => CODE[id] || id;
 
 const _hb = SECTIONS.find(s => s.key === 'habits');
@@ -595,7 +592,8 @@ function box(name){
   if(typeof b.phrase !== 'string') b.phrase = '';
   if(typeof b.phraseN !== 'number') b.phraseN = 0;
   if(typeof b.phraseTill !== 'number') b.phraseTill = 0;
-  if(typeof b.pract !== 'number') b.pract = 0;
+  if(!b.meas) b.meas = {};
+  if(typeof b.pract === 'number' && b.pract && b.meas.pract === undefined) b.meas.pract = b.pract;
   if(typeof b.photo === 'undefined') b.photo = false;
   if(typeof b.ext === 'undefined') b.ext = false;
   return b;
@@ -1062,7 +1060,8 @@ function renderPanels(){
   const counts = {
     today:  '',
     levers: (() => { let d=0,t=0; LEVERS.forEach(l => { const p = leverProgress(l.id); d+=p.done; t+=p.total; }); return d + ' / ' + t; })(),
-    day:    (b.sleep !== '' ? b.sleep + ' ч' : 'сон не внесён') + ' · отрезки ' + segDone + '/3' + (b.pract ? ' · практика ' + b.pract + ' мин' : ''),
+    day:    (b.sleep !== '' ? b.sleep + ' ч' : 'сон не внесён') + ' · отрезки ' + segDone + '/3' +
+            DAYMEAS.map(m => measVal(b, m.id) ? ' · ' + m.name.toLowerCase() + ' ' + measVal(b, m.id) + ' ' + (m.unit || '') : '').join(''),
     journal:(b.notesList.length ? b.notesList.length + ' зам.' : 'заметок нет') + ' · хроника ' + w.chron.length
   };
   const so = secOrder();
@@ -1496,36 +1495,37 @@ if(!CAT_LOADED){
   document.body.insertBefore(w, document.body.firstChild);
 }
 
-/* ================= СФЕРА 7 «ДУША» — ВРЕМЕННЫЙ ЗАМЕР ПРАКТИКИ =================
-   Вне счёта привычек: на процент привычек, зачёт недели и правило 36 не влияет.
-   Цепочка дней считается сквозной, поверх границ учётных недель. */
-const SOUL_KEY = 'vahta_soul_days_v1';
+/* ================= ЧИСЛОВЫЕ ЗАМЕРЫ ДНЯ =================
+   Какие замеры существуют — решает каталог (DAYMEAS), не движок.
+   Вне счёта привычек: на процент привычек, зачёт недели и правило 36 не влияют. */
+const MEAS_KEY = 'vahta_meas_days_v1';
 
-function soulDays(){
-  try { const a = JSON.parse(localStorage.getItem(SOUL_KEY) || '[]'); return Array.isArray(a) ? a : []; }
-  catch(e){ return []; }
+function measDays(){
+  try { const o = JSON.parse(localStorage.getItem(MEAS_KEY) || '{}'); return (o && typeof o === 'object') ? o : {}; }
+  catch(e){ return {}; }
 }
-function soulSave(a){ try { localStorage.setItem(SOUL_KEY, JSON.stringify(a)); } catch(e){} }
+function measSave(o){ try { localStorage.setItem(MEAS_KEY, JSON.stringify(o)); } catch(e){} }
 
 /* '04.09' + год учётной недели -> число, чтобы считать соседние дни */
-function soulStamp(dd){
+function measStamp(dd){
   const m = /^(\d{2})\.(\d{2})$/.exec(dd || ''); if(!m) return null;
   const yr = (/(\d{4})/.exec(WEEK) || [])[1] || String(new Date().getFullYear());
   return Date.UTC(+yr, +m[2] - 1, +m[1]);
 }
-function soulMark(dd, on){
+function measMark(id, dd, on){
   if(!dd) return;
-  const a = soulDays(); const i = a.indexOf(dd);
+  const o = measDays(); const a = Array.isArray(o[id]) ? o[id] : [];
+  const i = a.indexOf(dd);
   if(on && i < 0) a.push(dd);
   if(!on && i >= 0) a.splice(i, 1);
-  soulSave(a);
+  o[id] = a; measSave(o);
 }
-function soulChain(){
-  const st = soulDays().map(soulStamp).filter(Boolean).sort((x, y) => y - x);
+function measChain(id){
+  const a = measDays()[id] || [];
+  const st = a.map(measStamp).filter(x => x !== null).sort((x, y) => y - x);
   if(!st.length) return 0;
   const DAY = 864e5;
-  const today = soulStamp((DAYS.find(x => x.id === current) || {}).date);
-  /* цепочка тянется от сегодняшнего дня либо от вчерашнего, если сегодня ещё не отмечено */
+  const today = measStamp((DAYS.find(x => x.id === current) || {}).date);
   if(today !== null && st[0] < today - DAY) return 0;
   let n = 1;
   for(let i = 1; i < st.length; i++){
@@ -1534,39 +1534,75 @@ function soulChain(){
   }
   return n;
 }
-function soulWeek(){
+function measVal(b, id){ return (b.meas && typeof b.meas[id] === 'number') ? b.meas[id] : 0; }
+function measWeek(m){
   let sum = 0, days = 0;
   DAYS.forEach(d => {
-    const v = (store[d.id] && store[d.id].pract) || 0;
-    if(v >= 1){ days++; sum += v; }
+    const b = store[d.id]; if(!b || !b.meas) return;
+    const v = b.meas[m.id] || 0;
+    if(v >= (m.floor || 1)){ days++; sum += v; }
   });
   return {sum, days};
 }
-function renderSoul(){
+function setMeas(id, v){
+  const m = DAYMEAS.find(x => x.id === id); if(!m) return;
   const b = box(current);
-  const inp = document.getElementById('pract');
-  if(document.activeElement !== inp) inp.value = b.pract ? b.pract : '';
-  const w = soulWeek(), ch = soulChain();
-  const chain = document.getElementById('soul-chain');
-  chain.textContent = 'цепочка ' + ch + (ch === 1 ? ' день' : ch >= 2 && ch <= 4 ? ' дня' : ' дней');
-  chain.dataset.hot = ch >= 3 ? '1' : '0';
-  document.getElementById('soul-week').textContent =
-    'За неделю: ' + w.days + ' из 7 дней с практикой · всего ' + w.sum + ' мин · в среднем ' +
-    (w.days ? Math.round(w.sum / w.days) : 0) + ' мин в день, когда была';
-}
-function setPract(v){
-  const b = box(current);
-  b.pract = Math.max(0, Math.min(600, Math.round(v || 0)));
+  b.meas[id] = Math.max(m.min || 0, Math.min(m.max || 999, Math.round(v || 0)));
   const d = DAYS.find(x => x.id === current);
-  soulMark(d && d.date, b.pract >= 1);
-  save(); renderSoul(); renderPanels();
+  measMark(id, d && d.date, b.meas[id] >= (m.floor || 1));
+  save(); renderDayMeas(); renderPanels();
 }
-document.getElementById('pract').oninput = e => setPract(parseInt(e.target.value, 10) || 0);
-document.getElementById('pract-plus').onclick  = () => setPract((box(current).pract || 0) + 5);
-document.getElementById('pract-minus').onclick = () => setPract((box(current).pract || 0) - 5);
+function wordDays(n){ return n === 1 ? ' день' : (n >= 2 && n <= 4 ? ' дня' : ' дней'); }
+
+function renderDayMeas(){
+  const host = document.getElementById('daymeas');
+  if(!host) return;
+  if(!DAYMEAS.length){ host.innerHTML = ''; return; }
+  const b = box(current);
+  if(host.children.length !== DAYMEAS.length){
+    host.innerHTML = DAYMEAS.map(m => (
+      '<div class="soul" data-meas="' + m.id + '">' +
+        '<div class="soul-top">' +
+          '<span class="soul-ttl">' + m.name + '</span>' +
+          '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="-1">−</button>' +
+          '<input class="num meas-ctl" type="number" inputmode="numeric" data-m="' + m.id + '">' +
+          '<span class="soul-unit">' + (m.unit || '') + '</span>' +
+          '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="1">+</button>' +
+          (m.chain ? '<span class="soul-chain" data-chain="' + m.id + '"></span>' : '') +
+        '</div>' +
+        '<div class="soul-week" data-week="' + m.id + '"></div>' +
+        (m.note ? '<div class="soul-note">' + m.note + '</div>' : '') +
+      '</div>'
+    )).join('');
+    host.querySelectorAll('input.num[data-m]').forEach(inp => {
+      inp.oninput = e => setMeas(e.target.dataset.m, parseInt(e.target.value, 10) || 0);
+    });
+    host.querySelectorAll('button.step[data-m]').forEach(btn => {
+      btn.onclick = () => {
+        const m = DAYMEAS.find(x => x.id === btn.dataset.m) || {};
+        setMeas(btn.dataset.m, measVal(box(current), btn.dataset.m) + (+btn.dataset.d) * (m.step || 1));
+      };
+    });
+  }
+  DAYMEAS.forEach(m => {
+    const inp = host.querySelector('input[data-m="' + m.id + '"]');
+    const v = measVal(b, m.id);
+    if(document.activeElement !== inp) inp.value = v ? v : '';
+    const w = measWeek(m);
+    host.querySelector('[data-week="' + m.id + '"]').textContent =
+      'За неделю: ' + w.days + ' из 7 дней · всего ' + w.sum + ' ' + (m.unit || '') +
+      ' · в среднем ' + (w.days ? Math.round(w.sum / w.days) : 0) + ' в день, когда было';
+    if(m.chain){
+      const ch = measChain(m.id);
+      const el = host.querySelector('[data-chain="' + m.id + '"]');
+      el.textContent = 'цепочка ' + ch + wordDays(ch);
+      el.dataset.hot = ch >= 3 ? '1' : '0';
+    }
+  });
+}
 
 function renderAll(){ renderWatch(); renderLevers(); renderSleep(); renderSections(); renderNotes(); renderChronForm(); renderChronList(); renderPanels();
-  renderToday(); renderPhrase(); renderSegs(); renderSoul();
+  renderToday(); renderPhrase(); renderSegs(); renderDayMeas();
   sortStatic('sleep_rows', document.querySelector('.pnl-in.sleep'), '.grp');
   const d = DAYS.find(x => x.id === current);
   document.getElementById('btn-copy').textContent = 'Отчёт ' + d.date;
@@ -1597,12 +1633,14 @@ function buildReport(){
   }
 
   /* --- практика сферы 7 --- */
-  const prStamp = 'pract=' + dayB.pract;
-  if(dayB.pract){
-    const sw = soulWeek(), ch = soulChain();
-    out += mark(dayB, prStamp) + '**Практика (сфера 7, вне счёта привычек)** ' + dayB.pract +
-           ' мин · за неделю ' + sw.days + '/7 дней, ' + sw.sum + ' мин · цепочка ' + ch + '\n\n';
-  }
+  DAYMEAS.forEach(m => {
+    const v = measVal(dayB, m.id);
+    if(!v) return;
+    const mw = measWeek(m);
+    out += mark(dayB, 'meas' + m.id + '=' + v) + '**' + m.name + ' (вне счёта привычек)** ' + v + ' ' + (m.unit || '') +
+           ' · за неделю ' + mw.days + '/7 дней, ' + mw.sum + ' ' + (m.unit || '') +
+           (m.chain ? ' · цепочка ' + measChain(m.id) : '') + '\n\n';
+  });
 
   /* --- замеры --- */
   const mStamp = 'meas=' + [dayB.en1, dayB.en2, dayB.en3, dayB.stool].join('/');
@@ -1832,13 +1870,17 @@ function buildWeekReport(){
     stoolRows.forEach(([d,v]) => { out += '| ' + d.label + ' ' + d.date + ' | ' + v + ' |\n'; });
   }
 
-  const sw = soulWeek();
-  out += '\n### Практика — сфера 7, вне счёта привычек\n\n' +
-         '| Замер | Значение |\n|---|---|\n' +
-         '| Дней с практикой | ' + sw.days + ' из 7 |\n' +
-         '| Всего минут | ' + sw.sum + ' |\n' +
-         '| Цепочка дней подряд | ' + soulChain() + ' |\n' +
-         '| По дням | ' + DAYS.map(d => d.label + ' ' + (((store[d.id] || {}).pract) || 0)).join(' · ') + ' |\n';
+  if(DAYMEAS.length){
+    out += '\n### Числовые замеры дня — вне счёта привычек\n';
+    DAYMEAS.forEach(m => {
+      const mw = measWeek(m);
+      out += '\n**' + m.name + '**\n\n| Замер | Значение |\n|---|---|\n' +
+             '| Дней со значением | ' + mw.days + ' из 7 |\n' +
+             '| Всего ' + (m.unit || '') + ' | ' + mw.sum + ' |\n' +
+             (m.chain ? '| Цепочка дней подряд | ' + measChain(m.id) + ' |\n' : '') +
+             '| По дням | ' + DAYS.map(d => d.label + ' ' + (((store[d.id] || {}).meas || {})[m.id] || 0)).join(' · ') + ' |\n';
+    });
+  }
 
   out += '\n### Привычки\n\n| Привычка | ' + DAYS.map(d => d.label + ' ' + d.id).join(' | ') + ' | Итог |\n|---|' +
          DAYS.map(() => '---').join('|') + '|---|\n';
@@ -2001,7 +2043,7 @@ function applyCat(r){
   if(r.err){ toast(r.err); return; }
   const c = r.cat;
   if(CAT_LOADED && c.WEEK !== WEEK && !confirm('Загружается каталог недели ' + c.WEEK + ' вместо ' + WEEK + '.\nОтметки этой недели останутся в браузере и вернутся при возврате к её каталогу. Продолжить?')) return;
-  try { localStorage.setItem(CAT_KEY, JSON.stringify({WEEK:c.WEEK, DAYS:c.DAYS, LEVERS:c.LEVERS || [], SECTIONS:c.SECTIONS, CODE:c.CODE || {}})); }
+  try { localStorage.setItem(CAT_KEY, JSON.stringify({WEEK:c.WEEK, DAYS:c.DAYS, LEVERS:c.LEVERS || [], SECTIONS:c.SECTIONS, CODE:c.CODE || {}, DAYMEAS:c.DAYMEAS || []})); }
   catch(e){ toast('Браузер не дал сохранить каталог'); return; }
   location.reload();
 }
