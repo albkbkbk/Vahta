@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-03/3 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-04 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -151,6 +151,17 @@ section{margin:0 0 20px}
 .pnl{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius)}
 .pnl-in{padding:11px 12px}
 section[data-panel]{margin:0 0 12px}
+.subhead{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-soft);margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--rule);display:flex;align-items:center;gap:8px}
+.once{margin:18px 0 12px;border:1px solid var(--rule);border-radius:var(--radius);background:var(--card)}
+.once-head{cursor:pointer}
+.footzone{margin:18px 0 6px;text-align:center}
+.footlink{background:none;border:none;color:var(--ink-mute);font:400 12px/1.4 "IBM Plex Sans",sans-serif;
+  text-decoration:underline;cursor:pointer;padding:6px}
+.once #once-body{padding:0 10px 4px}
+.once #once-body section[data-panel]{margin:0 0 10px}
+.trig-split{font-family:'Oswald',sans-serif;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-soft);margin:10px 0 6px;padding-top:8px;border-top:1px dashed var(--rule)}
 
 /* --- режим перестановки --- */
 .ordbtn{border:1px solid #4A5F8A;background:transparent;color:#9FB0CC;border-radius:var(--radius);
@@ -322,7 +333,7 @@ body.reorder .sec-head .count{margin-left:auto}
       <h1>Вахтенный лист</h1>
       <span class="week" id="week-label"></span>
       <button type="button" class="ordbtn" id="btn-order" aria-pressed="false">⇅ порядок</button>
-      <span class="syncdot" id="sync-dot" hidden></span>
+      <span class="syncdot" id="sync-dot"></span>
     </div>
     <nav class="watch" id="watch" aria-label="Выбор дня"></nav>
   </div>
@@ -351,8 +362,8 @@ body.reorder .sec-head .count{margin-left:auto}
     </section>
   </div>
 
-  <section class="z-steel" data-panel="sleep">
-  <div class="sec-head"><span class="fold">▸</span><h2>Сон и замеры дня</h2><span class="tag">каждый день</span><span class="count" id="cnt-sleep"></span></div>
+  <section class="z-steel" data-panel="day">
+  <div class="sec-head"><span class="fold">▸</span><h2>Замеры дня</h2><span class="tag">в течение дня</span><span class="count" id="cnt-day"></span></div>
   <div class="pnl"><div class="pnl-in sleep">
     <div class="grp" data-id="g-sleep"><div class="grp-body">
     <div class="line">
@@ -387,14 +398,8 @@ body.reorder .sec-head .count{margin-left:auto}
     </div>
     </div></div>
     <div class="line"><span class="cap">Часы сна, отбой ≤24:00 и разброс подъёма считаются сами · дневной сон не учитывается · ночь, помеченная как внешнее обязательство, провалом не считается</span></div>
-  </div></div>
-  </section>
 
-
-
-  <section class="z-steel" data-panel="segs">
-  <div class="sec-head"><span class="fold">▸</span><h2>Отрезки дня</h2><span class="tag">3 разбора голосом</span><span class="count" id="cnt-segs"></span></div>
-  <div class="pnl"><div class="pnl-in">
+    <div class="subhead">Отрезки дня — 3 разбора голосом</div>
     <div class="daybar" id="daybar"><span></span><span></span><span></span></div>
     <div class="seg" data-seg="1" id="seg1">
       <div class="seg-top">
@@ -423,22 +428,31 @@ body.reorder .sec-head .count{margin-left:auto}
       <textarea id="segt3" placeholder="Надиктуй: над чем работал, куда ушло время, что помешало"></textarea>
       <span class="hint">Диктуй голосом — микрофон на клавиатуре. Печатать не нужно.</span>
     </div>
+
+    <div class="subhead">Фраза дня</div>
+    <div class="phrase-wrap">
+      <button type="button" class="phrase-bar" id="phrase-bar" data-on="0">
+        <span class="ttl">Фраза<br>дня</span>
+        <span class="ph-txt empty" id="ph-txt">нажми ✎, чтобы задать</span>
+        <span class="ph-n" id="ph-n">0</span>
+      </button>
+      <button type="button" class="phrase-edit" id="phrase-minus" aria-label="Отменить одно применение">−</button>
+      <button type="button" class="phrase-edit" id="phrase-edit" aria-label="Изменить фразу дня">✎</button>
+    </div>
   </div></div>
   </section>
 
-  <section class="z-steel" data-panel="notes">
-    <div class="sec-head"><span class="fold">▸</span><h2>Заметки дня</h2><span class="tag">сырые факты</span><span class="count" id="cnt-notes"></span></div>
+  <section class="z-steel" data-panel="journal">
+    <div class="sec-head"><span class="fold">▸</span><h2>Заметки и хроника</h2><span class="tag">в течение дня</span><span class="count" id="cnt-journal"></span></div>
     <div class="pnl"><div class="pnl-in notes">
+      <div class="subhead">Заметки дня — сырые факты</div>
       <textarea id="notes" placeholder="Например: снимок зубов запрошен, ждём в пятницу"></textarea>
       <div class="hint">«Отбой не получилось» — факт. «День так себе» — не факт, не пишем.</div>
       <button type="button" class="add" id="notes-add">Добавить заметку</button>
       <div class="chron-list" id="notes-list"></div>
-    </div></div>
-  </section>
 
-  <section class="z-steel" data-panel="chron">
-  <div class="sec-head"><span class="fold">▸</span><h2>Хроника</h2><span class="tag">ловится в момент</span><span class="count" id="chron-n">0</span></div>
-  <div class="pnl"><div class="pnl-in chron">
+    <div class="subhead">Хроника — ловится в момент <span class="count" id="chron-n">0</span></div>
+    <div class="chron">
     <div class="tabs" id="chron-tabs">
       <button type="button" data-t="ev" aria-pressed="true">📖 Событие</button>
       <button type="button" data-t="up" aria-pressed="false">☀️ Подъём</button>
@@ -449,16 +463,17 @@ body.reorder .sec-head .count{margin-left:auto}
     <div class="hint" id="chron-hint"></div>
     <button type="button" class="add" id="chron-add">Записать</button>
     <div class="chron-list" id="chron-list"></div>
+    </div>
   </div></div>
   </section>
 
-  <div class="phrase-wrap">
-    <button type="button" class="phrase-bar" id="phrase-bar" data-on="0">
-      <span class="ttl">Фраза<br>дня</span>
-      <span class="ph-txt empty" id="ph-txt">нажми ✎, чтобы задать</span>
-      <span class="ph-n" id="ph-n">0</span>
-    </button>
-    <button type="button" class="phrase-edit" id="phrase-edit" aria-label="Изменить фразу дня">✎</button>
+  <div class="once" id="once">
+    <div class="sec-head once-head" id="once-head"><span class="fold">▸</span><h2>Раз в день</h2><span class="tag">задачи, привычки, ритуалы, рычаги</span><span class="count" id="cnt-once"></span></div>
+    <div id="once-body"></div>
+  </div>
+
+  <div class="footzone">
+    <button type="button" class="footlink" id="btn-reset">Очистить этот день</button>
   </div>
 </main>
 
@@ -467,8 +482,6 @@ body.reorder .sec-head .count{margin-left:auto}
     <button class="grow" id="btn-copy">Отчёт за день</button>
     <button class="ghost" id="btn-week">Неделя</button>
     <button class="ghost" id="btn-move">Загрузить</button>
-    <button class="ghost" id="btn-sync">Синхр.</button>
-    <button class="ghost" id="btn-reset">Сброс</button>
   </div>
 </div>
 
@@ -621,7 +634,7 @@ function leverProgress(levId){
   const w = box(W);
   SECTIONS.forEach(sec => sec.items.forEach(i => {
     if(i.lev !== levId) return;
-    if(sec.key === 'queue' || sec.key === 'trig' || sec.key === 'rituals_long') return;
+    if(sec.key === 'queue' || sec.key === 'rituals_long' || i.trig) return;
     if(sec.type === 'task'){
       total++; if(w.status[i.id] === 'done') done++;
     } else if(sec.type === 'ritual'){
@@ -674,14 +687,13 @@ function renderWatch(){
 
 /* ================= ПОРЯДОК РАЗДЕЛОВ И ПУНКТОВ ================= */
 /* Хранится глобально, не по неделям: настроил один раз — работает дальше */
-const ORDER_KEY = 'vahta_11_order_v1';
-const DEFAULT_SECS = ['today','levers','sleep'].concat(SECTIONS.map(x => x.key)).concat(['notes','chron']);
+const ORDER_KEY = 'vahta_11_order_v2';
+const DEFAULT_SECS = ['today','day','journal','levers'].concat(SECTIONS.map(x => x.key));
 const BUILTIN_ORDER = {
-  secs:['today','tasks','trig','queue','habits','rituals','rituals_long','levers','weekmeas','sleep','segs','notes','chron'],
+  secs:['today','day','journal','habits','tasks','queue','rituals','rituals_long','levers','weekmeas'],
   items:{
     habits:['E1','E2','E8','E9','O1','O3','L1'],
-    tasks:['N8','N9','N3','SH8','R11','R21','L3','N11','N12','N10'],
-    trig:['TN1','TO1','TN3'],
+    tasks:['N8','N9','N3','SH8','R11','R21','L3','N11','N12','N10','TN1','TO1','TN3'],
     queue:['SH2','V7','SH4','Z4'],
     rituals:['R1','R2','R3','R8','R9'],
     rituals_long:['R4','R7','R6','R12','R11v'],
@@ -716,12 +728,17 @@ function moveItem(sec, id, dir){
   ORDER.items[sec.key] = moveIn(itemOrder(sec).map(i => i.id), id, dir);
   saveOrder(); renderSections();
 }
+const DAY_KEYS = ['today','day','journal'];
 function applyOrder(){
   const host = document.querySelector('main');
+  const once = document.getElementById('once');
+  const body = document.getElementById('once-body');
   secOrder().forEach(k => {
-    const el = host.querySelector('section[data-panel="' + k + '"]');
-    if(el) host.appendChild(el);
+    const el = document.querySelector('section[data-panel="' + k + '"]');
+    if(!el) return;
+    (DAY_KEYS.indexOf(k) >= 0 ? host : body).appendChild(el);
   });
+  host.appendChild(once);
 }
 /* Перетаскивание: ручка ≡. Слушатели висят на document, а не на ручке:
    на телефоне захват указателя иногда не срабатывает, и события уходят мимо. */
@@ -939,6 +956,15 @@ document.getElementById('phrase-bar').onclick = () => {
   toast('Засчитано · сегодня ' + b.phraseN);
 };
 
+document.getElementById('phrase-minus').onclick = () => {
+  const b = box(current);
+  if(!b.phraseN){ toast('Нечего отменять — сегодня ноль'); return; }
+  b.phraseN = b.phraseN - 1;
+  if(!b.phraseN) b.phraseTill = 0;
+  save(); renderPhrase();
+  toast('Отменено · сегодня ' + b.phraseN);
+};
+
 document.getElementById('phrase-edit').onclick = () => {
   const b = box(current);
   const v = prompt('Фраза дня — короткая, чтобы держать в голове:', b.phrase || '');
@@ -1013,15 +1039,15 @@ function renderWeekMeas(){
 /* Сворачивание статических панелей: рычаги, сон, заметки, хроника */
 function renderPanels(){
   const w = box(W), b = box(current);
+  const segDone = [1,2,3].filter(n => segV(b, n) !== '').length;
   const counts = {
     today:  '',
     levers: (() => { let d=0,t=0; LEVERS.forEach(l => { const p = leverProgress(l.id); d+=p.done; t+=p.total; }); return d + ' / ' + t; })(),
-    sleep:  (b.sleep !== '' ? b.sleep + ' ч' : 'не внесено'),
-    notes:  (b.notesList.length ? String(b.notesList.length) : '—'),
-    chron:  String(w.chron.length)
+    day:    (b.sleep !== '' ? b.sleep + ' ч' : 'сон не внесён') + ' · отрезки ' + segDone + '/3',
+    journal:(b.notesList.length ? b.notesList.length + ' зам.' : 'заметок нет') + ' · хроника ' + w.chron.length
   };
   const so = secOrder();
-  ['today','levers','sleep','notes','chron'].forEach(key => {
+  ['today','levers','day','journal'].forEach(key => {
     const sec = document.querySelector('[data-panel="' + key + '"]');
     if(!sec) return;
     const head = sec.querySelector('.sec-head');
@@ -1037,6 +1063,31 @@ function renderPanels(){
     head.appendChild(ordGroup(so, key, d => moveSection(key, d)));
     head.appendChild(makeGrip(sec, document.querySelector('main'), 'section[data-panel]', commitSections));
   });
+  renderOnce();
+}
+
+/* Блок «Раз в день»: сворачивается целиком, внутри — свои разделы */
+function renderOnce(){
+  const head = document.getElementById('once-head');
+  const body = document.getElementById('once-body');
+  if(!head || !body) return;
+  const open = collapsed['once'] === 1;
+  head.querySelector('.fold').textContent = open ? '▾' : '▸';
+  body.style.display = open ? '' : 'none';
+  const w = box(W), b = box(current);
+  let done = 0, total = 0;
+  SECTIONS.forEach(sec => {
+    if(sec.type === 'meas') return;
+    const src = sec.type === 'habit' ? b : w;
+    sec.items.forEach(i => {
+      if(i.trig || sec.key === 'queue' || sec.key === 'rituals_long') return;
+      total++;
+      if(sec.type === 'ritual'){ if((src.tally[i.id] || 0) >= i.norm) done++; }
+      else if(src.status[i.id] === 'done') done++;
+    });
+  });
+  head.querySelector('.count').textContent = done + ' / ' + total;
+  head.onclick = () => { collapsed['once'] = open ? 0 : 1; saveUI(); renderOnce(); };
 }
 
 function renderSections(){
@@ -1058,8 +1109,9 @@ function renderSections(){
     } else {
       const cnt = sec.type === 'ritual'
         ? items.filter(i => (b.tally[i.id] || 0) >= i.norm).length
-        : items.filter(i => b.status[i.id] === 'done').length;
-      cntTxt = cnt + ' / ' + items.length;
+        : items.filter(i => !i.trig && b.status[i.id] === 'done').length;
+      const tot = sec.type === 'ritual' ? items.length : items.filter(i => !i.trig).length;
+      cntTxt = cnt + ' / ' + tot;
     }
     const head = document.createElement('div');
     head.className = 'sec-head';
@@ -1076,7 +1128,15 @@ function renderSections(){
     if(sec.type === 'meas') rows.appendChild(renderWeekMeas());
     else {
       const ids = items.map(i => i.id);
+      let splitDone = false;
       items.forEach(i => {
+        if(i.trig && !splitDone){
+          splitDone = true;
+          const sp = document.createElement('div');
+          sp.className = 'trig-split';
+          sp.textContent = 'Триггерные — ждут события, в лимит недели не входят';
+          rows.appendChild(sp);
+        }
         const r = sec.type === 'ritual' ? renderRitual(i, b) : renderRow(i, b, sec.type);
         r.dataset.id = i.id;
         const main = r.querySelector('.row-main');
@@ -1947,7 +2007,7 @@ function setMeta(m){ try { localStorage.setItem(SYNC_META, JSON.stringify(m)); }
 function syncDot(state, text){
   const el = document.getElementById('sync-dot');
   if(!el) return;
-  if(!state){ el.hidden = true; return; }
+  if(!state){ el.hidden = false; el.dataset.s = ''; el.textContent = 'синхр. выкл'; return; }
   el.hidden = false; el.dataset.s = state; el.textContent = text;
 }
 function hhmm(ts){
@@ -2085,7 +2145,8 @@ function syOpen(on){
     document.getElementById('sy-token').value = c.token || '';
   }
 }
-document.getElementById('btn-sync').onclick = () => syOpen(true);
+document.getElementById('sync-dot').onclick = () => syOpen(true);
+document.getElementById('sync-dot').style.cursor = 'pointer';
 document.getElementById('sy-close').onclick = () => syOpen(false);
 sy.onclick = e => { if(e.target === sy) syOpen(false); };
 
@@ -2122,6 +2183,7 @@ document.getElementById('sy-off').onclick = () => {
 };
 
 /* Подтягивание при открытии и при возврате на вкладку */
+if(!syncCfg()) syncDot(null);
 if(syncCfg()){
   syncDot('work', 'проверка…');
   syncPull(true);
