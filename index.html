@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-04/3 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-04 13:40 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -116,7 +116,7 @@ section{margin:0 0 20px}
 .row.is-done .row-name{color:var(--ink-soft)}
 .row-meta{font-family:'Oswald',sans-serif;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-mute);margin-top:3px}
 .row-meta .closed{color:var(--sea)}
-.acts{display:flex;gap:4px;flex-shrink:0;align-items:center}
+.acts{display:grid;grid-template-columns:repeat(2,34px);gap:3px;flex-shrink:0;align-items:center;justify-content:end}
 .acts button{width:34px;height:34px;border:1px solid var(--rule);background:#fff;border-radius:var(--radius);cursor:pointer;
   color:var(--ink-mute);font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .12s}
 .acts button:hover{border-color:var(--ink-mute)}
@@ -151,6 +151,7 @@ section{margin:0 0 20px}
 .pnl{background:var(--card);border:1px solid var(--rule);border-radius:var(--radius)}
 .pnl-in{padding:11px 12px}
 section[data-panel]{margin:0 0 12px}
+.sec-head .tag{display:none}
 .subhead{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
   color:var(--ink-soft);margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--rule);display:flex;align-items:center;gap:8px}
 .once{margin:18px 0 12px;border:1px solid var(--rule);border-radius:var(--radius);background:var(--card)}
@@ -315,6 +316,16 @@ body.reorder .sec-head .count{margin-left:auto}
 .seg textarea:focus{height:132px;outline:2px solid var(--ink);outline-offset:-1px}
 .seg textarea.filled{border-color:var(--ink-soft)}
 .seg-hint{font-size:11px;color:var(--ink-mute);line-height:1.4;margin:0 0 10px}
+.soul{border:1px solid var(--azure);background:var(--azure-bg);border-radius:var(--radius);padding:9px 10px;margin:0 0 12px}
+.soul-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.soul-ttl{font-family:'Oswald',sans-serif;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;flex:1 1 auto}
+.soul .num{width:62px}
+.soul-unit{font-size:12px;color:var(--ink-soft)}
+.soul-chain{font-family:'Oswald',sans-serif;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+  border:1px solid var(--azure);border-radius:99px;padding:4px 9px;color:var(--ink);background:var(--card);white-space:nowrap}
+.soul-chain[data-hot="1"]{background:var(--azure);color:#fff;border-color:var(--azure)}
+.soul-week{font-size:12px;color:var(--ink-soft);margin-top:7px;line-height:1.4}
+.soul-note{font-size:11px;color:var(--ink-mute);margin-top:5px;line-height:1.35}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media (max-width:420px){
   .watch button{font-size:10px}
@@ -394,6 +405,19 @@ body.reorder .sec-head .count{margin-left:auto}
     </div>
     <div class="seg-hint">Нажми на квадрат — 🟢 работал на цели · 🟡 наполовину · 🔴 потерял. Поле раскрывается при нажатии, диктуй голосом.</div>
 
+    <div class="soul" id="soul">
+      <div class="soul-top">
+        <span class="soul-ttl">Практика</span>
+        <button type="button" class="step" id="pract-minus">−</button>
+        <input class="num" type="number" min="0" max="600" step="5" inputmode="numeric" id="pract">
+        <span class="soul-unit">мин</span>
+        <button type="button" class="step" id="pract-plus">+</button>
+        <span class="soul-chain" id="soul-chain">цепочка 0</span>
+      </div>
+      <div class="soul-week" id="soul-week"></div>
+      <div class="soul-note">Сфера 7 «Душа» · вне счёта привычек, на зачёт недели не влияет · временно, 21 день</div>
+    </div>
+
     <div class="grp" data-id="g-sleep"><div class="grp-body">
     <div class="line">
       <span class="lbl">Сон</span>
@@ -467,7 +491,6 @@ body.reorder .sec-head .count{margin-left:auto}
     <button class="grow" id="btn-copy">Отчёт за день</button>
     <button class="ghost" id="btn-week">Неделя</button>
     <button class="ghost" id="btn-move">Загрузить</button>
-    <button class="ghost" id="btn-sync">Синхр.</button>
   </div>
 </div>
 
@@ -481,6 +504,11 @@ body.reorder .sec-head .count{margin-left:auto}
       <button type="button" class="solid" id="mv-pick">Выбрать файл</button>
       <button type="button" id="mv-in">Загрузить из поля</button>
       <button type="button" id="mv-close">Закрыть</button>
+    </div>
+    <p class="mv-hint" style="margin:14px 0 0">Обновление самого листа — когда я присылаю новый index.html. Заливается на сервер отсюда, заходить на GitHub не нужно.</p>
+    <input type="file" id="eng-file" accept=".html,text/html" hidden>
+    <div class="mv-row">
+      <button type="button" id="eng-pick">Обновить движок файлом</button>
     </div>
     <p class="mv-note">Состояние недели встанет из блока. Пункты, которых в этой версии нет, отбрасываются молча. Если здесь уже что-то введено — спросит подтверждение.</p>
   </div>
@@ -496,6 +524,8 @@ body.reorder .sec-head .count{margin-left:auto}
     <input id="sy-repo" spellcheck="false" autocomplete="off" placeholder="vahta-data">
     <label for="sy-path">Имя файла в нём</label>
     <input id="sy-path" spellcheck="false" autocomplete="off" placeholder="state.json">
+    <label for="sy-engine">Репозиторий с самим листом — для обновления движка файлом</label>
+    <input id="sy-engine" spellcheck="false" autocomplete="off" placeholder="vahta">
     <label for="sy-token">Ключ доступа</label>
     <input id="sy-token" type="password" spellcheck="false" autocomplete="off" placeholder="github_pat_...">
     <div class="mv-row">
@@ -565,6 +595,7 @@ function box(name){
   if(typeof b.phrase !== 'string') b.phrase = '';
   if(typeof b.phraseN !== 'number') b.phraseN = 0;
   if(typeof b.phraseTill !== 'number') b.phraseTill = 0;
+  if(typeof b.pract !== 'number') b.pract = 0;
   if(typeof b.photo === 'undefined') b.photo = false;
   if(typeof b.ext === 'undefined') b.ext = false;
   return b;
@@ -1031,7 +1062,7 @@ function renderPanels(){
   const counts = {
     today:  '',
     levers: (() => { let d=0,t=0; LEVERS.forEach(l => { const p = leverProgress(l.id); d+=p.done; t+=p.total; }); return d + ' / ' + t; })(),
-    day:    (b.sleep !== '' ? b.sleep + ' ч' : 'сон не внесён') + ' · отрезки ' + segDone + '/3',
+    day:    (b.sleep !== '' ? b.sleep + ' ч' : 'сон не внесён') + ' · отрезки ' + segDone + '/3' + (b.pract ? ' · практика ' + b.pract + ' мин' : ''),
     journal:(b.notesList.length ? b.notesList.length + ' зам.' : 'заметок нет') + ' · хроника ' + w.chron.length
   };
   const so = secOrder();
@@ -1465,8 +1496,77 @@ if(!CAT_LOADED){
   document.body.insertBefore(w, document.body.firstChild);
 }
 
+/* ================= СФЕРА 7 «ДУША» — ВРЕМЕННЫЙ ЗАМЕР ПРАКТИКИ =================
+   Вне счёта привычек: на процент привычек, зачёт недели и правило 36 не влияет.
+   Цепочка дней считается сквозной, поверх границ учётных недель. */
+const SOUL_KEY = 'vahta_soul_days_v1';
+
+function soulDays(){
+  try { const a = JSON.parse(localStorage.getItem(SOUL_KEY) || '[]'); return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function soulSave(a){ try { localStorage.setItem(SOUL_KEY, JSON.stringify(a)); } catch(e){} }
+
+/* '04.09' + год учётной недели -> число, чтобы считать соседние дни */
+function soulStamp(dd){
+  const m = /^(\d{2})\.(\d{2})$/.exec(dd || ''); if(!m) return null;
+  const yr = (/(\d{4})/.exec(WEEK) || [])[1] || String(new Date().getFullYear());
+  return Date.UTC(+yr, +m[2] - 1, +m[1]);
+}
+function soulMark(dd, on){
+  if(!dd) return;
+  const a = soulDays(); const i = a.indexOf(dd);
+  if(on && i < 0) a.push(dd);
+  if(!on && i >= 0) a.splice(i, 1);
+  soulSave(a);
+}
+function soulChain(){
+  const st = soulDays().map(soulStamp).filter(Boolean).sort((x, y) => y - x);
+  if(!st.length) return 0;
+  const DAY = 864e5;
+  const today = soulStamp((DAYS.find(x => x.id === current) || {}).date);
+  /* цепочка тянется от сегодняшнего дня либо от вчерашнего, если сегодня ещё не отмечено */
+  if(today !== null && st[0] < today - DAY) return 0;
+  let n = 1;
+  for(let i = 1; i < st.length; i++){
+    if(st[i - 1] - st[i] === DAY) n++;
+    else if(st[i - 1] - st[i] > DAY) break;
+  }
+  return n;
+}
+function soulWeek(){
+  let sum = 0, days = 0;
+  DAYS.forEach(d => {
+    const v = (store[d.id] && store[d.id].pract) || 0;
+    if(v >= 1){ days++; sum += v; }
+  });
+  return {sum, days};
+}
+function renderSoul(){
+  const b = box(current);
+  const inp = document.getElementById('pract');
+  if(document.activeElement !== inp) inp.value = b.pract ? b.pract : '';
+  const w = soulWeek(), ch = soulChain();
+  const chain = document.getElementById('soul-chain');
+  chain.textContent = 'цепочка ' + ch + (ch === 1 ? ' день' : ch >= 2 && ch <= 4 ? ' дня' : ' дней');
+  chain.dataset.hot = ch >= 3 ? '1' : '0';
+  document.getElementById('soul-week').textContent =
+    'За неделю: ' + w.days + ' из 7 дней с практикой · всего ' + w.sum + ' мин · в среднем ' +
+    (w.days ? Math.round(w.sum / w.days) : 0) + ' мин в день, когда была';
+}
+function setPract(v){
+  const b = box(current);
+  b.pract = Math.max(0, Math.min(600, Math.round(v || 0)));
+  const d = DAYS.find(x => x.id === current);
+  soulMark(d && d.date, b.pract >= 1);
+  save(); renderSoul(); renderPanels();
+}
+document.getElementById('pract').oninput = e => setPract(parseInt(e.target.value, 10) || 0);
+document.getElementById('pract-plus').onclick  = () => setPract((box(current).pract || 0) + 5);
+document.getElementById('pract-minus').onclick = () => setPract((box(current).pract || 0) - 5);
+
 function renderAll(){ renderWatch(); renderLevers(); renderSleep(); renderSections(); renderNotes(); renderChronForm(); renderChronList(); renderPanels();
-  renderToday(); renderPhrase(); renderSegs();
+  renderToday(); renderPhrase(); renderSegs(); renderSoul();
   sortStatic('sleep_rows', document.querySelector('.pnl-in.sleep'), '.grp');
   const d = DAYS.find(x => x.id === current);
   document.getElementById('btn-copy').textContent = 'Отчёт ' + d.date;
@@ -1494,6 +1594,14 @@ function buildReport(){
     out += l + '\n\n';
   } else {
     out += '**Сон** не внесён\n\n';
+  }
+
+  /* --- практика сферы 7 --- */
+  const prStamp = 'pract=' + dayB.pract;
+  if(dayB.pract){
+    const sw = soulWeek(), ch = soulChain();
+    out += mark(dayB, prStamp) + '**Практика (сфера 7, вне счёта привычек)** ' + dayB.pract +
+           ' мин · за неделю ' + sw.days + '/7 дней, ' + sw.sum + ' мин · цепочка ' + ch + '\n\n';
   }
 
   /* --- замеры --- */
@@ -1723,6 +1831,14 @@ function buildWeekReport(){
     out += '\n### Стул — тест элиминации Н6 (до 08.09)\n\n| День | Запись |\n|---|---|\n';
     stoolRows.forEach(([d,v]) => { out += '| ' + d.label + ' ' + d.date + ' | ' + v + ' |\n'; });
   }
+
+  const sw = soulWeek();
+  out += '\n### Практика — сфера 7, вне счёта привычек\n\n' +
+         '| Замер | Значение |\n|---|---|\n' +
+         '| Дней с практикой | ' + sw.days + ' из 7 |\n' +
+         '| Всего минут | ' + sw.sum + ' |\n' +
+         '| Цепочка дней подряд | ' + soulChain() + ' |\n' +
+         '| По дням | ' + DAYS.map(d => d.label + ' ' + (((store[d.id] || {}).pract) || 0)).join(' · ') + ' |\n';
 
   out += '\n### Привычки\n\n| Привычка | ' + DAYS.map(d => d.label + ' ' + d.id).join(' | ') + ' | Итог |\n|---|' +
          DAYS.map(() => '---').join('|') + '|---|\n';
@@ -2059,8 +2175,9 @@ async function ghGet(c){
   return {sha: j.sha, body: body};
 }
 
-async function ghPut(c, obj, sha){
-  const payload = {message:'вахта ' + new Date().toISOString(), content: b64enc(JSON.stringify(obj)), branch: c.branch || 'main'};
+async function ghPut(c, obj, sha, rawText){
+  const body = (typeof rawText === 'string') ? rawText : JSON.stringify(obj);
+  const payload = {message:'вахта ' + new Date().toISOString(), content: b64enc(body), branch: c.branch || 'main'};
   if(sha) payload.sha = sha;
   const r = await fetch(ghUrl(c), {method:'PUT', headers: Object.assign({'Content-Type':'application/json'}, ghHead(c)), body: JSON.stringify(payload)});
   if(r.status === 409 || r.status === 422) return {conflict:true};
@@ -2125,6 +2242,45 @@ function syncTouch(){
   syncTimer = setTimeout(function(){ syncPush(false); }, 4000);
 }
 
+/* Обновление самого листа: файл index.html уходит в публичный репозиторий тем же ключом */
+async function ghSha(c){
+  const r = await fetch(ghUrl(c) + '?ref=' + encodeURIComponent(c.branch || 'main') + '&t=' + Date.now(),
+                        {headers: ghHead(c), cache:'no-store'});
+  if(r.status === 404) return null;
+  if(!r.ok) throw new Error(r.status === 401 ? 'Ключ не принят' : (r.status === 403 ? 'У ключа нет прав на этот репозиторий' : 'Сервер ответил ' + r.status));
+  const j = await r.json();
+  return j.sha;
+}
+
+async function pushEngine(file){
+  const c = syncCfg();
+  if(!c){ toast('Сначала настрой синхронизацию — облачко в шапке'); return; }
+  const text = await file.text();
+  if(text.slice(0, 300).indexOf('<!DOCTYPE html>') < 0 || text.indexOf('Вахтенный лист') < 0){
+    toast('Это не файл вахтенного листа'); return;
+  }
+  const ec = {owner:c.owner, repo:(c.engineRepo || 'vahta'), path:'index.html', token:c.token, branch:'main'};
+  if(!confirm('Заменить сам вахтенный лист файлом ' + file.name + ' в репозитории ' + ec.repo + '?\nОтметки и каталог не пострадают.')) return;
+  syncDot('work', 'заливаю лист…');
+  try {
+    const sha = await ghSha(ec);
+    const r = await ghPut(ec, null, sha, text);
+    if(r && r.conflict) throw new Error('Файл на сервере изменился, повтори');
+    syncDot('ok', 'лист залит');
+    alert('Готово. Новая версия появится через одну–две минуты — GitHub пересобирает страницу. После этого закрой и открой лист заново.');
+  } catch(e){
+    syncDot('err', '✕ ' + (e.message || 'сбой'));
+    alert('Не вышло: ' + (e.message || 'сбой') + '.\nПроверь, что ключ имеет права Contents: Read and write на репозиторий ' + ec.repo + '.');
+  }
+}
+
+document.getElementById('eng-pick').onclick = () => document.getElementById('eng-file').click();
+document.getElementById('eng-file').onchange = e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(f) pushEngine(f);
+};
+
 /* Панель настройки */
 const sy = document.getElementById('sy');
 function syOpen(on){
@@ -2134,10 +2290,11 @@ function syOpen(on){
     document.getElementById('sy-owner').value = c.owner || '';
     document.getElementById('sy-repo').value  = c.repo  || '';
     document.getElementById('sy-path').value  = c.path  || 'state.json';
+    document.getElementById('sy-engine').value = c.engineRepo || 'vahta';
     document.getElementById('sy-token').value = c.token || '';
   }
 }
-document.getElementById('btn-sync').onclick = () => syOpen(true);
+
 document.getElementById('sync-dot').onclick = () => syOpen(true);
 document.getElementById('sync-dot').style.cursor = 'pointer';
 document.getElementById('sy-close').onclick = () => syOpen(false);
@@ -2148,6 +2305,7 @@ document.getElementById('sy-save').onclick = async () => {
     owner: document.getElementById('sy-owner').value.trim(),
     repo:  document.getElementById('sy-repo').value.trim(),
     path:  document.getElementById('sy-path').value.trim() || 'state.json',
+    engineRepo: document.getElementById('sy-engine').value.trim() || 'vahta',
     token: document.getElementById('sy-token').value.trim(),
     branch:'main'
   };
