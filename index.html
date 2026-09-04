@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-04 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-04/3 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -155,9 +155,7 @@ section[data-panel]{margin:0 0 12px}
   color:var(--ink-soft);margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--rule);display:flex;align-items:center;gap:8px}
 .once{margin:18px 0 12px;border:1px solid var(--rule);border-radius:var(--radius);background:var(--card)}
 .once-head{cursor:pointer}
-.footzone{margin:18px 0 6px;text-align:center}
-.footlink{background:none;border:none;color:var(--ink-mute);font:400 12px/1.4 "IBM Plex Sans",sans-serif;
-  text-decoration:underline;cursor:pointer;padding:6px}
+
 .once #once-body{padding:0 10px 4px}
 .once #once-body section[data-panel]{margin:0 0 10px}
 .trig-split{font-family:'Oswald',sans-serif;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
@@ -298,25 +296,25 @@ body.reorder .sec-head .count{margin-left:auto}
 .sy-in label{display:block;font:500 12px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink-soft);margin:9px 0 3px}
 .sy-in input{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;border:1px solid var(--rule);border-radius:var(--radius);padding:9px 8px;background:var(--paper);color:var(--ink)}
 /* --- отрезки дня --- */
-.seg{border:1px solid var(--rule);border-radius:var(--radius);padding:10px;margin:0 0 8px;background:var(--card)}
+.segs3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 6px}
+.seg{border:1px solid var(--rule);border-radius:var(--radius);padding:7px;background:var(--card);
+  display:flex;flex-direction:column;gap:5px;margin:0;min-width:0}
 .seg.on{border-color:var(--grass);background:var(--grass-bg)}
 .seg.half{border-color:var(--azure);background:var(--azure-bg)}
 .seg.lost{border-color:var(--signal);background:var(--signal-bg)}
-.seg-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.seg-when{font-family:'Oswald',sans-serif;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;flex:1 1 auto;min-width:118px}
-.seg-v{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.04em;text-transform:uppercase;
-  border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:var(--radius);
-  padding:7px 10px;cursor:pointer;min-width:150px;text-align:left}
-.seg-v:hover{opacity:.85}
-.seg .num{width:44px}
-.seg textarea{width:100%;margin-top:8px;min-height:52px;border:1px solid var(--rule);border-radius:var(--radius);
-  padding:8px;font-size:13.5px;line-height:1.45;background:var(--paper);color:var(--ink);resize:vertical;font-family:inherit}
-.seg .hint{font-size:11.5px;color:var(--ink-mute);margin-top:4px;display:block}
-.daybar{display:flex;gap:3px;margin:0 0 10px}
-.daybar span{flex:1;height:6px;border-radius:2px;background:var(--rule)}
-.daybar span.on{background:var(--grass)}
-.daybar span.half{background:var(--azure)}
-.daybar span.lost{background:var(--signal)}
+.seg-when{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--ink-soft);line-height:1.25}
+.seg-v{font-size:17px;line-height:1;border:1px solid var(--rule);background:var(--paper);color:var(--ink);
+  border-radius:var(--radius);padding:5px 0;cursor:pointer;width:100%}
+.seg-v:hover{opacity:.8}
+.seg-en{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--ink-mute)}
+.seg-en .num{width:100%;min-width:0}
+.seg textarea{width:100%;height:30px;border:1px solid var(--rule);border-radius:var(--radius);
+  padding:5px 6px;font-size:12.5px;line-height:1.35;background:var(--paper);color:var(--ink);
+  resize:none;font-family:inherit;transition:height .15s ease}
+.seg textarea:focus{height:132px;outline:2px solid var(--ink);outline-offset:-1px}
+.seg textarea.filled{border-color:var(--ink-soft)}
+.seg-hint{font-size:11px;color:var(--ink-mute);line-height:1.4;margin:0 0 10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media (max-width:420px){
   .watch button{font-size:10px}
@@ -340,8 +338,17 @@ body.reorder .sec-head .count{margin-left:auto}
 </header>
 
 <main class="wrap">
+  <div class="phrase-wrap" id="phrase-wrap">
+    <button type="button" class="phrase-bar" id="phrase-bar" data-on="0">
+      <span class="ttl">Фраза<br>дня</span>
+      <span class="ph-txt empty" id="ph-txt">нажми ✎, чтобы задать</span>
+      <span class="ph-n" id="ph-n">0</span>
+    </button>
+    <button type="button" class="phrase-edit" id="phrase-minus" aria-label="Отменить одно применение">−</button>
+    <button type="button" class="phrase-edit" id="phrase-edit" aria-label="Изменить фразу дня">✎</button>
+  </div>
+
   <div class="levers">
-    <div class="cap">Рычаги недели — считаются сами, отмечать не нужно</div>
     <div class="ordbar">
     <span>Режим перестановки: тяни за ручку ≡ или двигай стрелками. Отметки скрыты, чтобы не нажать случайно.</span>
     <button type="button" class="reset" id="ord-copy">Скопировать порядок</button>
@@ -365,6 +372,28 @@ body.reorder .sec-head .count{margin-left:auto}
   <section class="z-steel" data-panel="day">
   <div class="sec-head"><span class="fold">▸</span><h2>Замеры дня</h2><span class="tag">в течение дня</span><span class="count" id="cnt-day"></span></div>
   <div class="pnl"><div class="pnl-in sleep">
+    <div class="segs3" id="segs3">
+      <div class="seg" data-seg="1" id="seg1">
+        <div class="seg-when">подъём<br>→ 13:00</div>
+        <button type="button" class="seg-v" id="segv1" title="Оценка отрезка">⬜</button>
+        <div class="seg-en"><span>эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en1"></div>
+        <textarea id="segt1" placeholder="надиктуй"></textarea>
+      </div>
+      <div class="seg" data-seg="2" id="seg2">
+        <div class="seg-when">13:00<br>→ 19:00</div>
+        <button type="button" class="seg-v" id="segv2" title="Оценка отрезка">⬜</button>
+        <div class="seg-en"><span>эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en2"></div>
+        <textarea id="segt2" placeholder="надиктуй"></textarea>
+      </div>
+      <div class="seg" data-seg="3" id="seg3">
+        <div class="seg-when">19:00<br>→ отбой</div>
+        <button type="button" class="seg-v" id="segv3" title="Оценка отрезка">⬜</button>
+        <div class="seg-en"><span>эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en3"></div>
+        <textarea id="segt3" placeholder="надиктуй"></textarea>
+      </div>
+    </div>
+    <div class="seg-hint">Нажми на квадрат — 🟢 работал на цели · 🟡 наполовину · 🔴 потерял. Поле раскрывается при нажатии, диктуй голосом.</div>
+
     <div class="grp" data-id="g-sleep"><div class="grp-body">
     <div class="line">
       <span class="lbl">Сон</span>
@@ -399,46 +428,6 @@ body.reorder .sec-head .count{margin-left:auto}
     </div></div>
     <div class="line"><span class="cap">Часы сна, отбой ≤24:00 и разброс подъёма считаются сами · дневной сон не учитывается · ночь, помеченная как внешнее обязательство, провалом не считается</span></div>
 
-    <div class="subhead">Отрезки дня — 3 разбора голосом</div>
-    <div class="daybar" id="daybar"><span></span><span></span><span></span></div>
-    <div class="seg" data-seg="1" id="seg1">
-      <div class="seg-top">
-        <span class="seg-when">Подъём → 13:00</span>
-        <button type="button" class="seg-v" data-segv="1" id="segv1">⬜ не разобран</button>
-        <span class="cap">энергия</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en1">
-      </div>
-      <textarea id="segt1" placeholder="Надиктуй: над чем работал, куда ушло время, что помешало"></textarea>
-      <span class="hint">Диктуй голосом — микрофон на клавиатуре. Печатать не нужно.</span>
-    </div>
-    <div class="seg" data-seg="2" id="seg2">
-      <div class="seg-top">
-        <span class="seg-when">13:00 → 19:00</span>
-        <button type="button" class="seg-v" data-segv="2" id="segv2">⬜ не разобран</button>
-        <span class="cap">энергия</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en2">
-      </div>
-      <textarea id="segt2" placeholder="Надиктуй: над чем работал, куда ушло время, что помешало"></textarea>
-      <span class="hint">Диктуй голосом — микрофон на клавиатуре. Печатать не нужно.</span>
-    </div>
-    <div class="seg" data-seg="3" id="seg3">
-      <div class="seg-top">
-        <span class="seg-when">19:00 → отбой</span>
-        <button type="button" class="seg-v" data-segv="3" id="segv3">⬜ не разобран</button>
-        <span class="cap">энергия</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en3">
-      </div>
-      <textarea id="segt3" placeholder="Надиктуй: над чем работал, куда ушло время, что помешало"></textarea>
-      <span class="hint">Диктуй голосом — микрофон на клавиатуре. Печатать не нужно.</span>
-    </div>
-
-    <div class="subhead">Фраза дня</div>
-    <div class="phrase-wrap">
-      <button type="button" class="phrase-bar" id="phrase-bar" data-on="0">
-        <span class="ttl">Фраза<br>дня</span>
-        <span class="ph-txt empty" id="ph-txt">нажми ✎, чтобы задать</span>
-        <span class="ph-n" id="ph-n">0</span>
-      </button>
-      <button type="button" class="phrase-edit" id="phrase-minus" aria-label="Отменить одно применение">−</button>
-      <button type="button" class="phrase-edit" id="phrase-edit" aria-label="Изменить фразу дня">✎</button>
-    </div>
   </div></div>
   </section>
 
@@ -471,10 +460,6 @@ body.reorder .sec-head .count{margin-left:auto}
     <div class="sec-head once-head" id="once-head"><span class="fold">▸</span><h2>Раз в день</h2><span class="tag">задачи, привычки, ритуалы, рычаги</span><span class="count" id="cnt-once"></span></div>
     <div id="once-body"></div>
   </div>
-
-  <div class="footzone">
-    <button type="button" class="footlink" id="btn-reset">Очистить этот день</button>
-  </div>
 </main>
 
 <div class="dock">
@@ -482,16 +467,19 @@ body.reorder .sec-head .count{margin-left:auto}
     <button class="grow" id="btn-copy">Отчёт за день</button>
     <button class="ghost" id="btn-week">Неделя</button>
     <button class="ghost" id="btn-move">Загрузить</button>
+    <button class="ghost" id="btn-sync">Синхр.</button>
   </div>
 </div>
 
 <div class="mv" id="mv" data-open="0">
   <div class="mv-in">
     <h3>Перенос данных между версиями</h3>
-    <p class="mv-hint">Вставь сюда последнюю выгрузку из старой версии — целиком, как копировал в чат. Блок переноса в её конце найдётся сам.</p>
+    <p class="mv-hint">Выбери файл, который я прислал, — каталог недели или блок дней. Можно и вставить текст в поле ниже: нужный блок найдётся сам.</p>
     <textarea id="mv-text" placeholder="Вставь сюда выгрузку за день или сводку недели" spellcheck="false"></textarea>
+    <input type="file" id="mv-file" accept=".txt,.json,.md,text/plain,application/json" hidden>
     <div class="mv-row">
-      <button type="button" class="solid" id="mv-in">Загрузить</button>
+      <button type="button" class="solid" id="mv-pick">Выбрать файл</button>
+      <button type="button" id="mv-in">Загрузить из поля</button>
       <button type="button" id="mv-close">Закрыть</button>
     </div>
     <p class="mv-note">Состояние недели встанет из блока. Пункты, которых в этой версии нет, отбрасываются молча. Если здесь уже что-то введено — спросит подтверждение.</p>
@@ -1313,20 +1301,23 @@ document.getElementById('stool').oninput = e => { box(current).stool = e.target.
 const SEG_WHEN = {1:'подъём → 13:00', 2:'13:00 → 19:00', 3:'19:00 → отбой'};
 const SEG_V = ['', 'on', 'half', 'lost'];
 const SEG_LBL = {'':'⬜ не разобран', on:'🟢 работал на цели', half:'🟡 наполовину', lost:'🔴 потерял отрезок'};
+const SEG_ICON = {'':'⬜', on:'🟢', half:'🟡', lost:'🔴'};
 
 function segV(b, n){ return b['segv' + n] || ''; }
 
 function renderSegs(){
   const b = box(current);
-  const bar = document.getElementById('daybar').children;
   let done = 0;
   [1,2,3].forEach(n => {
     const v = segV(b, n);
     const wrap = document.getElementById('seg' + n);
     wrap.className = 'seg' + (v ? ' ' + v : '');
-    document.getElementById('segv' + n).textContent = SEG_LBL[v];
-    document.getElementById('segt' + n).value = b['segt' + n] || '';
-    bar[n-1].className = v || '';
+    const btn = document.getElementById('segv' + n);
+    btn.textContent = SEG_ICON[v];
+    btn.title = SEG_LBL[v];
+    const ta = document.getElementById('segt' + n);
+    if(document.activeElement !== ta) ta.value = b['segt' + n] || '';
+    ta.classList.toggle('filled', !!(b['segt' + n] || '').trim());
     if(v) done++;
   });
   const c = document.getElementById('cnt-segs');
@@ -1928,19 +1919,20 @@ const mv = document.getElementById('mv');
 function mvOpen(on){ mv.dataset.open = on ? '1' : '0'; if(on) document.getElementById('mv-text').value = ''; }
 
 document.getElementById('btn-move').onclick = () => mvOpen(true);
+document.getElementById('mv-pick').onclick = () => document.getElementById('mv-file').click();
+document.getElementById('mv-file').onchange = e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { document.getElementById('mv-text').value = String(r.result || ''); applyMove(String(r.result || '')); };
+  r.onerror = () => toast('Файл не прочитался');
+  r.readAsText(f);
+};
+
 document.getElementById('mv-close').onclick = () => mvOpen(false);
 mv.onclick = e => { if(e.target === mv) mvOpen(false); };
 document.getElementById('mv-in').onclick = () => applyMove(document.getElementById('mv-text').value);
-
-document.getElementById('btn-reset').onclick = () => {
-  const d = DAYS.find(x => x.id === current);
-  if(confirm('Очистить привычки, замеры и заметки за ' + d.date + '?\nЗадачи и ритуалы недели не затрагиваются.')){
-    store[current] = {status:{}, comments:{}, closed:{}, tally:{}, notes:'', sleep:'', bed:'', wake:'',
-                      en1:'', en2:'', en3:'', stool:'', prom:0, hit:0, ext:false, exported:[],
-                      segv1:'', segv2:'', segv3:'', segt1:'', segt2:'', segt3:''};
-    save(); renderAll(); toast('День очищен');
-  }
-};
 
 document.getElementById('btn-order').onclick = () => {
   const on = document.body.classList.toggle('reorder');
@@ -2145,6 +2137,7 @@ function syOpen(on){
     document.getElementById('sy-token').value = c.token || '';
   }
 }
+document.getElementById('btn-sync').onclick = () => syOpen(true);
 document.getElementById('sync-dot').onclick = () => syOpen(true);
 document.getElementById('sync-dot').style.cursor = 'pointer';
 document.getElementById('sy-close').onclick = () => syOpen(false);
