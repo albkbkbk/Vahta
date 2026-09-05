@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-04 20:30 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-05 12:10 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -163,6 +163,19 @@ section[data-panel]{margin:0 0 12px}
   color:var(--ink-soft);margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--rule);display:flex;align-items:center;gap:8px}
 .once{margin:18px 0 12px;border:1px solid var(--rule);border-radius:var(--radius);background:var(--card)}
 .once-head{cursor:pointer}
+.fixes{margin:16px 0 10px;border:1px solid var(--rule);border-radius:var(--radius);background:var(--card)}
+.fixes-head{cursor:pointer}
+#fixes-body{padding:0 12px 14px}
+.fixes-hint{font-size:12px;color:var(--ink-mute);line-height:1.45;margin:0 0 10px}
+.fixes-layer{display:flex;gap:5px;margin-bottom:8px}
+.fixes-layer button{flex:1;padding:8px 0;border:1px solid var(--rule);background:#fff;color:var(--ink-soft);
+  border-radius:var(--radius);font:inherit;font-size:12.5px;cursor:pointer}
+.fixes-layer button[data-on="1"]{background:var(--ink);border-color:var(--ink);color:#fff}
+#fix-text{width:100%;min-height:66px;border:1px solid var(--rule);border-radius:var(--radius);padding:8px;
+  font:inherit;font-size:13px;background:var(--paper);color:var(--ink);resize:vertical}
+.fix-tag{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+  border:1px solid var(--rule);border-radius:99px;padding:2px 7px;color:var(--ink-soft);margin-right:6px;white-space:nowrap}
+body.reorder .fixes{display:none}
 
 .once #once-body{padding:0 10px 4px}
 .once #once-body section[data-panel]{margin:0 0 10px}
@@ -184,6 +197,17 @@ body.reorder .ordbar{display:flex}
 .mode[data-m="touch"]{background:var(--amber-bg);border-color:var(--amber);color:var(--ink)}
 body.reorder .mode{display:none}
 .phrase-wrap{display:flex;gap:7px;align-items:stretch;margin:14px 0 4px}
+.duty{margin:14px 0 4px}
+.duty .phrase-wrap{margin:0}
+.duty-ctl{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.duty-first{border:1px solid var(--rule);background:#fff;color:var(--ink-soft);border-radius:var(--radius);
+  font:inherit;font-size:12.5px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.duty-first[data-on="1"]{background:var(--grass);border-color:var(--grass);color:#fff}
+.duty-add{border:1px solid var(--rule);background:#fff;color:var(--ink);border-radius:var(--radius);
+  font:inherit;font-size:12.5px;padding:8px 11px;cursor:pointer}
+.duty-ctl .num{width:66px}
+.duty-unit{font-size:11.5px;color:var(--ink-mute)}
+body.reorder .duty{opacity:.45;pointer-events:none}
 .phrase-bar{flex:1;min-width:0;display:flex;align-items:center;gap:9px;cursor:pointer;text-align:left;
   padding:8px 10px;font:inherit;color:var(--ink);
   background:var(--azure-bg);border:1px solid #E8C64A;border-left:3px solid var(--azure);border-radius:var(--radius);
@@ -323,16 +347,23 @@ body.reorder .sec-head .count{margin-left:auto}
 .seg textarea:focus{height:132px;outline:2px solid var(--ink);outline-offset:-1px}
 .seg textarea.filled{border-color:var(--ink-soft)}
 .seg-hint{font-size:11px;color:var(--ink-mute);line-height:1.4;margin:0 0 10px}
-.soul{border:1px solid var(--azure);background:var(--azure-bg);border-radius:var(--radius);padding:9px 10px;margin:0 0 12px}
+.soul{border:1px solid var(--rule);background:var(--card);border-radius:var(--radius);padding:10px;margin:0 0 10px}
+.soul-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.soul-row{display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap}
+.soul-row + .soul-row{border-top:1px solid var(--rule)}
+.soul-lbl{flex:1 1 auto;font-size:13px;min-width:90px}
+.soul-num{display:flex;align-items:center;gap:5px}
+.soul-num .num{width:56px}
 .soul-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.soul-ttl{font-family:'Oswald',sans-serif;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;flex:1 1 auto}
+.soul-ttl{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.05em;text-transform:uppercase;flex:1 1 auto}
 .soul .num{width:62px}
 .soul-unit{font-size:12px;color:var(--ink-soft)}
-.soul-chain{font-family:'Oswald',sans-serif;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
-  border:1px solid var(--azure);border-radius:99px;padding:4px 9px;color:var(--ink);background:var(--card);white-space:nowrap}
-.soul-chain[data-hot="1"]{background:var(--azure);color:#fff;border-color:var(--azure)}
-.soul-week{font-size:12px;color:var(--ink-soft);margin-top:7px;line-height:1.4}
-.soul.done{border-color:var(--sea);background:var(--sea-bg)}
+.soul-chain{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  border:1px solid var(--rule);border-radius:99px;padding:3px 9px;color:var(--ink-soft);background:var(--paper);white-space:nowrap}
+.soul-chain[data-hot="1"]{background:var(--sea);color:#fff;border-color:var(--sea)}
+.soul-week{font-size:11.5px;color:var(--ink-mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.soul.done{border-color:var(--sea)}
+.soul.done .soul-head{color:var(--sea)}
 .soul-yes{border:1px solid var(--rule);background:#fff;color:var(--ink-soft);border-radius:var(--radius);
   font:inherit;font-size:12.5px;padding:7px 14px;cursor:pointer;white-space:nowrap}
 .soul-yes[data-on="1"]{background:var(--sea);border-color:var(--sea);color:#fff}
@@ -345,6 +376,19 @@ body.reorder .sec-head .count{margin-left:auto}
 .pb-hint{font-size:11.5px;color:var(--ink-mute);margin-top:5px;line-height:1.35}
 .pb-f input.num{width:100%}
 .row-probe{font-size:11.5px;color:var(--ink-soft);margin-top:5px;line-height:1.4}
+.tried{flex-shrink:0;border:1px solid var(--rule);background:#fff;color:var(--ink-mute);border-radius:var(--radius);
+  font:inherit;font-size:11.5px;padding:7px 9px;cursor:pointer;white-space:nowrap}
+.tried[data-on="1"]{background:var(--steel-bg);border-color:var(--steel);color:var(--ink)}
+body.reorder .tried{display:none}
+.cmt-list{margin-bottom:7px}
+.cmt-item{display:flex;gap:7px;align-items:flex-start;font-size:12.5px;line-height:1.4;
+  padding:5px 0;border-bottom:1px solid var(--rule)}
+.cmt-item b{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.04em;color:var(--ink-mute)}
+.cmt-item span{flex:1}
+.cmt-del{border:none;background:none;color:var(--ink-mute);font-size:16px;line-height:1;cursor:pointer;padding:0 3px}
+.cmt-add{margin-top:6px;border:1px solid var(--rule);background:#fff;color:var(--ink);border-radius:var(--radius);
+  font:inherit;font-size:12.5px;padding:8px 12px;cursor:pointer}
+.note[data-n]:not([data-n=""])::after{content:attr(data-n);font-size:9.5px;vertical-align:super;margin-left:1px}
 .soul-note{font-size:11px;color:var(--ink-mute);margin-top:5px;line-height:1.35}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media (max-width:420px){
@@ -369,6 +413,24 @@ body.reorder .sec-head .count{margin-left:auto}
 </header>
 
 <main class="wrap">
+  <div class="duty" id="duty">
+    <div class="phrase-wrap">
+      <button type="button" class="phrase-bar" id="duty-bar" data-on="0">
+        <span class="ttl">Дело<br>дня</span>
+        <span class="ph-txt empty" id="duty-txt">нажми ✎, чтобы назвать основное дело</span>
+        <span class="ph-n" id="duty-n">0</span>
+      </button>
+      <button type="button" class="phrase-edit" id="duty-edit" aria-label="Назвать основное дело дня">✎</button>
+    </div>
+    <div class="duty-ctl">
+      <button type="button" class="duty-first" id="duty-first">начал первым</button>
+      <button type="button" class="duty-add" data-add="15">+15</button>
+      <button type="button" class="duty-add" data-add="30">+30</button>
+      <input class="num" type="number" min="0" max="900" inputmode="numeric" id="duty-min" aria-label="Минуты на деле дня">
+      <span class="duty-unit">мин всего</span>
+    </div>
+  </div>
+
   <div class="phrase-wrap" id="phrase-wrap">
     <button type="button" class="phrase-bar" id="phrase-bar" data-on="0">
       <span class="ttl">Фраза<br>дня</span>
@@ -425,7 +487,6 @@ body.reorder .sec-head .count{margin-left:auto}
     </div>
     <div class="seg-hint">Нажми на квадрат — 🟢 работал на цели · 🟡 наполовину · 🔴 потерял. Поле раскрывается при нажатии, диктуй голосом.</div>
 
-    <div id="daymeas"></div>
 
     <div class="grp" data-id="g-sleep"><div class="grp-body">
     <div class="line">
@@ -459,9 +520,14 @@ body.reorder .sec-head .count{margin-left:auto}
       <span class="cap">Н6, до 08.09 каждый день</span>
     </div>
     </div></div>
-    <div class="line"><span class="cap">Часы сна, отбой ≤24:00 и разброс подъёма считаются сами · дневной сон не учитывается · ночь, помеченная как внешнее обязательство, провалом не считается</span></div>
+    <div class="line"><span class="cap">Ночь перед этим днём — вносится утром. Часы сна, отбой ≤24:00 и разброс подъёма считаются сами · дневной сон не учитывается · ночь, помеченная как внешнее обязательство, провалом не считается</span></div>
 
   </div></div>
+  </section>
+
+  <section class="z-steel" data-panel="meas">
+    <div class="sec-head"><span class="fold">▸</span><h2>Практика и замеры</h2><span class="count" id="cnt-meas"></span></div>
+    <div class="pnl"><div class="pnl-in"><div id="daymeas"></div></div></div>
   </section>
 
   <section class="z-steel" data-panel="journal">
@@ -492,6 +558,24 @@ body.reorder .sec-head .count{margin-left:auto}
   <div class="once" id="once">
     <div class="sec-head once-head" id="once-head"><span class="fold">▸</span><h2>Раз в день</h2><span class="tag">задачи, привычки, ритуалы, рычаги</span><span class="count" id="cnt-once"></span></div>
     <div id="once-body"></div>
+  </div>
+
+  <div class="fixes" id="fixes">
+    <div class="sec-head fixes-head" id="fixes-head"><span class="fold">▸</span><h2>Поправки листа</h2><span class="count" id="cnt-fixes"></span></div>
+    <div id="fixes-body">
+      <p class="fixes-hint">Что в самом листе мешает или чего не хватает. Копится здесь, уходит в технический диалог одной кнопкой.</p>
+      <div class="fixes-layer" id="fix-layer">
+        <button type="button" data-l="catalog">каталог</button>
+        <button type="button" data-l="engine">движок</button>
+        <button type="button" data-l="unknown" data-on="1">не знаю</button>
+      </div>
+      <textarea id="fix-text" placeholder="Что изменить в вахтенном листе"></textarea>
+      <div class="mv-row">
+        <button type="button" class="solid" id="fix-add">Записать поправку</button>
+        <button type="button" id="fix-copy">Скопировать поправки</button>
+      </div>
+      <div class="cmt-list" id="fix-list"></div>
+    </div>
   </div>
 </main>
 
@@ -594,14 +678,29 @@ function save(){ try { localStorage.setItem(KEY, JSON.stringify(store)); } catch
 
 /* Данные вносит только пользователь. Никаких предзаполненных значений в файле нет:
    иначе версия файла начинает конкурировать с тем, что реально введено в браузере. */
+function cmtList(b, id){
+  if(!Array.isArray(b.comments[id])) b.comments[id] = (typeof b.comments[id] === 'string' && b.comments[id].trim())
+    ? [{d:'', text:b.comments[id].trim()}] : [];
+  return b.comments[id];
+}
+function cmtText(b, id){ return cmtList(b, id).map(r => (r.d ? r.d + ' — ' : '') + r.text).join(' | '); }
+
 function box(name){
   if(!store[name]) store[name] = {};
   const b = store[name];
   if(!b.status)   b.status = {};
   if(!b.comments) b.comments = {};
+  /* старый одиночный комментарий переезжает в список записей */
+  Object.keys(b.comments).forEach(k => {
+    if(typeof b.comments[k] === 'string'){
+      const t = b.comments[k].trim();
+      b.comments[k] = t ? [{d:'', text:t}] : [];
+    }
+  });
   if(!b.closed)   b.closed = {};
   if(!b.tally)    b.tally = {};
   if(!b.probes)   b.probes = {};
+  if(!b.tried)    b.tried = {};   /* дневная отметка «приступал» по взятому на день */
   if(!b.exported) b.exported = [];
   if(typeof b.notes !== 'string') b.notes = '';
   if(!Array.isArray(b.notesList)) b.notesList = [];
@@ -615,8 +714,12 @@ function box(name){
   if(!Array.isArray(b.chron)) b.chron = [];
   if(!Array.isArray(b.focus)) b.focus = [];
   if(typeof b.fmode !== 'object' || !b.fmode) b.fmode = {};
+  if(typeof b.duty !== 'string') b.duty = '';
+  if(typeof b.dutyMin !== 'number') b.dutyMin = 0;
+  if(typeof b.dutyFirst !== 'number') b.dutyFirst = 0;
   if(typeof b.phrase !== 'string') b.phrase = '';
   if(typeof b.phraseN !== 'number') b.phraseN = 0;
+
   if(typeof b.phraseTill !== 'number') b.phraseTill = 0;
   if(!b.meas) b.meas = {};
   if(typeof b.pract === 'number' && b.pract && b.meas.pract === undefined) b.meas.pract = b.pract;
@@ -664,10 +767,10 @@ function applySleepDerived(b){
 /* Трек заполняется НА СЛЕДУЮЩИЙ ДЕНЬ: по умолчанию открывается вчерашний день.
    Причина: время подъёма известно только наутро (правило от 25.08.2026). */
 let current = (function(){
-  const y = new Date(); y.setDate(y.getDate() - 1);
-  const t = String(y.getDate());
+  const t = String(new Date().getDate());
   if(DAYS.some(d => d.id === t)) return t;
-  const t2 = String(new Date().getDate());
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const t2 = String(y.getDate());
   return DAYS.some(d => d.id === t2) ? t2 : DAYS[0].id;
 })();
 
@@ -730,10 +833,10 @@ function renderWatch(){
 
 /* ================= ПОРЯДОК РАЗДЕЛОВ И ПУНКТОВ ================= */
 /* Хранится глобально, не по неделям: настроил один раз — работает дальше */
-const ORDER_KEY = 'vahta_11_order_v2';
-const DEFAULT_SECS = ['today','day','journal','levers'].concat(SECTIONS.map(x => x.key));
+const ORDER_KEY = 'vahta_11_order_v3';
+const DEFAULT_SECS = ['today','day','meas','journal','levers'].concat(SECTIONS.map(x => x.key));
 const BUILTIN_ORDER = {
-  secs:['today','day','journal','habits','tasks','queue','rituals','rituals_long','levers','weekmeas'],
+  secs:['today','day','meas','journal','habits','tasks','queue','rituals','rituals_long','levers','weekmeas'],
   items:{
     habits:['E1','E2','E8','E9','O1','O3','L1'],
     tasks:['N8','N9','N3','SH8','R11','R21','L3','N11','N12','N10','TN1','TO1','TN3'],
@@ -771,7 +874,7 @@ function moveItem(sec, id, dir){
   ORDER.items[sec.key] = moveIn(itemOrder(sec).map(i => i.id), id, dir);
   saveOrder(); renderSections();
 }
-const DAY_KEYS = ['today','day','journal'];
+const DAY_KEYS = ['today','day','meas','journal'];
 function applyOrder(){
   const host = document.querySelector('main');
   const once = document.getElementById('once');
@@ -931,6 +1034,8 @@ function renderToday(){
   if(live.length){
     txt = cl.length ? done + ' / ' + cl.length : '';
     if(tc.length) txt += (txt ? ' · ' : '') + '≈' + touched + '/' + tc.length;
+    const tr = live.filter(id => b.tried[id]).length;
+    txt += (txt ? ' · ' : '') + 'приступал ' + tr + '/' + live.length;
   }
   document.getElementById('cnt-today').textContent = txt;
 
@@ -964,6 +1069,19 @@ function renderToday(){
         save(); renderAll();
       };
       main.appendChild(mb);
+      const tb = document.createElement('button');
+      tb.type = 'button'; tb.className = 'tried';
+      const on = !!box(current).tried[id];
+      tb.dataset.on = on ? '1' : '0';
+      tb.textContent = on ? 'приступал ✓' : 'приступал';
+      tb.title = 'Брался ли сегодня за это вообще';
+      tb.onclick = ev => {
+        ev.stopPropagation();
+        const bb = box(current);
+        if(bb.tried[id]) delete bb.tried[id]; else bb.tried[id] = 1;
+        save(); renderAll();
+      };
+      main.appendChild(tb);
       main.appendChild(makePin(id));
       main.appendChild(makeGrip(r, host, '[data-id]', () => {
         box(current).focus = Array.from(host.children).map(n => n.dataset.id).filter(Boolean);
@@ -974,6 +1092,62 @@ function renderToday(){
   });
 }
 
+/* Фраза держится, пока не задана новая: у дня без своей берётся последняя заданная раньше. */
+function phraseOf(id){
+  const b = store[id];
+  if(b && b.phrase) return b.phrase;
+  const idx = DAYS.findIndex(d => d.id === id);
+  for(let k = idx - 1; k >= 0; k--){
+    const prev = store[DAYS[k].id];
+    if(prev && prev.phrase) return prev.phrase;
+  }
+  return '';
+}
+
+/* Обещание дня: основное дело, признак «начал первым» и накопленные минуты. */
+function renderDuty(){
+  const b = box(current);
+  const bar = document.getElementById('duty-bar');
+  const txt = document.getElementById('duty-txt');
+  txt.textContent = b.duty || 'нажми ✎, чтобы назвать основное дело';
+  txt.classList.toggle('empty', !b.duty);
+  bar.dataset.on = b.dutyFirst ? '1' : '0';
+  document.getElementById('duty-n').textContent = b.dutyMin || 0;
+  document.getElementById('duty-first').dataset.on = b.dutyFirst ? '1' : '0';
+  document.getElementById('duty-first').textContent = b.dutyFirst ? 'начал первым ✓' : 'начал первым';
+  const inp = document.getElementById('duty-min');
+  if(document.activeElement !== inp) inp.value = b.dutyMin ? b.dutyMin : '';
+}
+function dutyAdd(n){
+  const b = box(current);
+  if(!b.duty){ toast('Сначала назови дело — кнопка ✎'); return; }
+  b.dutyMin = Math.max(0, Math.min(900, (b.dutyMin || 0) + n));
+  save(); renderDuty(); renderPanels();
+}
+document.getElementById('duty-edit').onclick = () => {
+  const b = box(current);
+  const v = prompt('Основное дело дня — одно, коротко:', b.duty || '');
+  if(v === null) return;
+  b.duty = v.trim();
+  if(!b.duty){ b.dutyFirst = 0; b.dutyMin = 0; }
+  save(); renderDuty(); renderPanels();
+  toast(b.duty ? 'Дело дня записано' : 'Дело дня очищено');
+};
+document.getElementById('duty-bar').onclick = () => {
+  const b = box(current);
+  if(!b.duty){ toast('Сначала назови дело — кнопка ✎'); return; }
+  b.dutyFirst = b.dutyFirst ? 0 : 1;
+  save(); renderDuty(); renderPanels();
+  toast(b.dutyFirst ? 'Начал первым — засчитано' : 'Отметка снята');
+};
+document.getElementById('duty-first').onclick = () => document.getElementById('duty-bar').onclick();
+document.querySelectorAll('.duty-add').forEach(btn => { btn.onclick = () => dutyAdd(+btn.dataset.add); });
+document.getElementById('duty-min').oninput = e => {
+  const b = box(current);
+  b.dutyMin = Math.max(0, Math.min(900, parseInt(e.target.value, 10) || 0));
+  save(); renderPanels();
+};
+
 /* Фраза дня: синяя полоса внизу. Нажал — засчитано: зеленеет на час, счётчик +1. */
 const PHRASE_HOLD = 60 * 60 * 1000;
 
@@ -983,15 +1157,17 @@ function renderPhrase(){
   const txt = document.getElementById('ph-txt');
   const on = Date.now() < (b.phraseTill || 0);
   bar.dataset.on = on ? '1' : '0';
-  if(b.phrase){ txt.textContent = b.phrase; txt.classList.remove('empty'); }
+  const ph = phraseOf(current);
+  if(ph){ txt.textContent = ph; txt.classList.remove('empty'); }
   else { txt.textContent = 'нажми ✎, чтобы задать'; txt.classList.add('empty'); }
   document.getElementById('ph-n').textContent = b.phraseN || 0;
   bar.title = on ? 'Засчитано. Держится час, потом снова синяя'
-                 : (b.phrase ? 'Применил — нажми, счётчик вырастет' : 'Сначала задай фразу');
+                 : (ph ? 'Применил — нажми, счётчик вырастет' : 'Сначала задай фразу');
 }
 
 document.getElementById('phrase-bar').onclick = () => {
   const b = box(current);
+  if(!b.phrase) b.phrase = phraseOf(current);   /* при первом применении фраза закрепляется за днём */
   if(!b.phrase){ toast('Сначала задай фразу — кнопка ✎ справа'); return; }
   b.phraseN = (b.phraseN || 0) + 1;
   b.phraseTill = Date.now() + PHRASE_HOLD;
@@ -1088,10 +1264,14 @@ function renderPanels(){
     levers: (() => { let d=0,t=0; LEVERS.forEach(l => { const p = leverProgress(l.id); d+=p.done; t+=p.total; }); return d + ' / ' + t; })(),
     day:    (b.sleep !== '' ? b.sleep + ' ч' : 'сон не внесён') + ' · отрезки ' + segDone + '/3' +
             DAYMEAS.map(m => measVal(b, m.id) ? ' · ' + m.name.toLowerCase() + ' ' + measVal(b, m.id) + ' ' + (m.unit || '') : '').join(''),
-    journal:(b.notesList.length ? b.notesList.length + ' зам.' : 'заметок нет') + ' · хроника ' + w.chron.length
+    journal:(b.notesList.length ? b.notesList.length + ' зам.' : 'заметок нет') + ' · хроника ' + w.chron.length,
+    meas:   DAYMEAS.map(m => {
+              const v = measVal(b, m.id);
+              return m.kind === 'check' ? (v ? '✓' : '—') : (v ? v + ' ' + (m.unit || '') : '');
+            }).filter(Boolean).join(' · ')
   };
   const so = secOrder();
-  ['today','levers','day','journal'].forEach(key => {
+  ['today','levers','day','meas','journal'].forEach(key => {
     const sec = document.querySelector('[data-panel="' + key + '"]');
     if(!sec) return;
     const head = sec.querySelector('.sec-head');
@@ -1220,16 +1400,48 @@ function shell(item, b){
 
   const note = document.createElement('button');
   note.type = 'button'; note.className = 'note'; note.innerHTML = '&#9998;';
-  note.setAttribute('aria-label', 'Комментарий: ' + item.name);
-  note.dataset.has = b.comments[item.id] ? '1' : '0';
+  note.setAttribute('aria-label', 'Записи по пункту: ' + item.name);
+  const cnt = () => cmtList(b, item.id).length;
+  note.dataset.has = cnt() ? '1' : '0';
+  if(cnt()) note.dataset.n = cnt();
 
   const cmt = document.createElement('div');
-  cmt.className = 'cmt' + (b.comments[item.id] ? ' open' : '');
+  cmt.className = 'cmt' + (cnt() ? ' open' : '');
+  const list = document.createElement('div');
+  list.className = 'cmt-list';
   const ta = document.createElement('textarea');
-  ta.placeholder = 'Комментарий по пункту';
-  ta.value = b.comments[item.id] || '';
-  ta.oninput = e => { b.comments[item.id] = e.target.value; note.dataset.has = e.target.value ? '1' : '0'; save(); };
-  cmt.appendChild(ta);
+  ta.placeholder = 'Новая запись по пункту — прежние остаются';
+  const addBtn = document.createElement('button');
+  addBtn.type = 'button'; addBtn.className = 'cmt-add'; addBtn.textContent = 'Добавить запись';
+
+  const paint = () => {
+    const arr = cmtList(b, item.id);
+    list.innerHTML = '';
+    arr.forEach((rec, i) => {
+      const line = document.createElement('div');
+      line.className = 'cmt-item';
+      const t = document.createElement('span');
+      t.innerHTML = '<b>' + (rec.d || '') + '</b> ' + rec.text.replace(/[<>&]/g, ch => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[ch]));
+      const del = document.createElement('button');
+      del.type = 'button'; del.className = 'cmt-del'; del.textContent = '×';
+      del.title = 'Удалить запись';
+      del.onclick = () => { arr.splice(i, 1); b.comments[item.id] = arr; save(); paint(); note.dataset.has = arr.length ? '1' : '0'; note.dataset.n = arr.length || ''; };
+      line.appendChild(t); line.appendChild(del);
+      list.appendChild(line);
+    });
+    note.dataset.has = arr.length ? '1' : '0';
+    note.dataset.n = arr.length || '';
+  };
+  addBtn.onclick = () => {
+    const v = ta.value.trim();
+    if(!v){ toast('Пусто — нечего добавлять'); return; }
+    const arr = cmtList(b, item.id);
+    arr.push({d: (DAYS.find(x => x.id === current) || {}).date || '', text: v});
+    b.comments[item.id] = arr; ta.value = ''; save(); paint();
+    toast('Запись добавлена');
+  };
+  cmt.appendChild(list); cmt.appendChild(ta); cmt.appendChild(addBtn);
+  paint();
   row.appendChild(cmt);
   note.onclick = () => { cmt.classList.toggle('open'); if(cmt.classList.contains('open')) ta.focus(); };
 
@@ -1588,26 +1800,44 @@ function setMeas(id, v){
 }
 function wordDays(n){ return n === 1 ? ' день' : (n >= 2 && n <= 4 ? ' дня' : ' дней'); }
 
+function measGroups(){
+  const out = [], seen = {};
+  DAYMEAS.forEach(m => {
+    const g = m.group || m.id;
+    if(seen[g] === undefined){ seen[g] = out.length; out.push({key:g, title:m.groupName || m.name, note:'', rows:[]}); }
+    const grp = out[seen[g]];
+    if(m.note && !grp.note) grp.note = m.note;
+    grp.rows.push(m);
+  });
+  return out;
+}
+
 function renderDayMeas(){
   const host = document.getElementById('daymeas');
   if(!host) return;
-  if(!DAYMEAS.length){ host.innerHTML = ''; return; }
+  const groups = measGroups();
+  if(!groups.length){ host.innerHTML = ''; return; }
   const b = box(current);
-  if(host.children.length !== DAYMEAS.length){
-    host.innerHTML = DAYMEAS.map(m => (
-      '<div class="soul' + (m.kind === 'check' ? ' soul-check' : '') + '" data-meas="' + m.id + '">' +
-        '<div class="soul-top">' +
-          '<span class="soul-ttl">' + m.name + '</span>' +
-          (m.kind === 'check'
-            ? '<button type="button" class="soul-yes meas-ctl" data-c="' + m.id + '">отметить</button>'
-            : '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="-1">−</button>' +
-              '<input class="num meas-ctl" type="number" inputmode="numeric" data-m="' + m.id + '">' +
-              '<span class="soul-unit">' + (m.unit || '') + '</span>' +
-              '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="1">+</button>') +
-          (m.chain ? '<span class="soul-chain" data-chain="' + m.id + '"></span>' : '') +
+  if(host.dataset.built !== String(groups.length)){
+    host.dataset.built = String(groups.length);
+    host.innerHTML = groups.map(g => (
+      '<div class="soul" data-grp="' + g.key + '">' +
+        '<div class="soul-head"><span class="soul-ttl">' + g.title + '</span>' +
+          (g.rows.some(m => m.chain) ? '<span class="soul-chain" data-chain="' + (g.rows.find(m => m.chain) || {}).id + '"></span>' : '') +
         '</div>' +
-        '<div class="soul-week" data-week="' + m.id + '"></div>' +
-        (m.note ? '<div class="soul-note">' + m.note + '</div>' : '') +
+        g.rows.map(m =>
+          '<div class="soul-row" data-meas="' + m.id + '">' +
+            '<span class="soul-lbl">' + (m.short || m.name) + '</span>' +
+            (m.kind === 'check'
+              ? '<button type="button" class="soul-yes meas-ctl" data-c="' + m.id + '">отметить</button>'
+              : '<span class="soul-num"><button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="-1">−</button>' +
+                '<input class="num meas-ctl" type="number" inputmode="numeric" data-m="' + m.id + '">' +
+                '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="1">+</button>' +
+                '<span class="soul-unit">' + (m.unit || '') + '</span></span>') +
+            '<span class="soul-week" data-week="' + m.id + '"></span>' +
+          '</div>'
+        ).join('') +
+        (g.note ? '<div class="soul-note">' + g.note + '</div>' : '') +
       '</div>'
     )).join('');
     host.querySelectorAll('button.soul-yes[data-c]').forEach(btn => {
@@ -1626,35 +1856,29 @@ function renderDayMeas(){
   DAYMEAS.forEach(m => {
     const v = measVal(b, m.id);
     const wrap = host.querySelector('[data-meas="' + m.id + '"]');
+    if(!wrap) return;
     const mw = measWeek(m);
     if(m.kind === 'check'){
       const btn = wrap.querySelector('button.soul-yes');
       btn.dataset.on = v ? '1' : '0';
       btn.textContent = v ? 'сделано' : 'отметить';
-      wrap.classList.toggle('done', !!v);
-      host.querySelector('[data-week="' + m.id + '"]').textContent =
-        'За неделю: ' + mw.days + ' из 7' + (m.norm ? ' · норма ' + m.norm + '/7' : '') +
-        (m.floorWeek ? ' · порог ' + m.floorWeek + '/7' : '') +
-        (m.norm ? (mw.days >= m.norm ? ' — норма взята' : (mw.days >= (m.floorWeek || 0) ? ' — выше порога' : '')) : '');
+      wrap.closest('.soul').classList.toggle('done', !!v);
+      wrap.querySelector('[data-week]').textContent =
+        mw.days + '/7' + (m.norm ? ' · норма ' + m.norm : '');
     } else {
       const inp = wrap.querySelector('input[data-m="' + m.id + '"]');
       if(document.activeElement !== inp) inp.value = v ? v : '';
-      host.querySelector('[data-week="' + m.id + '"]').textContent =
-        'За неделю: ' + mw.days + ' из 7 дней · всего ' + mw.sum + ' ' + (m.unit || '') +
-        ' · в среднем ' + (mw.days ? Math.round(mw.sum / mw.days) : 0) + ' в день, когда было';
+      wrap.querySelector('[data-week]').textContent = 'за неделю ' + mw.sum + ' ' + (m.unit || '');
     }
-    const w = mw;
     if(m.chain){
-      const ch = measChain(m.id);
       const el = host.querySelector('[data-chain="' + m.id + '"]');
-      el.textContent = 'цепочка ' + ch + wordDays(ch);
-      el.dataset.hot = ch >= 3 ? '1' : '0';
+      if(el){ const ch = measChain(m.id); el.textContent = 'цепочка ' + ch + wordDays(ch); el.dataset.hot = ch >= 3 ? '1' : '0'; }
     }
   });
 }
 
 function renderAll(){ renderWatch(); renderLevers(); renderSleep(); renderSections(); renderNotes(); renderChronForm(); renderChronList(); renderPanels();
-  renderToday(); renderPhrase(); renderSegs(); renderDayMeas();
+  renderToday(); renderDuty(); renderPhrase(); renderSegs(); renderDayMeas(); renderFixes();
   sortStatic('sleep_rows', document.querySelector('.pnl-in.sleep'), '.grp');
   const d = DAYS.find(x => x.id === current);
   document.getElementById('btn-copy').textContent = 'Отчёт ' + d.date;
@@ -1729,6 +1953,71 @@ function probeText(item){
   }).filter(Boolean).join(' · ') + (r.d ? ' (' + r.d + ')' : '')).join('  |  ');
 }
 
+/* ================= ПОПРАВКИ САМОГО ЛИСТА =================
+   Живут вне недели: смена каталога их не трогает, между устройствами синхронизируются. */
+const FIX_KEY = 'vahta_fixes_v1';
+const FIX_LBL = {catalog:'каталог', engine:'движок', unknown:'слой не определён'};
+let fixLayer = 'unknown';
+
+function fixes(){
+  try { const a = JSON.parse(localStorage.getItem(FIX_KEY) || '[]'); return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function fixesSave(a){ try { localStorage.setItem(FIX_KEY, JSON.stringify(a)); } catch(e){} if(typeof syncTouch === 'function') syncTouch(); }
+
+function renderFixes(){
+  const a = fixes();
+  const open = collapsed['fixes'] === 1;
+  const head = document.getElementById('fixes-head');
+  head.querySelector('.fold').textContent = open ? '▾' : '▸';
+  document.getElementById('fixes-body').style.display = open ? '' : 'none';
+  document.getElementById('cnt-fixes').textContent = a.length ? String(a.length) : '';
+  const list = document.getElementById('fix-list');
+  list.innerHTML = '';
+  a.forEach((f, i) => {
+    const line = document.createElement('div');
+    line.className = 'cmt-item';
+    const t = document.createElement('span');
+    t.innerHTML = '<span class="fix-tag">' + FIX_LBL[f.layer] + '</span><b>' + (f.d || '') + '</b> ' +
+                  f.text.replace(/[<>&]/g, ch => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[ch]));
+    const del = document.createElement('button');
+    del.type = 'button'; del.className = 'cmt-del'; del.textContent = '×'; del.title = 'Удалить поправку';
+    del.onclick = () => { const arr = fixes(); arr.splice(i, 1); fixesSave(arr); renderFixes(); };
+    line.appendChild(t); line.appendChild(del);
+    list.appendChild(line);
+  });
+  document.querySelectorAll('#fix-layer button').forEach(b => b.dataset.on = (b.dataset.l === fixLayer) ? '1' : '0');
+}
+
+document.getElementById('fixes-head').onclick = () => { collapsed['fixes'] = collapsed['fixes'] === 1 ? 0 : 1; saveUI(); renderFixes(); };
+document.querySelectorAll('#fix-layer button').forEach(b => {
+  b.onclick = () => { fixLayer = b.dataset.l; renderFixes(); };
+});
+document.getElementById('fix-add').onclick = () => {
+  const ta = document.getElementById('fix-text');
+  const v = ta.value.trim();
+  if(!v){ toast('Пусто — нечего записывать'); return; }
+  const a = fixes();
+  a.push({d:(DAYS.find(x => x.id === current) || {}).date || '', layer:fixLayer, text:v});
+  fixesSave(a); ta.value = ''; renderFixes();
+  toast('Поправка записана · всего ' + a.length);
+};
+document.getElementById('fix-copy').onclick = () => {
+  const a = fixes();
+  if(!a.length){ toast('Поправок нет'); return; }
+  const order = ['catalog','engine','unknown'];
+  let out = '';
+  order.forEach(l => {
+    a.filter(f => f.layer === l).forEach(f => {
+      out += '### ПРАВКА ВАХТЕННОГО ЛИСТА · ' + (f.d || '') + '\n' +
+             'Слой: ' + FIX_LBL[l] + '\n' +
+             'Что: ' + f.text + '\n\n';
+    });
+  });
+  copyText(out.trim());
+  if(confirm('Скопировано ' + a.length + '. Очистить список?')){ fixesSave([]); renderFixes(); }
+};
+
 /* ================= ОТЧЁТ ================= */
 const LBL = {done:'✅ выполнил', fail:'❌ не выполнил', wip:'⏳ в работе', ext:'🟡 внешнее обязательство'};
 
@@ -1753,7 +2042,23 @@ function buildReport(){
     out += '**Сон** не внесён\n\n';
   }
 
-  /* --- практика сферы 7 --- */
+  const takenIds = (dayB.focus || []).filter(id => ITEM_INDEX[id]);
+  if(takenIds.length){
+    out += '**Взято на день — приступал**\n';
+    takenIds.forEach(id => {
+      const it = ITEM_INDEX[id].item;
+      out += '- ' + mark(dayB, 'tried' + id + '=' + (dayB.tried[id] ? 1 : 0)) + code(id) + ' ' + it.name +
+             ' — ' + (dayB.tried[id] ? 'приступал' : 'не приступал') + ' · режим: ' + (fmode(id) === 'close' ? 'закрыть' : 'касание') + '\n';
+    });
+    out += '\n';
+  }
+
+  if(dayB.duty){
+    out += mark(dayB, 'duty=' + dayB.duty + '/' + dayB.dutyFirst + '/' + dayB.dutyMin) +
+           '**Дело дня** ' + dayB.duty + ' · начал первым: ' + (dayB.dutyFirst ? 'да' : 'нет') +
+           ' · ' + (dayB.dutyMin || 0) + ' мин\n\n';
+  }
+
   DAYMEAS.forEach(m => {
     const v = measVal(dayB, m.id);
     if(!v) return;
@@ -1800,7 +2105,7 @@ function buildReport(){
   }
 
   /* --- фраза дня --- */
-  if(dayB.phrase) out += '**Фраза дня** — ' + dayB.phrase +
+  if(phraseOf(current)) out += '**Фраза дня** — ' + phraseOf(current) +
     ' · применена ' + (dayB.phraseN || 0) + ' раз(а)\n\n';
 
   /* --- взято на сегодня --- */
@@ -1833,11 +2138,11 @@ function buildReport(){
   const hDone = hSec.items.filter(i => dayB.status[i.id] === 'done').length;
   out += '**Привычки — ' + hDone + ' из ' + hSec.items.length + '**\n';
   /* Выполненные без комментария не перечисляются: в разбор идёт только то, что не закрыто */
-  const hRest = hSec.items.filter(i => dayB.status[i.id] !== 'done' || dayB.comments[i.id]);
+  const hRest = hSec.items.filter(i => dayB.status[i.id] !== 'done' || cmtList(dayB, i.id).length);
   if(hRest.length){
     hRest.forEach(i => {
       const st = dayB.status[i.id];
-      const c = dayB.comments[i.id];
+      const c = cmtText(dayB, i.id);
       out += '- ' + (st ? mark(dayB, i.id + '=' + st) : '') + i.name + ' — ' +
              (st ? LBL[st] : '⬜ не отмечено') + (c ? ' — ' + c : '') + '\n';
     });
@@ -1847,13 +2152,13 @@ function buildReport(){
   /* --- задачи и ритуалы недели: текущий статус целиком --- */
   /* Задачи и ритуалы: в дневной отчёт идёт только тронутое. Полный список — в сводке недели */
   SECTIONS.filter(x => x.type === 'task').forEach(sec => {
-    const live = sec.items.filter(i => wB.status[i.id] || wB.comments[i.id]);
+    const live = sec.items.filter(i => wB.status[i.id] || cmtList(wB, i.id).length);
     const idle = sec.items.length - live.length;
     if(!live.length){ out += '**' + sec.title + '** — не тронуто ни одной из ' + sec.items.length + '\n\n'; return; }
     out += '**' + sec.title + '**\n';
     live.forEach(i => {
       const st = wB.status[i.id];
-      const c = wB.comments[i.id];
+      const c = cmtText(wB, i.id);
       const cl = (st === 'done' && wB.closed[i.id]) ? ' (' + wB.closed[i.id] + ')' : '';
       out += '- ' + (st ? mark(wB, i.id + '=' + st) : '') + code(i.id) + ' ' + i.name + ' — ' +
              (st ? LBL[st] : '⬜ не отмечено') + cl + (c ? ' — ' + c : '') + '\n';
@@ -1863,13 +2168,13 @@ function buildReport(){
   });
 
   SECTIONS.filter(x => x.type === 'ritual').forEach(sec => {
-    const live = sec.items.filter(i => (wB.tally[i.id] || 0) > 0 || wB.comments[i.id]);
+    const live = sec.items.filter(i => (wB.tally[i.id] || 0) > 0 || cmtList(wB, i.id).length);
     const idle = sec.items.length - live.length;
     if(!live.length){ out += '**' + sec.title + '** — ни одного из ' + sec.items.length + '\n\n'; return; }
     out += '**' + sec.title + '**\n';
     live.forEach(i => {
       const n = wB.tally[i.id] || 0;
-      const c = wB.comments[i.id];
+      const c = cmtText(wB, i.id);
       out += '- ' + (n ? mark(wB, i.id + '=' + n) : '') + i.name + ' — ' + n + ' из ' + i.norm +
              (n >= i.norm ? ' ✅' : n ? ' ⏳' : ' ⬜') + (c ? ' — ' + c : '') + '\n';
     });
@@ -1991,6 +2296,46 @@ function buildWeekReport(){
     stoolRows.forEach(([d,v]) => { out += '| ' + d.label + ' ' + d.date + ' | ' + v + ' |\n'; });
   }
 
+  const takenAgg = {};
+  DAYS.forEach(d => {
+    const b = store[d.id]; if(!b || !Array.isArray(b.focus)) return;
+    b.focus.forEach(id => {
+      if(!ITEM_INDEX[id]) return;
+      if(!takenAgg[id]) takenAgg[id] = {took:0, tried:0};
+      takenAgg[id].took++;
+      if(b.tried && b.tried[id]) takenAgg[id].tried++;
+    });
+  });
+  const takenKeys = Object.keys(takenAgg);
+  if(takenKeys.length){
+    out += '\n### Взято на день и приступал\n\n| Пункт | Дней взято | Из них приступал | Разрыв |\n|---|---|---|---|\n';
+    takenKeys.forEach(id => {
+      const a = takenAgg[id];
+      out += '| ' + code(id) + ' ' + ITEM_INDEX[id].item.name + ' | ' + a.took + ' | ' + a.tried + ' | ' + (a.took - a.tried) + ' |\n';
+    });
+  }
+
+  const duties = DAYS.map(d => ({d, b: store[d.id]})).filter(x => x.b && x.b.duty);
+  if(duties.length){
+    const agg = {};
+    duties.forEach(x => {
+      const k = x.b.duty.trim();
+      if(!agg[k]) agg[k] = {min:0, first:0, days:0, zero:0};
+      agg[k].min += x.b.dutyMin || 0;
+      agg[k].days++;
+      if(x.b.dutyFirst) agg[k].first++;
+      if(!(x.b.dutyMin || 0)) agg[k].zero++;
+    });
+    const firstAll = duties.filter(x => x.b.dutyFirst).length;
+    const zeroAll  = duties.filter(x => !(x.b.dutyMin || 0)).length;
+    out += '\n### Дело дня\n\n| Дело | Дней | Минут всего | Начал первым | Дней с нулём |\n|---|---|---|---|---|\n';
+    Object.keys(agg).forEach(k => {
+      const a = agg[k];
+      out += '| ' + k + ' | ' + a.days + ' | ' + a.min + ' | ' + a.first + ' | ' + a.zero + ' |\n';
+    });
+    out += '\nИтого за неделю: начато первым ' + firstAll + ' из 7 дней · дней с нулём минут ' + zeroAll + ' из ' + duties.length + ' названных\n';
+  }
+
   const probed = [];
   SECTIONS.forEach(sec => sec.items.forEach(i => { if(i.probe && i.probe.length && ((w.probes || {})[i.id] || []).length) probed.push(i); }));
   if(probed.length){
@@ -2035,12 +2380,12 @@ function buildWeekReport(){
   SECTIONS.filter(s => s.type === 'task').forEach(sec => sec.items.forEach(i => {
     const st = w.status[i.id];
     out += '| ' + code(i.id) + ' | ' + i.name + ' | ' + (st ? LBL[st] : '— не отмечено') + ' | ' +
-           (w.closed[i.id] || '—') + ' | ' + (w.comments[i.id] || '—') + ' |\n';
+           (w.closed[i.id] || '—') + ' | ' + (cmtList(w, i.id).length || '—') + ' |\n';
   }));
 
   out += '\n### Ритуалы\n\n| Ритуал | Факт | Норма | Комментарий |\n|---|---|---|---|\n';
   SECTIONS.find(s => s.key === 'rituals').items.forEach(i => {
-    out += '| ' + i.name + ' | ' + (w.tally[i.id] || 0) + ' | ' + i.norm + ' | ' + (w.comments[i.id] || '—') + ' |\n';
+    out += '| ' + i.name + ' | ' + (w.tally[i.id] || 0) + ' | ' + i.norm + ' | ' + (cmtList(w, i.id).length || '—') + ' |\n';
   });
 
   if(w.chron && w.chron.length){
@@ -2099,9 +2444,10 @@ function slimBox(b){
   });
   ['bed','wake','en1','en2','en3','pain','stool','phrase','notes',
    'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => { if(b[k]) o[k] = b[k]; });
-  ['prom','hit','phraseN'].forEach(k => { if(b[k]) o[k] = b[k]; });
+  ['prom','hit','phraseN','dutyMin','dutyFirst'].forEach(k => { if(b[k]) o[k] = b[k]; });
   if(b.meas && Object.keys(b.meas).length) o.meas = b.meas;
   if(b.probes && Object.keys(b.probes).length) o.probes = b.probes;
+  if(b.tried && Object.keys(b.tried).length) o.tried = b.tried;
   if(b.ext) o.ext = true;
   return Object.keys(o).length ? o : null;
 }
@@ -2142,11 +2488,12 @@ function cleanBox(raw){
   b.chron = (raw && Array.isArray(raw.chron)) ? raw.chron.filter(e => e && CHRON[e.t]) : [];
   b.exported = (raw && Array.isArray(raw.exported)) ? raw.exported.slice() : [];
   b.meas = (raw && raw.meas && typeof raw.meas === 'object') ? raw.meas : {};
-  ['bed','wake','sleep','en1','en2','en3','pain','stool','notes','phrase',
+  b.tried = (raw && raw.tried && typeof raw.tried === 'object') ? raw.tried : {};
+  ['bed','wake','sleep','en1','en2','en3','pain','stool','notes','phrase','duty',
    'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => {
     b[k] = (raw && typeof raw[k] === 'string') ? raw[k] : '';
   });
-  ['prom','hit','phraseN','phraseTill'].forEach(k => { b[k] = (raw && typeof raw[k] === 'number') ? raw[k] : 0; });
+  ['prom','hit','phraseN','phraseTill','dutyMin','dutyFirst'].forEach(k => { b[k] = (raw && typeof raw[k] === 'number') ? raw[k] : 0; });
   ['photo','ext'].forEach(k => { b[k] = !!(raw && raw[k]); });
   return b;
 }
