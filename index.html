@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-04 19:40 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-04 20:30 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -332,6 +332,19 @@ body.reorder .sec-head .count{margin-left:auto}
   border:1px solid var(--azure);border-radius:99px;padding:4px 9px;color:var(--ink);background:var(--card);white-space:nowrap}
 .soul-chain[data-hot="1"]{background:var(--azure);color:#fff;border-color:var(--azure)}
 .soul-week{font-size:12px;color:var(--ink-soft);margin-top:7px;line-height:1.4}
+.soul.done{border-color:var(--sea);background:var(--sea-bg)}
+.soul-yes{border:1px solid var(--rule);background:#fff;color:var(--ink-soft);border-radius:var(--radius);
+  font:inherit;font-size:12.5px;padding:7px 14px;cursor:pointer;white-space:nowrap}
+.soul-yes[data-on="1"]{background:var(--sea);border-color:var(--sea);color:#fff}
+.pb-f{margin:12px 0}
+.pb-f label{display:block;font:500 12.5px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink-soft);margin-bottom:5px}
+.pb-scale{display:flex;gap:5px}
+.pb-scale button{flex:1;padding:9px 0;border:1px solid var(--rule);background:#fff;color:var(--ink);
+  border-radius:var(--radius);font:inherit;font-size:14px;cursor:pointer}
+.pb-scale button[data-on="1"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.pb-hint{font-size:11.5px;color:var(--ink-mute);margin-top:5px;line-height:1.35}
+.pb-f input.num{width:100%}
+.row-probe{font-size:11.5px;color:var(--ink-soft);margin-top:5px;line-height:1.4}
 .soul-note{font-size:11px;color:var(--ink-mute);margin-top:5px;line-height:1.35}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media (max-width:420px){
@@ -536,6 +549,18 @@ body.reorder .sec-head .count{margin-left:auto}
   </div>
 </div>
 
+<div class="mv" id="pb" data-open="0">
+  <div class="mv-in">
+    <h3 id="pb-title"></h3>
+    <p class="mv-hint">Ставится факт, а не оценка. Заполни и сохрани — заход засчитается.</p>
+    <div id="pb-fields"></div>
+    <div class="mv-row">
+      <button type="button" class="solid" id="pb-save">Записать заход</button>
+      <button type="button" id="pb-cancel">Отмена</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -576,6 +601,7 @@ function box(name){
   if(!b.comments) b.comments = {};
   if(!b.closed)   b.closed = {};
   if(!b.tally)    b.tally = {};
+  if(!b.probes)   b.probes = {};
   if(!b.exported) b.exported = [];
   if(typeof b.notes !== 'string') b.notes = '';
   if(!Array.isArray(b.notesList)) b.notesList = [];
@@ -1182,6 +1208,14 @@ function shell(item, b){
   main.innerHTML = '<div class="row-text"><div class="row-name"></div><div class="row-meta"></div></div>';
   main.querySelector('.row-name').textContent = item.name;
   main.querySelector('.row-meta').textContent = item.meta;
+  if(item.probe && item.probe.length){
+    const pt = probeText(item);
+    if(pt){
+      const pv = document.createElement('div');
+      pv.className = 'row-probe'; pv.textContent = pt;
+      main.querySelector('.row-text').appendChild(pv);
+    }
+  }
   row.appendChild(main);
 
   const note = document.createElement('button');
@@ -1270,7 +1304,7 @@ function renderRitual(item, b){
   const plus = document.createElement('button');
   plus.type = 'button'; plus.className = 'plus'; plus.innerHTML = '+';
   plus.setAttribute('aria-label', 'Засчитать: ' + item.name);
-  plus.onclick = () => { b.tally[item.id] = n + 1; save(); renderAll(); };
+  plus.onclick = () => { if(item.probe && item.probe.length){ probeOpen(item); return; } b.tally[item.id] = n + 1; save(); renderAll(); };
 
   t.appendChild(minus); t.appendChild(val); t.appendChild(plus); t.appendChild(s.note);
   s.main.appendChild(t);
@@ -1561,19 +1595,24 @@ function renderDayMeas(){
   const b = box(current);
   if(host.children.length !== DAYMEAS.length){
     host.innerHTML = DAYMEAS.map(m => (
-      '<div class="soul" data-meas="' + m.id + '">' +
+      '<div class="soul' + (m.kind === 'check' ? ' soul-check' : '') + '" data-meas="' + m.id + '">' +
         '<div class="soul-top">' +
           '<span class="soul-ttl">' + m.name + '</span>' +
-          '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="-1">−</button>' +
-          '<input class="num meas-ctl" type="number" inputmode="numeric" data-m="' + m.id + '">' +
-          '<span class="soul-unit">' + (m.unit || '') + '</span>' +
-          '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="1">+</button>' +
+          (m.kind === 'check'
+            ? '<button type="button" class="soul-yes meas-ctl" data-c="' + m.id + '">отметить</button>'
+            : '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="-1">−</button>' +
+              '<input class="num meas-ctl" type="number" inputmode="numeric" data-m="' + m.id + '">' +
+              '<span class="soul-unit">' + (m.unit || '') + '</span>' +
+              '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="1">+</button>') +
           (m.chain ? '<span class="soul-chain" data-chain="' + m.id + '"></span>' : '') +
         '</div>' +
         '<div class="soul-week" data-week="' + m.id + '"></div>' +
         (m.note ? '<div class="soul-note">' + m.note + '</div>' : '') +
       '</div>'
     )).join('');
+    host.querySelectorAll('button.soul-yes[data-c]').forEach(btn => {
+      btn.onclick = () => setMeas(btn.dataset.c, measVal(box(current), btn.dataset.c) ? 0 : 1);
+    });
     host.querySelectorAll('input.num[data-m]').forEach(inp => {
       inp.oninput = e => setMeas(e.target.dataset.m, parseInt(e.target.value, 10) || 0);
     });
@@ -1585,13 +1624,26 @@ function renderDayMeas(){
     });
   }
   DAYMEAS.forEach(m => {
-    const inp = host.querySelector('input[data-m="' + m.id + '"]');
     const v = measVal(b, m.id);
-    if(document.activeElement !== inp) inp.value = v ? v : '';
-    const w = measWeek(m);
-    host.querySelector('[data-week="' + m.id + '"]').textContent =
-      'За неделю: ' + w.days + ' из 7 дней · всего ' + w.sum + ' ' + (m.unit || '') +
-      ' · в среднем ' + (w.days ? Math.round(w.sum / w.days) : 0) + ' в день, когда было';
+    const wrap = host.querySelector('[data-meas="' + m.id + '"]');
+    const mw = measWeek(m);
+    if(m.kind === 'check'){
+      const btn = wrap.querySelector('button.soul-yes');
+      btn.dataset.on = v ? '1' : '0';
+      btn.textContent = v ? 'сделано' : 'отметить';
+      wrap.classList.toggle('done', !!v);
+      host.querySelector('[data-week="' + m.id + '"]').textContent =
+        'За неделю: ' + mw.days + ' из 7' + (m.norm ? ' · норма ' + m.norm + '/7' : '') +
+        (m.floorWeek ? ' · порог ' + m.floorWeek + '/7' : '') +
+        (m.norm ? (mw.days >= m.norm ? ' — норма взята' : (mw.days >= (m.floorWeek || 0) ? ' — выше порога' : '')) : '');
+    } else {
+      const inp = wrap.querySelector('input[data-m="' + m.id + '"]');
+      if(document.activeElement !== inp) inp.value = v ? v : '';
+      host.querySelector('[data-week="' + m.id + '"]').textContent =
+        'За неделю: ' + mw.days + ' из 7 дней · всего ' + mw.sum + ' ' + (m.unit || '') +
+        ' · в среднем ' + (mw.days ? Math.round(mw.sum / mw.days) : 0) + ' в день, когда было';
+    }
+    const w = mw;
     if(m.chain){
       const ch = measChain(m.id);
       const el = host.querySelector('[data-chain="' + m.id + '"]');
@@ -1606,6 +1658,75 @@ function renderAll(){ renderWatch(); renderLevers(); renderSleep(); renderSectio
   sortStatic('sleep_rows', document.querySelector('.pnl-in.sleep'), '.grp');
   const d = DAYS.find(x => x.id === current);
   document.getElementById('btn-copy').textContent = 'Отчёт ' + d.date;
+}
+
+/* ================= ЗАМЕР ПОСЛЕ СОБЫТИЯ =================
+   Ритуал с полем probe в каталоге: каждое +1 сопровождается вопросами.
+   Ставится факт, а не оценка. */
+let probeItem = null;
+
+function probeOpen(item){
+  probeItem = item;
+  const box_ = document.getElementById('pb-fields');
+  box_.innerHTML = item.probe.map(f => {
+    if(f.type === 'scale'){
+      return '<div class="pb-f"><label>' + f.label + '</label><div class="pb-scale" data-k="' + f.k + '">' +
+        f.opts.map((o, n) => '<button type="button" data-v="' + n + '" title="' + o + '">' + n + '</button>').join('') +
+        '</div><div class="pb-hint" data-hint="' + f.k + '">' + f.opts[0] + '</div></div>';
+    }
+    if(f.type === 'yesno'){
+      return '<div class="pb-f"><label>' + f.label + '</label><div class="pb-scale" data-k="' + f.k + '">' +
+        '<button type="button" data-v="0">нет</button><button type="button" data-v="1">да</button></div></div>';
+    }
+    return '<div class="pb-f"><label>' + f.label + '</label>' +
+      '<input class="num" type="number" inputmode="numeric" data-k="' + f.k + '" placeholder="' + (f.unit || '') + '"></div>';
+  }).join('');
+  box_.querySelectorAll('.pb-scale').forEach(sc => {
+    sc.querySelectorAll('button').forEach(btn => {
+      btn.onclick = () => {
+        sc.querySelectorAll('button').forEach(x => x.dataset.on = '0');
+        btn.dataset.on = '1'; sc.dataset.val = btn.dataset.v;
+        const f = probeItem.probe.find(x => x.k === sc.dataset.k);
+        const h = box_.querySelector('[data-hint="' + sc.dataset.k + '"]');
+        if(h && f && f.opts) h.textContent = f.opts[+btn.dataset.v];
+      };
+    });
+  });
+  document.getElementById('pb-title').textContent = item.name;
+  document.getElementById('pb').dataset.open = '1';
+}
+
+function probeSave(){
+  if(!probeItem) return;
+  const b = box(W), rec = {d: (DAYS.find(x => x.id === current) || {}).date || ''};
+  let miss = '';
+  probeItem.probe.forEach(f => {
+    const sc = document.querySelector('#pb-fields .pb-scale[data-k="' + f.k + '"]');
+    if(sc){ if(sc.dataset.val === undefined){ miss = f.label; return; } rec[f.k] = +sc.dataset.val; return; }
+    const inp = document.querySelector('#pb-fields input[data-k="' + f.k + '"]');
+    if(inp){ if(inp.value === ''){ miss = f.label; return; } rec[f.k] = parseInt(inp.value, 10) || 0; }
+  });
+  if(miss){ toast('Не заполнено: ' + miss); return; }
+  if(!Array.isArray(b.probes[probeItem.id])) b.probes[probeItem.id] = [];
+  b.probes[probeItem.id].push(rec);
+  b.tally[probeItem.id] = (b.tally[probeItem.id] || 0) + 1;
+  save(); document.getElementById('pb').dataset.open = '0'; probeItem = null; renderAll();
+  toast('Заход записан');
+}
+document.getElementById('pb-save').onclick = probeSave;
+document.getElementById('pb-cancel').onclick = () => { document.getElementById('pb').dataset.open = '0'; probeItem = null; };
+document.getElementById('pb').onclick = e => { if(e.target.id === 'pb'){ document.getElementById('pb').dataset.open = '0'; probeItem = null; } };
+
+function probeText(item){
+  const recs = (box(W).probes || {})[item.id] || [];
+  if(!recs.length) return '';
+  return recs.map(r => item.probe.map(f => {
+    const v = r[f.k];
+    if(v === undefined) return '';
+    if(f.type === 'scale') return f.short + ' ' + v;
+    if(f.type === 'yesno') return f.short + ' ' + (v ? 'да' : 'нет');
+    return f.short + ' ' + v + (f.unit ? ' ' + f.unit : '');
+  }).filter(Boolean).join(' · ') + (r.d ? ' (' + r.d + ')' : '')).join('  |  ');
 }
 
 /* ================= ОТЧЁТ ================= */
@@ -1870,6 +1991,24 @@ function buildWeekReport(){
     stoolRows.forEach(([d,v]) => { out += '| ' + d.label + ' ' + d.date + ' | ' + v + ' |\n'; });
   }
 
+  const probed = [];
+  SECTIONS.forEach(sec => sec.items.forEach(i => { if(i.probe && i.probe.length && ((w.probes || {})[i.id] || []).length) probed.push(i); }));
+  if(probed.length){
+    out += '\n### Замеры после события\n';
+    probed.forEach(i => {
+      out += '\n**' + i.name + '** — заходов ' + (w.probes[i.id] || []).length + '\n\n';
+      (w.probes[i.id] || []).forEach(r => {
+        out += '- ' + (r.d ? r.d + ' · ' : '') + i.probe.map(f => {
+          const v = r[f.k];
+          if(v === undefined) return '';
+          if(f.type === 'yesno') return f.short + ': ' + (v ? 'да' : 'нет');
+          if(f.type === 'scale') return f.short + ': ' + v + ' — ' + f.opts[v];
+          return f.short + ': ' + v + (f.unit ? ' ' + f.unit : '');
+        }).filter(Boolean).join(' · ') + '\n';
+      });
+    });
+  }
+
   if(DAYMEAS.length){
     out += '\n### Числовые замеры дня — вне счёта привычек\n';
     DAYMEAS.forEach(m => {
@@ -1961,6 +2100,8 @@ function slimBox(b){
   ['bed','wake','en1','en2','en3','pain','stool','phrase','notes',
    'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => { if(b[k]) o[k] = b[k]; });
   ['prom','hit','phraseN'].forEach(k => { if(b[k]) o[k] = b[k]; });
+  if(b.meas && Object.keys(b.meas).length) o.meas = b.meas;
+  if(b.probes && Object.keys(b.probes).length) o.probes = b.probes;
   if(b.ext) o.ext = true;
   return Object.keys(o).length ? o : null;
 }
@@ -1995,10 +2136,12 @@ function cleanBox(raw){
   });
   b.tally = {};
   if(raw && raw.tally) Object.keys(raw.tally).forEach(id => { if(knownId(id)) b.tally[id] = Number(raw.tally[id]) || 0; });
+  if(raw && raw.probes) Object.keys(raw.probes).forEach(id => { if(knownId(id) && Array.isArray(raw.probes[id])) b.probes[id] = raw.probes[id]; });
   b.focus = (raw && Array.isArray(raw.focus)) ? raw.focus.filter(knownId) : [];
   b.notesList = (raw && Array.isArray(raw.notesList)) ? raw.notesList.filter(n => n && typeof n.text === 'string') : [];
   b.chron = (raw && Array.isArray(raw.chron)) ? raw.chron.filter(e => e && CHRON[e.t]) : [];
   b.exported = (raw && Array.isArray(raw.exported)) ? raw.exported.slice() : [];
+  b.meas = (raw && raw.meas && typeof raw.meas === 'object') ? raw.meas : {};
   ['bed','wake','sleep','en1','en2','en3','pain','stool','notes','phrase',
    'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => {
     b[k] = (raw && typeof raw[k] === 'string') ? raw[k] : '';
