@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-05 12:10 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-05 16:20 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -16,6 +16,7 @@
   --rule:#D3D9DE; --signal:#B3261E; --signal-bg:#FBECEA; --amber:#8A5A00; --amber-bg:#FAF0DC;
   --sea:#1B5E4A; --sea-bg:#E7F1ED; --steel:#6B7280; --steel-bg:#EDF0F2; --radius:3px;
   --azure:#B58100; --azure-bg:#FFF2B8; --grass:#1E7A3C; --grass-bg:#E2F3E7;
+  --sky:#1F6FB2; --sky-bg:#E6F0F8;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -163,10 +164,6 @@ section[data-panel]{margin:0 0 12px}
   color:var(--ink-soft);margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--rule);display:flex;align-items:center;gap:8px}
 .once{margin:18px 0 12px;border:1px solid var(--rule);border-radius:var(--radius);background:var(--card)}
 .once-head{cursor:pointer}
-.fixes{margin:16px 0 10px;border:1px solid var(--rule);border-radius:var(--radius);background:var(--card)}
-.fixes-head{cursor:pointer}
-#fixes-body{padding:0 12px 14px}
-.fixes-hint{font-size:12px;color:var(--ink-mute);line-height:1.45;margin:0 0 10px}
 .fixes-layer{display:flex;gap:5px;margin-bottom:8px}
 .fixes-layer button{flex:1;padding:8px 0;border:1px solid var(--rule);background:#fff;color:var(--ink-soft);
   border-radius:var(--radius);font:inherit;font-size:12.5px;cursor:pointer}
@@ -175,7 +172,7 @@ section[data-panel]{margin:0 0 12px}
   font:inherit;font-size:13px;background:var(--paper);color:var(--ink);resize:vertical}
 .fix-tag{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.05em;text-transform:uppercase;
   border:1px solid var(--rule);border-radius:99px;padding:2px 7px;color:var(--ink-soft);margin-right:6px;white-space:nowrap}
-body.reorder .fixes{display:none}
+#fix-list{margin-top:12px}
 
 .once #once-body{padding:0 10px 4px}
 .once #once-body section[data-panel]{margin:0 0 10px}
@@ -197,9 +194,14 @@ body.reorder .ordbar{display:flex}
 .mode[data-m="touch"]{background:var(--amber-bg);border-color:var(--amber);color:var(--ink)}
 body.reorder .mode{display:none}
 .phrase-wrap{display:flex;gap:7px;align-items:stretch;margin:14px 0 4px}
+.key-warn{margin:12px 0 0;padding:10px 12px;border-radius:var(--radius);border:1px solid #E0A0A2;
+  background:var(--signal-bg);color:#7A1E1A;font-size:12.5px;line-height:1.45}
 .duty{margin:14px 0 4px}
 .duty .phrase-wrap{margin:0}
-.duty-ctl{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.duty-bar{background:var(--sky) !important;border-color:var(--sky) !important}
+.duty-bar[data-on="1"]{background:var(--grass) !important;border-color:var(--grass) !important}
+.duty-ctl{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap;
+  border:1px solid var(--rule);border-radius:var(--radius);background:var(--card);padding:9px 10px}
 .duty-first{border:1px solid var(--rule);background:#fff;color:var(--ink-soft);border-radius:var(--radius);
   font:inherit;font-size:12.5px;padding:8px 12px;cursor:pointer;white-space:nowrap}
 .duty-first[data-on="1"]{background:var(--grass);border-color:var(--grass);color:#fff}
@@ -321,6 +323,10 @@ body.reorder .sec-head .count{margin-left:auto}
 .mv-row button.solid{background:var(--ink);color:#fff}
 .mv-row button:hover{opacity:.85}
 .mv-note{font-size:12px;color:var(--ink-mute);margin-top:10px;line-height:1.45}
+.mv-say{margin-top:12px;padding:10px 11px;border-radius:var(--radius);font-size:12.5px;line-height:1.45;
+  border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+.mv-say[data-k="err"]{border-color:#E0A0A2;background:var(--signal-bg);color:#7A1E1A}
+.mv-say[data-k="ok"]{border-color:#9CCBAE;background:var(--grass-bg);color:#14512B}
 .syncdot{font:500 11.5px/1 "IBM Plex Sans",sans-serif;padding:4px 7px;border-radius:99px;border:1px solid var(--rule);color:var(--ink-soft);white-space:nowrap}
 .syncdot[data-s="ok"]{color:#1E6B3A;border-color:#9CCBAE}
 .syncdot[data-s="work"]{color:var(--ink-soft)}
@@ -348,22 +354,20 @@ body.reorder .sec-head .count{margin-left:auto}
 .seg textarea.filled{border-color:var(--ink-soft)}
 .seg-hint{font-size:11px;color:var(--ink-mute);line-height:1.4;margin:0 0 10px}
 .soul{border:1px solid var(--rule);background:var(--card);border-radius:var(--radius);padding:10px;margin:0 0 10px}
-.soul-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.soul-row{display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap}
-.soul-row + .soul-row{border-top:1px solid var(--rule)}
-.soul-lbl{flex:1 1 auto;font-size:13px;min-width:90px}
-.soul-num{display:flex;align-items:center;gap:5px}
-.soul-num .num{width:56px}
+.soul-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.soul-cell{display:flex;align-items:center;gap:4px}
+.soul-cell .num{width:52px}
+
 .soul-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.soul-ttl{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.05em;text-transform:uppercase;flex:1 1 auto}
+.soul-ttl{font-family:'Oswald',sans-serif;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;flex:1 1 auto;min-width:110px}
 .soul .num{width:62px}
 .soul-unit{font-size:12px;color:var(--ink-soft)}
 .soul-chain{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.04em;text-transform:uppercase;
   border:1px solid var(--rule);border-radius:99px;padding:3px 9px;color:var(--ink-soft);background:var(--paper);white-space:nowrap}
 .soul-chain[data-hot="1"]{background:var(--sea);color:#fff;border-color:var(--sea)}
-.soul-week{font-size:11.5px;color:var(--ink-mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.soul-week{font-size:11.5px;color:var(--ink-mute);margin-top:6px;font-variant-numeric:tabular-nums;line-height:1.4}
 .soul.done{border-color:var(--sea)}
-.soul.done .soul-head{color:var(--sea)}
+.soul.done .soul-ttl{color:var(--sea)}
 .soul-yes{border:1px solid var(--rule);background:#fff;color:var(--ink-soft);border-radius:var(--radius);
   font:inherit;font-size:12.5px;padding:7px 14px;cursor:pointer;white-space:nowrap}
 .soul-yes[data-on="1"]{background:var(--sea);border-color:var(--sea);color:#fff}
@@ -413,16 +417,18 @@ body.reorder .tried{display:none}
 </header>
 
 <main class="wrap">
+  <div class="key-warn" id="key-warn" hidden></div>
+
   <div class="duty" id="duty">
     <div class="phrase-wrap">
-      <button type="button" class="phrase-bar" id="duty-bar" data-on="0">
+      <button type="button" class="phrase-bar duty-bar" id="duty-bar" data-on="0" aria-expanded="false">
         <span class="ttl">Дело<br>дня</span>
         <span class="ph-txt empty" id="duty-txt">нажми ✎, чтобы назвать основное дело</span>
         <span class="ph-n" id="duty-n">0</span>
       </button>
       <button type="button" class="phrase-edit" id="duty-edit" aria-label="Назвать основное дело дня">✎</button>
     </div>
-    <div class="duty-ctl">
+    <div class="duty-ctl" id="duty-ctl" hidden>
       <button type="button" class="duty-first" id="duty-first">начал первым</button>
       <button type="button" class="duty-add" data-add="15">+15</button>
       <button type="button" class="duty-add" data-add="30">+30</button>
@@ -488,6 +494,8 @@ body.reorder .tried{display:none}
     <div class="seg-hint">Нажми на квадрат — 🟢 работал на цели · 🟡 наполовину · 🔴 потерял. Поле раскрывается при нажатии, диктуй голосом.</div>
 
 
+    <div class="grp" data-id="g-d1"><div class="grp-body"><div id="daymeas"></div></div></div>
+
     <div class="grp" data-id="g-sleep"><div class="grp-body">
     <div class="line">
       <span class="lbl">Сон</span>
@@ -525,11 +533,6 @@ body.reorder .tried{display:none}
   </div></div>
   </section>
 
-  <section class="z-steel" data-panel="meas">
-    <div class="sec-head"><span class="fold">▸</span><h2>Практика и замеры</h2><span class="count" id="cnt-meas"></span></div>
-    <div class="pnl"><div class="pnl-in"><div id="daymeas"></div></div></div>
-  </section>
-
   <section class="z-steel" data-panel="journal">
     <div class="sec-head"><span class="fold">▸</span><h2>Заметки и хроника</h2><span class="tag">в течение дня</span><span class="count" id="cnt-journal"></span></div>
     <div class="pnl"><div class="pnl-in notes">
@@ -560,22 +563,6 @@ body.reorder .tried{display:none}
     <div id="once-body"></div>
   </div>
 
-  <div class="fixes" id="fixes">
-    <div class="sec-head fixes-head" id="fixes-head"><span class="fold">▸</span><h2>Поправки листа</h2><span class="count" id="cnt-fixes"></span></div>
-    <div id="fixes-body">
-      <p class="fixes-hint">Что в самом листе мешает или чего не хватает. Копится здесь, уходит в технический диалог одной кнопкой.</p>
-      <div class="fixes-layer" id="fix-layer">
-        <button type="button" data-l="catalog">каталог</button>
-        <button type="button" data-l="engine">движок</button>
-        <button type="button" data-l="unknown" data-on="1">не знаю</button>
-      </div>
-      <textarea id="fix-text" placeholder="Что изменить в вахтенном листе"></textarea>
-      <div class="mv-row">
-        <button type="button" class="solid" id="fix-add">Записать поправку</button>
-        <button type="button" id="fix-copy">Скопировать поправки</button>
-      </div>
-      <div class="cmt-list" id="fix-list"></div>
-    </div>
   </div>
 </main>
 
@@ -584,6 +571,7 @@ body.reorder .tried{display:none}
     <button class="grow" id="btn-copy">Отчёт за день</button>
     <button class="ghost" id="btn-week">Неделя</button>
     <button class="ghost" id="btn-move">Загрузить</button>
+    <button class="ghost" id="btn-fixes">Поправки</button>
   </div>
 </div>
 
@@ -599,6 +587,7 @@ body.reorder .tried{display:none}
       <button type="button" id="mv-close">Закрыть</button>
     </div>
     <p class="mv-hint" style="margin:14px 0 0">Обновление самого листа — когда я присылаю новый index.html. Заливается на сервер отсюда, заходить на GitHub не нужно.</p>
+    <div class="mv-say" id="mv-say" hidden></div>
     <input type="file" id="eng-file" accept=".html,text/html" hidden>
     <div class="mv-row">
       <button type="button" id="eng-pick">Обновить движок файлом</button>
@@ -619,6 +608,8 @@ body.reorder .tried{display:none}
     <input id="sy-path" spellcheck="false" autocomplete="off" placeholder="state.json">
     <label for="sy-engine">Репозиторий с самим листом — для обновления движка файлом</label>
     <input id="sy-engine" spellcheck="false" autocomplete="off" placeholder="vahta">
+    <label for="sy-till">Ключ действует до — дата из GitHub, формат ДД.ММ.ГГГГ</label>
+    <input id="sy-till" spellcheck="false" autocomplete="off" inputmode="numeric" placeholder="04.09.2027">
     <label for="sy-token">Ключ доступа</label>
     <input id="sy-token" type="password" spellcheck="false" autocomplete="off" placeholder="github_pat_...">
     <div class="mv-row">
@@ -630,6 +621,25 @@ body.reorder .tried{display:none}
       <button type="button" id="sy-close">Закрыть</button>
     </div>
     <p class="mv-note" id="sy-note">Правило: отмечай на одном устройстве за раз. Если открыть страницу сразу на двух и править в обеих, сохранённое позже затрёт раннее — страница предупредит, но разрешить конфликт придётся тебе.</p>
+  </div>
+</div>
+
+<div class="mv" id="fixes" data-open="0">
+  <div class="mv-in">
+    <h3>Поправки листа</h3>
+    <p class="mv-hint">Что в самом листе мешает или чего не хватает. Копится здесь, уходит в технический диалог одной кнопкой.</p>
+    <div class="fixes-layer" id="fix-layer">
+      <button type="button" data-l="catalog">каталог</button>
+      <button type="button" data-l="engine">движок</button>
+      <button type="button" data-l="unknown" data-on="1">не знаю</button>
+    </div>
+    <textarea id="fix-text" placeholder="Что изменить в вахтенном листе"></textarea>
+    <div class="mv-row">
+      <button type="button" class="solid" id="fix-add">Записать поправку</button>
+      <button type="button" id="fix-copy">Скопировать</button>
+      <button type="button" id="fix-close">Закрыть</button>
+    </div>
+    <div class="cmt-list" id="fix-list"></div>
   </div>
 </div>
 
@@ -833,17 +843,17 @@ function renderWatch(){
 
 /* ================= ПОРЯДОК РАЗДЕЛОВ И ПУНКТОВ ================= */
 /* Хранится глобально, не по неделям: настроил один раз — работает дальше */
-const ORDER_KEY = 'vahta_11_order_v3';
-const DEFAULT_SECS = ['today','day','meas','journal','levers'].concat(SECTIONS.map(x => x.key));
+const ORDER_KEY = 'vahta_11_order_v4';
+const DEFAULT_SECS = ['today','day','journal','levers'].concat(SECTIONS.map(x => x.key));
 const BUILTIN_ORDER = {
-  secs:['today','day','meas','journal','habits','tasks','queue','rituals','rituals_long','levers','weekmeas'],
+  secs:['today','day','journal','habits','tasks','queue','rituals','rituals_long','levers','weekmeas'],
   items:{
     habits:['E1','E2','E8','E9','O1','O3','L1'],
     tasks:['N8','N9','N3','SH8','R11','R21','L3','N11','N12','N10','TN1','TO1','TN3'],
     queue:['SH2','V7','SH4','Z4'],
     rituals:['R1','R2','R3','R8','R9'],
     rituals_long:['R4','R7','R6','R12','R11v'],
-    sleep_rows:['g-energy','g-word','g-stool','g-sleep']
+    sleep_rows:['g-d1','g-word','g-stool','g-sleep']
   }
 };
 let ORDER = JSON.parse(JSON.stringify(BUILTIN_ORDER));
@@ -874,7 +884,7 @@ function moveItem(sec, id, dir){
   ORDER.items[sec.key] = moveIn(itemOrder(sec).map(i => i.id), id, dir);
   saveOrder(); renderSections();
 }
-const DAY_KEYS = ['today','day','meas','journal'];
+const DAY_KEYS = ['today','day','journal'];
 function applyOrder(){
   const host = document.querySelector('main');
   const once = document.getElementById('once');
@@ -1117,6 +1127,9 @@ function renderDuty(){
   document.getElementById('duty-first').textContent = b.dutyFirst ? 'начал первым ✓' : 'начал первым';
   const inp = document.getElementById('duty-min');
   if(document.activeElement !== inp) inp.value = b.dutyMin ? b.dutyMin : '';
+  const ctl = document.getElementById('duty-ctl');
+  if(collapsed['duty'] === 1) ctl.removeAttribute('hidden'); else ctl.setAttribute('hidden', '');
+  document.getElementById('duty-bar').setAttribute('aria-expanded', collapsed['duty'] === 1 ? 'true' : 'false');
 }
 function dutyAdd(n){
   const b = box(current);
@@ -1134,13 +1147,19 @@ document.getElementById('duty-edit').onclick = () => {
   toast(b.duty ? 'Дело дня записано' : 'Дело дня очищено');
 };
 document.getElementById('duty-bar').onclick = () => {
+  const ctl = document.getElementById('duty-ctl');
+  const open = ctl.hasAttribute('hidden');
+  if(open) ctl.removeAttribute('hidden'); else ctl.setAttribute('hidden', '');
+  document.getElementById('duty-bar').setAttribute('aria-expanded', open ? 'true' : 'false');
+  collapsed['duty'] = open ? 1 : 0; saveUI();
+};
+document.getElementById('duty-first').onclick = () => {
   const b = box(current);
   if(!b.duty){ toast('Сначала назови дело — кнопка ✎'); return; }
   b.dutyFirst = b.dutyFirst ? 0 : 1;
   save(); renderDuty(); renderPanels();
   toast(b.dutyFirst ? 'Начал первым — засчитано' : 'Отметка снята');
 };
-document.getElementById('duty-first').onclick = () => document.getElementById('duty-bar').onclick();
 document.querySelectorAll('.duty-add').forEach(btn => { btn.onclick = () => dutyAdd(+btn.dataset.add); });
 document.getElementById('duty-min').oninput = e => {
   const b = box(current);
@@ -1263,15 +1282,15 @@ function renderPanels(){
     today:  '',
     levers: (() => { let d=0,t=0; LEVERS.forEach(l => { const p = leverProgress(l.id); d+=p.done; t+=p.total; }); return d + ' / ' + t; })(),
     day:    (b.sleep !== '' ? b.sleep + ' ч' : 'сон не внесён') + ' · отрезки ' + segDone + '/3' +
-            DAYMEAS.map(m => measVal(b, m.id) ? ' · ' + m.name.toLowerCase() + ' ' + measVal(b, m.id) + ' ' + (m.unit || '') : '').join(''),
-    journal:(b.notesList.length ? b.notesList.length + ' зам.' : 'заметок нет') + ' · хроника ' + w.chron.length,
-    meas:   DAYMEAS.map(m => {
+            DAYMEAS.map(m => {
               const v = measVal(b, m.id);
-              return m.kind === 'check' ? (v ? '✓' : '—') : (v ? v + ' ' + (m.unit || '') : '');
-            }).filter(Boolean).join(' · ')
+              if(!v) return '';
+              return ' · ' + (m.short || m.name) + ' ' + (m.kind === 'check' ? '✓' : v + ' ' + (m.unit || ''));
+            }).join(''),
+    journal:(b.notesList.length ? b.notesList.length + ' зам.' : 'заметок нет') + ' · хроника ' + w.chron.length
   };
   const so = secOrder();
-  ['today','levers','day','meas','journal'].forEach(key => {
+  ['today','levers','day','journal'].forEach(key => {
     const sec = document.querySelector('[data-panel="' + key + '"]');
     if(!sec) return;
     const head = sec.querySelector('.sec-head');
@@ -1822,21 +1841,20 @@ function renderDayMeas(){
     host.dataset.built = String(groups.length);
     host.innerHTML = groups.map(g => (
       '<div class="soul" data-grp="' + g.key + '">' +
-        '<div class="soul-head"><span class="soul-ttl">' + g.title + '</span>' +
+        '<div class="soul-line">' +
+          '<span class="soul-ttl">' + g.title + '</span>' +
+          g.rows.map(m => (m.kind === 'check'
+            ? '<span class="soul-cell" data-meas="' + m.id + '">' +
+                '<button type="button" class="soul-yes meas-ctl" data-c="' + m.id + '">отметить</button></span>'
+            : '<span class="soul-cell soul-num" data-meas="' + m.id + '">' +
+                '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="-1">−</button>' +
+                '<input class="num meas-ctl" type="number" inputmode="numeric" data-m="' + m.id + '">' +
+                '<span class="soul-unit">' + (m.unit || '') + '</span>' +
+                '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="1">+</button></span>'
+          )).join('') +
           (g.rows.some(m => m.chain) ? '<span class="soul-chain" data-chain="' + (g.rows.find(m => m.chain) || {}).id + '"></span>' : '') +
         '</div>' +
-        g.rows.map(m =>
-          '<div class="soul-row" data-meas="' + m.id + '">' +
-            '<span class="soul-lbl">' + (m.short || m.name) + '</span>' +
-            (m.kind === 'check'
-              ? '<button type="button" class="soul-yes meas-ctl" data-c="' + m.id + '">отметить</button>'
-              : '<span class="soul-num"><button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="-1">−</button>' +
-                '<input class="num meas-ctl" type="number" inputmode="numeric" data-m="' + m.id + '">' +
-                '<button type="button" class="step meas-ctl" data-m="' + m.id + '" data-d="1">+</button>' +
-                '<span class="soul-unit">' + (m.unit || '') + '</span></span>') +
-            '<span class="soul-week" data-week="' + m.id + '"></span>' +
-          '</div>'
-        ).join('') +
+        '<div class="soul-week" data-gweek="' + g.key + '"></div>' +
         (g.note ? '<div class="soul-note">' + g.note + '</div>' : '') +
       '</div>'
     )).join('');
@@ -1853,32 +1871,37 @@ function renderDayMeas(){
       };
     });
   }
-  DAYMEAS.forEach(m => {
-    const v = measVal(b, m.id);
-    const wrap = host.querySelector('[data-meas="' + m.id + '"]');
-    if(!wrap) return;
-    const mw = measWeek(m);
-    if(m.kind === 'check'){
-      const btn = wrap.querySelector('button.soul-yes');
-      btn.dataset.on = v ? '1' : '0';
-      btn.textContent = v ? 'сделано' : 'отметить';
-      wrap.closest('.soul').classList.toggle('done', !!v);
-      wrap.querySelector('[data-week]').textContent =
-        mw.days + '/7' + (m.norm ? ' · норма ' + m.norm : '');
-    } else {
-      const inp = wrap.querySelector('input[data-m="' + m.id + '"]');
-      if(document.activeElement !== inp) inp.value = v ? v : '';
-      wrap.querySelector('[data-week]').textContent = 'за неделю ' + mw.sum + ' ' + (m.unit || '');
-    }
-    if(m.chain){
-      const el = host.querySelector('[data-chain="' + m.id + '"]');
-      if(el){ const ch = measChain(m.id); el.textContent = 'цепочка ' + ch + wordDays(ch); el.dataset.hot = ch >= 3 ? '1' : '0'; }
-    }
+  groups.forEach(g => {
+    const parts = [];
+    g.rows.forEach(m => {
+      const v = measVal(b, m.id);
+      const cell = host.querySelector('[data-meas="' + m.id + '"]');
+      if(!cell) return;
+      const mw = measWeek(m);
+      if(m.kind === 'check'){
+        const btn = cell.querySelector('button.soul-yes');
+        btn.dataset.on = v ? '1' : '0';
+        btn.textContent = v ? 'сделано' : 'отметить';
+        cell.closest('.soul').classList.toggle('done', !!v);
+        parts.push(mw.days + '/7' + (m.norm ? ' при норме ' + m.norm : '') + (m.floorWeek ? ', порог ' + m.floorWeek : ''));
+      } else {
+        const inp = cell.querySelector('input[data-m="' + m.id + '"]');
+        if(document.activeElement !== inp) inp.value = v ? v : '';
+        parts.push('за неделю ' + mw.sum + ' ' + (m.unit || ''));
+      }
+      if(m.chain){
+        const el = host.querySelector('[data-chain="' + m.id + '"]');
+        if(el){ const ch = measChain(m.id); el.textContent = ch + wordDays(ch) + ' подряд'; el.dataset.hot = ch >= 3 ? '1' : '0'; }
+      }
+    });
+    const gw = host.querySelector('[data-gweek="' + g.key + '"]');
+    if(gw) gw.textContent = parts.join(' · ');
   });
 }
 
 function renderAll(){ renderWatch(); renderLevers(); renderSleep(); renderSections(); renderNotes(); renderChronForm(); renderChronList(); renderPanels();
   renderToday(); renderDuty(); renderPhrase(); renderSegs(); renderDayMeas(); renderFixes();
+  if(typeof keyWarn === 'function') keyWarn();
   sortStatic('sleep_rows', document.querySelector('.pnl-in.sleep'), '.grp');
   const d = DAYS.find(x => x.id === current);
   document.getElementById('btn-copy').textContent = 'Отчёт ' + d.date;
@@ -1967,11 +1990,8 @@ function fixesSave(a){ try { localStorage.setItem(FIX_KEY, JSON.stringify(a)); }
 
 function renderFixes(){
   const a = fixes();
-  const open = collapsed['fixes'] === 1;
-  const head = document.getElementById('fixes-head');
-  head.querySelector('.fold').textContent = open ? '▾' : '▸';
-  document.getElementById('fixes-body').style.display = open ? '' : 'none';
-  document.getElementById('cnt-fixes').textContent = a.length ? String(a.length) : '';
+  const btn = document.getElementById('btn-fixes');
+  if(btn) btn.textContent = a.length ? 'Поправки ' + a.length : 'Поправки';
   const list = document.getElementById('fix-list');
   list.innerHTML = '';
   a.forEach((f, i) => {
@@ -1989,7 +2009,9 @@ function renderFixes(){
   document.querySelectorAll('#fix-layer button').forEach(b => b.dataset.on = (b.dataset.l === fixLayer) ? '1' : '0');
 }
 
-document.getElementById('fixes-head').onclick = () => { collapsed['fixes'] = collapsed['fixes'] === 1 ? 0 : 1; saveUI(); renderFixes(); };
+document.getElementById('btn-fixes').onclick = () => { document.getElementById('fixes').dataset.open = '1'; renderFixes(); };
+document.getElementById('fix-close').onclick = () => { document.getElementById('fixes').dataset.open = '0'; };
+document.getElementById('fixes').onclick = e => { if(e.target.id === 'fixes') e.target.dataset.open = '0'; };
 document.querySelectorAll('#fix-layer button').forEach(b => {
   b.onclick = () => { fixLayer = b.dataset.l; renderFixes(); };
 });
@@ -2506,11 +2528,11 @@ function parseMove(txt){
   const i = t.indexOf('{"vahta"');
   if(i >= 0){ try { o = JSON.parse(t.slice(i, t.lastIndexOf('}') + 1)); } catch(e){} }
   if(!o){ try { o = JSON.parse(t); } catch(e){} }
-  if(!o || typeof o !== 'object') return {err:'Блока переноса в этом тексте нет'};
+  if(!o || typeof o !== 'object') return {err:'Блока переноса в этом тексте нет. Нужен текст, содержащий {"vahta":2 — это хвост выгрузки со старой версии или файл с днями.'};
   const st = o.store && typeof o.store === 'object' ? o.store : (o.vahta ? null : o);
   if(!st || typeof st !== 'object') return {err:'В блоке нет данных'};
   const keys = Object.keys(st).filter(knownBox);
-  if(!keys.length) return {err:'В блоке нет ни одного дня этой недели'};
+  if(!keys.length) return {err:'В блоке нет ни одного дня текущей недели. Скорее всего блок от другой недели — сначала загрузи её каталог.'};
   return {store:st, keys:keys, order:o.order, week:o.week};
 }
 
@@ -2530,20 +2552,28 @@ function parseCat(txt){
 }
 
 function applyCat(r){
-  if(r.err){ toast(r.err); return; }
+  if(r.err){ mvSay('err', r.err); return; }
   const c = r.cat;
   if(CAT_LOADED && c.WEEK !== WEEK && !confirm('Загружается каталог недели ' + c.WEEK + ' вместо ' + WEEK + '.\nОтметки этой недели останутся в браузере и вернутся при возврате к её каталогу. Продолжить?')) return;
   try { localStorage.setItem(CAT_KEY, JSON.stringify({WEEK:c.WEEK, DAYS:c.DAYS, LEVERS:c.LEVERS || [], SECTIONS:c.SECTIONS, CODE:c.CODE || {}, DAYMEAS:c.DAYMEAS || []})); }
-  catch(e){ toast('Браузер не дал сохранить каталог'); return; }
+  catch(e){ mvSay('err', 'Браузер не дал сохранить каталог — возможно, кончилось место'); return; }
   location.reload();
 }
 
+function mvSay(kind, text){
+  const el = document.getElementById('mv-say');
+  if(!el) return;
+  if(!text){ el.hidden = true; el.textContent = ''; return; }
+  el.hidden = false; el.dataset.k = kind; el.textContent = text;
+}
+
 function applyMove(txt){
+  mvSay('', '');
   const c = parseCat(txt);
   if(c){ applyCat(c); return; }
-  if(!CAT_LOADED){ toast('Сначала залей каталог недели, потом отметки'); return; }
+  if(!CAT_LOADED){ mvSay('err', 'Сначала залей каталог недели, потом отметки. Каталог — блок, который начинается с {"vahtacat".'); return; }
   const r = parseMove(txt);
-  if(r.err){ toast(r.err); return; }
+  if(r.err){ mvSay('err', r.err); return; }
   if(r.week && r.week !== WEEK && !confirm('Блок собран за неделю ' + r.week + ', а открыта ' + WEEK + '.\nВсё равно загрузить?')) return;
   if(stateFilled() && !confirm('Здесь уже что-то внесено. Состояние будет заменено блоком целиком. Продолжить?')) return;
 
@@ -2560,7 +2590,8 @@ function applyMove(txt){
     ORDER = Object.assign({secs:[], items:{}}, r.order); saveOrder();
   }
   renderAll(); mvOpen(false);
-  toast('Состояние загружено · дней в блоке: ' + r.keys.length);
+  mvSay('ok', 'Состояние загружено · боксов в блоке: ' + r.keys.length);
+  toast('Состояние загружено');
 }
 
 const mv = document.getElementById('mv');
@@ -2823,6 +2854,7 @@ function syOpen(on){
     document.getElementById('sy-repo').value  = c.repo  || '';
     document.getElementById('sy-path').value  = c.path  || 'state.json';
     document.getElementById('sy-engine').value = c.engineRepo || 'vahta';
+    document.getElementById('sy-till').value = c.till || '';
     document.getElementById('sy-token').value = c.token || '';
   }
 }
@@ -2838,6 +2870,7 @@ document.getElementById('sy-save').onclick = async () => {
     repo:  document.getElementById('sy-repo').value.trim(),
     path:  document.getElementById('sy-path').value.trim() || 'state.json',
     engineRepo: document.getElementById('sy-engine').value.trim() || 'vahta',
+    till: document.getElementById('sy-till').value.trim(),
     token: document.getElementById('sy-token').value.trim(),
     branch:'main'
   };
@@ -2864,6 +2897,28 @@ document.getElementById('sy-off').onclick = () => {
   localStorage.removeItem(SYNC_CFG); localStorage.removeItem(SYNC_META);
   syncDot(null); syOpen(false); toast('Синхронизация отключена');
 };
+
+/* Срок ключа: предупреждаем за две недели, иначе синхронизация умрёт молча */
+function keyDaysLeft(){
+  const c = syncCfg(); if(!c || !c.till) return null;
+  const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(c.till.trim()); if(!m) return null;
+  const till = Date.UTC(+m[3], +m[2] - 1, +m[1]);
+  const now = new Date();
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((till - today) / 864e5);
+}
+function keyWarn(){
+  const n = keyDaysLeft();
+  if(n === null) return;
+  const el = document.getElementById('key-warn');
+  if(!el) return;
+  if(n > 14){ el.hidden = true; return; }
+  el.hidden = false;
+  el.textContent = n < 0
+    ? 'Ключ доступа истёк ' + Math.abs(n) + wordDays(Math.abs(n)) + ' назад — синхронизация не работает. Выпусти новый и впиши в облачко.'
+    : (n === 0 ? 'Ключ доступа истекает сегодня — выпусти новый и впиши в облачко.'
+               : 'Ключ доступа истекает через ' + n + wordDays(n) + '. Выпусти новый и впиши в облачко, иначе синхронизация встанет.');
+}
 
 /* Подтягивание при открытии и при возврате на вкладку */
 if(!syncCfg()) syncDot(null);
