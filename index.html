@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-05 16:20 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-07 21:40 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -198,8 +198,17 @@ body.reorder .mode{display:none}
   background:var(--signal-bg);color:#7A1E1A;font-size:12.5px;line-height:1.45}
 .duty{margin:14px 0 4px}
 .duty .phrase-wrap{margin:0}
-.duty-bar{background:var(--sky) !important;border-color:var(--sky) !important}
-.duty-bar[data-on="1"]{background:var(--grass) !important;border-color:var(--grass) !important}
+.duty-bar{background:var(--sky-bg) !important;border-color:#A8C8E4 !important;border-left-color:var(--sky) !important;
+  box-shadow:0 0 0 3px rgba(31,111,178,.18) !important}
+.duty-bar:hover{box-shadow:0 0 0 4px rgba(31,111,178,.30) !important}
+.duty-bar .ttl{color:var(--sky)}
+.duty-bar .ph-txt.empty{color:#5D7C99}
+.duty-bar .ph-n{color:var(--sky);border-color:#A8C8E4}
+.duty-bar[data-on="1"]{background:var(--grass-bg) !important;border-color:#A6D6B5 !important;border-left-color:var(--grass) !important;
+  box-shadow:0 0 0 3px rgba(30,122,60,.17) !important}
+.duty-bar[data-on="1"] .ttl{color:var(--grass)}
+.duty-bar[data-on="1"] .ph-n{color:var(--grass);border-color:var(--grass)}
+.duty-ctl[hidden]{display:none !important}
 .duty-ctl{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap;
   border:1px solid var(--rule);border-radius:var(--radius);background:var(--card);padding:9px 10px}
 .duty-first{border:1px solid var(--rule);background:#fff;color:var(--ink-soft);border-radius:var(--radius);
@@ -353,6 +362,19 @@ body.reorder .sec-head .count{margin-left:auto}
 .seg textarea:focus{height:132px;outline:2px solid var(--ink);outline-offset:-1px}
 .seg textarea.filled{border-color:var(--ink-soft)}
 .seg-hint{font-size:11px;color:var(--ink-mute);line-height:1.4;margin:0 0 10px}
+/* Л9 лёгкость · Л10 шаг загружен · Л11 главное дело */
+.seg-ez{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--ink-mute);margin-top:4px}
+.seg-ez .num{width:100%;min-width:0}
+.seg-tg{display:flex;gap:4px;margin-top:5px}
+.seg-tg button{flex:1;min-width:0;border:1px solid var(--rule);background:#fff;color:var(--ink-mute);
+  border-radius:var(--radius);font:inherit;font-size:10.5px;padding:5px 2px;cursor:pointer;line-height:1.1}
+.seg-tg button[data-on="1"]{background:var(--grass);border-color:var(--grass);color:#fff}
+.seg-tip{font-size:10px;color:var(--signal);line-height:1.25;margin-top:4px}
+.en-key{cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}
+.en-scale{font-size:11.5px;color:var(--ink-soft);line-height:1.55;margin:0 0 10px;
+  border:1px solid var(--rule);border-radius:var(--radius);background:var(--card);padding:9px 11px}
+.en-scale b{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-mute);display:block;margin-bottom:5px}
 .soul{border:1px solid var(--rule);background:var(--card);border-radius:var(--radius);padding:10px;margin:0 0 10px}
 .soul-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .soul-cell{display:flex;align-items:center;gap:4px}
@@ -475,23 +497,42 @@ body.reorder .tried{display:none}
       <div class="seg" data-seg="1" id="seg1">
         <div class="seg-when">подъём<br>→ 13:00</div>
         <button type="button" class="seg-v" id="segv1" title="Оценка отрезка">⬜</button>
-        <div class="seg-en"><span>эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en1"></div>
+        <div class="seg-en"><span class="en-key" data-scale="1" title="Шкала энергии">эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en1"></div>
+        <div class="seg-ez"><span>лёг.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="ez1" title="Л9 — лёгкость отрезка, 1–10"></div>
+        <div class="seg-tg"><button type="button" id="st1" data-on="0" title="Л10 — следующий шаг загружен">шаг</button><button type="button" id="mn1" data-on="0" title="Л11 — работал по главному делу">глав.</button></div>
+        <div class="seg-tip" id="tip1" hidden>назови следующее действие сейчас</div>
         <textarea id="segt1" placeholder="надиктуй"></textarea>
       </div>
       <div class="seg" data-seg="2" id="seg2">
         <div class="seg-when">13:00<br>→ 19:00</div>
         <button type="button" class="seg-v" id="segv2" title="Оценка отрезка">⬜</button>
-        <div class="seg-en"><span>эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en2"></div>
+        <div class="seg-en"><span class="en-key" data-scale="1" title="Шкала энергии">эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en2"></div>
+        <div class="seg-ez"><span>лёг.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="ez2" title="Л9 — лёгкость отрезка, 1–10"></div>
+        <div class="seg-tg"><button type="button" id="st2" data-on="0" title="Л10 — следующий шаг загружен">шаг</button><button type="button" id="mn2" data-on="0" title="Л11 — работал по главному делу">глав.</button></div>
+        <div class="seg-tip" id="tip2" hidden>назови следующее действие сейчас</div>
         <textarea id="segt2" placeholder="надиктуй"></textarea>
       </div>
       <div class="seg" data-seg="3" id="seg3">
         <div class="seg-when">19:00<br>→ отбой</div>
         <button type="button" class="seg-v" id="segv3" title="Оценка отрезка">⬜</button>
-        <div class="seg-en"><span>эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en3"></div>
+        <div class="seg-en"><span class="en-key" data-scale="1" title="Шкала энергии">эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en3"></div>
+        <div class="seg-ez"><span>лёг.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="ez3" title="Л9 — лёгкость отрезка, 1–10"></div>
+        <div class="seg-tg"><button type="button" id="st3" data-on="0" title="Л10 — следующий шаг загружен">шаг</button><button type="button" id="mn3" data-on="0" title="Л11 — работал по главному делу">глав.</button></div>
+        <div class="seg-tip" id="tip3" hidden>назови следующее действие сейчас</div>
         <textarea id="segt3" placeholder="надиктуй"></textarea>
       </div>
     </div>
-    <div class="seg-hint">Нажми на квадрат — 🟢 работал на цели · 🟡 наполовину · 🔴 потерял. Поле раскрывается при нажатии, диктуй голосом.</div>
+    <div class="seg-hint">Нажми на квадрат — 🟢 работал на цели · 🟡 времени не было · 🔴 время было, ушёл в ненужное.
+      Оценивай по преобладанию, не по наличию: полчаса работы внутри шестичасового отрезка зелёным его не делают.
+      «лёг.» — замер Л9, лёгкость отрезка 1–10. «шаг» — замер Л10, следующий шаг был загружен на входе в отрезок.
+      «глав.» — замер Л11, работал по главному делу дня; засчитывается только при заполненной заметке.
+      Поле раскрывается при нажатии, диктуй голосом. Нажми «эн.» — шкала энергии.</div>
+    <div class="en-scale" id="en-scale" hidden><b>Шкала энергии</b>
+      1–2 — не могу работать, лежу, любое действие через силу<br>
+      3–4 — делаю только механическое, сложное не берётся<br>
+      5–6 — работаю, но без запаса: хватает на текущее, не на новое<br>
+      7–8 — рабочее состояние, сложное берётся без раскачки<br>
+      9–10 — подъём, беру больше обычного и не устаю</div>
 
 
     <div class="grp" data-id="g-d1"><div class="grp-body"><div id="daymeas"></div></div></div>
@@ -719,7 +760,8 @@ function box(name){
   if(typeof b.sleep === 'undefined') b.sleep = '';
   if(typeof b.bed === 'undefined') b.bed = '';
   if(typeof b.wake === 'undefined') b.wake = '';
-  ['en1','en2','en3','pain','stool'].forEach(k => { if(typeof b[k] === 'undefined') b[k] = ''; });
+  ['en1','en2','en3','ez1','ez2','ez3','pain','stool'].forEach(k => { if(typeof b[k] === 'undefined') b[k] = ''; });
+  ['st1','st2','st3','mn1','mn2','mn3'].forEach(k => { if(typeof b[k] !== 'number') b[k] = 0; });
   ['prom','hit'].forEach(k => { if(typeof b[k] !== 'number') b[k] = 0; });
   if(!Array.isArray(b.chron)) b.chron = [];
   if(!Array.isArray(b.focus)) b.focus = [];
@@ -1595,7 +1637,9 @@ document.getElementById('stool').oninput = e => { box(current).stool = e.target.
    Один заход закрывает и замер энергии, и разбор — отдельных поводов открывать лист не добавляется. */
 const SEG_WHEN = {1:'подъём → 13:00', 2:'13:00 → 19:00', 3:'19:00 → отбой'};
 const SEG_V = ['', 'on', 'half', 'lost'];
-const SEG_LBL = {'':'⬜ не разобран', on:'🟢 работал на цели', half:'🟡 наполовину', lost:'🔴 потерял отрезок'};
+const SEG_LBL = {'':'⬜ не разобран', on:'🟢 работал на цели',
+                 half:'🟡 времени не было — отрезок занят внешним',
+                 lost:'🔴 время было, ушёл в ненужное'};
 const SEG_ICON = {'':'⬜', on:'🟢', half:'🟡', lost:'🔴'};
 
 function segV(b, n){ return b['segv' + n] || ''; }
@@ -1613,6 +1657,26 @@ function renderSegs(){
     const ta = document.getElementById('segt' + n);
     if(document.activeElement !== ta) ta.value = b['segt' + n] || '';
     ta.classList.toggle('filled', !!(b['segt' + n] || '').trim());
+    /* Л9 лёгкость */
+    const ez = document.getElementById('ez' + n);
+    if(ez && document.activeElement !== ez) ez.value = b['ez' + n] || '';
+    /* Л10 шаг загружен · Л11 главное дело */
+    const st = document.getElementById('st' + n);
+    if(st){
+      st.dataset.on = b['st' + n] ? '1' : '0';
+      st.textContent = b['st' + n] ? 'шаг ✓' : 'шаг';
+    }
+    const mn = document.getElementById('mn' + n);
+    if(mn){
+      mn.dataset.on = b['mn' + n] ? '1' : '0';
+      mn.textContent = b['mn' + n] ? 'глав. ✓' : 'глав.';
+    }
+    /* подсказка появляется только когда шаг явно не загружен */
+    const tip = document.getElementById('tip' + n);
+    if(tip){
+      const asked = b['st' + n] === 0 && (v || b['ez' + n] || b['en' + n]);
+      if(asked) tip.removeAttribute('hidden'); else tip.setAttribute('hidden', '');
+    }
     if(v) done++;
   });
   const c = document.getElementById('cnt-segs');
@@ -1627,7 +1691,35 @@ function renderSegs(){
     save(); renderSegs();
   };
   document.getElementById('segt' + n).oninput = e => {
-    box(current)['segt' + n] = e.target.value; save();
+    box(current)['segt' + n] = e.target.value; save(); renderSegs();
+  };
+  const ez = document.getElementById('ez' + n);
+  if(ez) ez.oninput = e => {
+    const v = e.target.value.replace(/[^0-9]/g, '');
+    const num = v === '' ? '' : String(Math.max(1, Math.min(10, parseInt(v, 10) || 1)));
+    box(current)['ez' + n] = num; save(); renderSegs();
+  };
+  const st = document.getElementById('st' + n);
+  if(st) st.onclick = () => {
+    const b = box(current);
+    b['st' + n] = b['st' + n] ? 0 : 1; save(); renderSegs();
+  };
+  const mn = document.getElementById('mn' + n);
+  if(mn) mn.onclick = () => {
+    const b = box(current);
+    if(!b['mn' + n] && !(b['segt' + n] || '').trim()){
+      toast('Л11 (главное дело) не засчитывается: заметка отрезка пуста');
+    }
+    b['mn' + n] = b['mn' + n] ? 0 : 1; save(); renderSegs();
+  };
+});
+/* Л11 засчитывается только при заполненной заметке отрезка */
+function mnHit(b, n){ return (b['mn' + n] ? 1 : 0) && (b['segt' + n] || '').trim() ? 1 : 0; }
+document.querySelectorAll('.en-key').forEach(el => {
+  el.onclick = () => {
+    const sc = document.getElementById('en-scale');
+    if(!sc) return;
+    if(sc.hasAttribute('hidden')) sc.removeAttribute('hidden'); else sc.setAttribute('hidden', '');
   };
 });
 document.getElementById('ext').onchange = e => { const b = box(current); b.ext = e.target.checked; applySleepDerived(b); save(); renderAll(); };
@@ -2116,12 +2208,23 @@ function buildReport(){
       const v = dayB['segv' + n] || '';
       const t = dayB['segt' + n] || '';
       const stamp = 'seg' + n + '=' + v + '/' + t.length;
-      out += '- ' + ((v || t) ? mark(dayB, stamp) : '') + SEG_WHEN[n] + ' — ' + SEG_LBL[v] +
-             (dayB['en' + n] ? ' · энергия ' + dayB['en' + n] : '') + (t ? '\n  ' + t : '') + '\n';
+      const parts = [];
+      if(dayB['en' + n]) parts.push('энергия ' + dayB['en' + n]);
+      if(dayB['ez' + n]) parts.push('лёгкость ' + dayB['ez' + n]);
+      const touched = v || t || dayB['en' + n] || dayB['ez' + n] || dayB['st' + n] || dayB['mn' + n];
+      if(touched){
+        parts.push('шаг загружен: ' + (dayB['st' + n] ? 'да' : 'нет'));
+        parts.push('главное дело: ' + (mnHit(dayB, n) ? 'да'
+                   : (dayB['mn' + n] ? 'нет — заметка отрезка пуста' : 'нет')));
+      }
+      out += '- ' + (touched ? mark(dayB, stamp) : '') + SEG_WHEN[n] + ' — ' + SEG_LBL[v] +
+             (parts.length ? ' · ' + parts.join(' · ') : '') + (t ? '\n  ' + t : '') + '\n';
     });
     const lost = [1,2,3].filter(n => dayB['segv' + n] === 'lost').length;
+    const half = [1,2,3].filter(n => dayB['segv' + n] === 'half').length;
     const onT = [1,2,3].filter(n => dayB['segv' + n] === 'on').length;
-    out += '- **Итог дня: на целях ' + onT + ' из 3, потеряно ' + lost + '**\n\n';
+    out += '- **Итог дня: на целях ' + onT + ' из 3 · времени не было ' + half +
+           ' · время было, ушёл в ненужное ' + lost + '**\n\n';
   } else {
     out += '**Отрезки дня** не разобраны\n\n';
   }
@@ -2280,6 +2383,81 @@ function buildWeekReport(){
       out += '| ' + t + ' | ' + r.join(' | ') + ' | ' + (n.length ? (n.reduce((a,c)=>a+c,0)/n.length).toFixed(1) : '—') + ' |\n';
     });
     out += '\n**Средняя энергия за неделю: ' + (enAll.reduce((a,c)=>a+c,0)/enAll.length).toFixed(1) + '**\n';
+  }
+
+  /* --- Лёгкость и переходы: замеры Л9, Л10, Л11 --- */
+  const segBoxes = [];
+  DAYS.forEach(d => {
+    const b = store[d.id];
+    if(!b) return;
+    [1,2,3].forEach(n => {
+      const touched = b['segv'+n] || b['segt'+n] || b['en'+n] || b['ez'+n] || b['st'+n] || b['mn'+n];
+      if(touched) segBoxes.push({d:d, n:n, b:b});
+    });
+  });
+  const ezAll = segBoxes.filter(x => x.b['ez'+x.n] !== '' && typeof x.b['ez'+x.n] !== 'undefined')
+                        .map(x => Number(x.b['ez'+x.n]));
+  if(ezAll.length || segBoxes.length){
+    out += '\n### Лёгкость и переходы — замеры Л9, Л10, Л11\n\n';
+    out += '| Показатель | Значение |\n|---|---|\n';
+    const den = segBoxes.length;
+    out += '| Отрезков заполнено | ' + den + ' из 21 |\n';
+    if(ezAll.length){
+      out += '| Средняя лёгкость (замер Л9) | ' +
+             (ezAll.reduce((a,c)=>a+c,0)/ezAll.length).toFixed(1) + ' по ' + ezAll.length + ' отрезкам |\n';
+      const pairs = segBoxes.filter(x => x.b['ez'+x.n] !== '' && x.b['en'+x.n] !== ''
+                                    && typeof x.b['ez'+x.n] !== 'undefined' && typeof x.b['en'+x.n] !== 'undefined')
+                            .map(x => Number(x.b['ez'+x.n]) - Number(x.b['en'+x.n]));
+      if(pairs.length){
+        const avg = pairs.reduce((a,c)=>a+c,0)/pairs.length;
+        out += '| Расхождение лёгкость − энергия | ' + (avg >= 0 ? '+' : '') + avg.toFixed(1) +
+               ' в среднем по ' + pairs.length + ' парам |\n';
+      }
+    }
+    const stYes = segBoxes.filter(x => x.b['st'+x.n]).length;
+    const mnYes = segBoxes.filter(x => mnHit(x.b, x.n)).length;
+    const mnClaim = segBoxes.filter(x => x.b['mn'+x.n]).length;
+    out += '| Шаг загружен (замер Л10) | ' + stYes + ' из ' + den +
+           (den ? ' · ' + Math.round(stYes/den*100) + '%' : '') + ' |\n';
+    out += '| Главное дело (замер Л11) | ' + mnYes + ' из ' + den +
+           (den ? ' · ' + Math.round(mnYes/den*100) + '%' : '') +
+           (mnClaim > mnYes ? ' · снято при пустой заметке: ' + (mnClaim - mnYes) : '') + ' |\n';
+    const firstDays = DAYS.filter(d => store[d.id] && store[d.id].dutyFirst).length;
+    out += '| Кнопка «начал первым» (дело дня) | ' + firstDays + ' из 7 · норма 3/7, порог 2/7 |\n';
+    if(den){
+      const mnDays = DAYS.filter(d => store[d.id] && [1,2,3].some(n => mnHit(store[d.id], n))).length;
+      out += '| Расхождение Л11 против «начал первым» | дней с главным делом в отрезках ' + mnDays +
+             ', дней с кнопкой ' + firstDays + ' · разрыв ' + (mnDays - firstDays) + ' |\n';
+    }
+    /* по дням: лёгкость построчно */
+    if(ezAll.length){
+      out += '\n| Лёгкость по отрезкам | ' + DAYS.map(d => d.label + ' ' + d.date).join(' | ') + ' | Ср. |\n|---|' +
+             DAYS.map(() => '---').join('|') + '|---|\n';
+      [[1,'подъём → 13:00'],[2,'13:00 → 19:00'],[3,'19:00 → отбой']].forEach(([n,t]) => {
+        const r = DAYS.map(d => (store[d.id] && store[d.id]['ez'+n]) || '—');
+        const num = r.filter(x => x !== '—').map(Number);
+        out += '| ' + t + ' | ' + r.join(' | ') + ' | ' +
+               (num.length ? (num.reduce((a,c)=>a+c,0)/num.length).toFixed(1) : '—') + ' |\n';
+      });
+    }
+  }
+
+  /* --- Отрезки дня: куда ушло время --- */
+  const segCnt = {on:0, half:0, lost:0};
+  DAYS.forEach(d => {
+    const b = store[d.id];
+    if(!b) return;
+    [1,2,3].forEach(n => { const v = b['segv'+n]; if(v && segCnt[v] !== undefined) segCnt[v]++; });
+  });
+  const segTot = segCnt.on + segCnt.half + segCnt.lost;
+  if(segTot){
+    out += '\n### Отрезки дня — куда ушло время\n\n';
+    out += '| Оценка | Отрезков | Доля |\n|---|---|---|\n';
+    out += '| 🟢 работал на цели | ' + segCnt.on + ' | ' + Math.round(segCnt.on/segTot*100) + '% |\n';
+    out += '| 🟡 времени не было — внешнее | ' + segCnt.half + ' | ' + Math.round(segCnt.half/segTot*100) + '% |\n';
+    out += '| 🔴 время было, ушёл в ненужное | ' + segCnt.lost + ' | ' + Math.round(segCnt.lost/segTot*100) + '% |\n';
+    out += '\n- Оценено отрезков ' + segTot + ' из 21\n';
+    out += '- 🟡 лечится расписанием, 🔴 лечится приоритетами. В одно число не сводить\n';
   }
 
   if(w.pain !== '' || w.photo){
@@ -2464,9 +2642,10 @@ function slimBox(b){
   ['focus','notesList','chron','exported'].forEach(m => {
     if(Array.isArray(b[m]) && b[m].length) o[m] = b[m];
   });
-  ['bed','wake','en1','en2','en3','pain','stool','phrase','notes',
+  ['bed','wake','en1','en2','en3','ez1','ez2','ez3','pain','stool','phrase','notes',
    'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => { if(b[k]) o[k] = b[k]; });
-  ['prom','hit','phraseN','dutyMin','dutyFirst'].forEach(k => { if(b[k]) o[k] = b[k]; });
+  ['prom','hit','phraseN','dutyMin','dutyFirst',
+   'st1','st2','st3','mn1','mn2','mn3'].forEach(k => { if(b[k]) o[k] = b[k]; });
   if(b.meas && Object.keys(b.meas).length) o.meas = b.meas;
   if(b.probes && Object.keys(b.probes).length) o.probes = b.probes;
   if(b.tried && Object.keys(b.tried).length) o.tried = b.tried;
@@ -2511,11 +2690,12 @@ function cleanBox(raw){
   b.exported = (raw && Array.isArray(raw.exported)) ? raw.exported.slice() : [];
   b.meas = (raw && raw.meas && typeof raw.meas === 'object') ? raw.meas : {};
   b.tried = (raw && raw.tried && typeof raw.tried === 'object') ? raw.tried : {};
-  ['bed','wake','sleep','en1','en2','en3','pain','stool','notes','phrase','duty',
+  ['bed','wake','sleep','en1','en2','en3','ez1','ez2','ez3','pain','stool','notes','phrase','duty',
    'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => {
     b[k] = (raw && typeof raw[k] === 'string') ? raw[k] : '';
   });
-  ['prom','hit','phraseN','phraseTill','dutyMin','dutyFirst'].forEach(k => { b[k] = (raw && typeof raw[k] === 'number') ? raw[k] : 0; });
+  ['prom','hit','phraseN','phraseTill','dutyMin','dutyFirst',
+   'st1','st2','st3','mn1','mn2','mn3'].forEach(k => { b[k] = (raw && typeof raw[k] === 'number') ? raw[k] : 0; });
   ['photo','ext'].forEach(k => { b[k] = !!(raw && raw[k]); });
   return b;
 }
