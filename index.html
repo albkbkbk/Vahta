@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-07 21:40 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-14 13:20 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -193,6 +193,17 @@ body.reorder .ordbar{display:flex}
 .mode[data-m="close"]{background:var(--ink);border-color:var(--ink);color:#fff}
 .mode[data-m="touch"]{background:var(--amber-bg);border-color:var(--amber);color:var(--ink)}
 body.reorder .mode{display:none}
+/* время начала: во сколько планирую взяться за пункт */
+.ftime{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--rule);
+  background:#fff;border-radius:var(--radius);padding:3px 6px;cursor:pointer}
+.ftime::before{content:'в';font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-mute)}
+.ftime input{border:0;background:transparent;font:inherit;font-size:12px;color:var(--ink-mute);
+  font-variant-numeric:tabular-nums;padding:0;width:58px;cursor:pointer}
+.ftime input:focus{outline:2px solid var(--ink);outline-offset:2px}
+.ftime[data-on="1"]{border-color:var(--sky);background:var(--sky-bg)}
+.ftime[data-on="1"] input{color:var(--sky)}
+body.reorder .ftime{display:none}
 .phrase-wrap{display:flex;gap:7px;align-items:stretch;margin:14px 0 4px}
 .key-warn{margin:12px 0 0;padding:10px 12px;border-radius:var(--radius);border:1px solid #E0A0A2;
   background:var(--signal-bg);color:#7A1E1A;font-size:12.5px;line-height:1.45}
@@ -766,6 +777,7 @@ function box(name){
   if(!Array.isArray(b.chron)) b.chron = [];
   if(!Array.isArray(b.focus)) b.focus = [];
   if(typeof b.fmode !== 'object' || !b.fmode) b.fmode = {};
+  if(typeof b.ftime !== 'object' || !b.ftime) b.ftime = {};
   if(typeof b.duty !== 'string') b.duty = '';
   if(typeof b.dutyMin !== 'number') b.dutyMin = 0;
   if(typeof b.dutyFirst !== 'number') b.dutyFirst = 0;
@@ -1121,6 +1133,23 @@ function renderToday(){
         save(); renderAll();
       };
       main.appendChild(mb);
+      /* время начала — необязательное поле планирования */
+      const fw = document.createElement('label');
+      fw.className = 'ftime';
+      fw.title = 'Во сколько планирую взяться. Поле необязательное';
+      const fi = document.createElement('input');
+      fi.type = 'time';
+      fi.value = (box(current).ftime && box(current).ftime[id]) || '';
+      fw.dataset.on = fi.value ? '1' : '0';
+      fi.onclick = ev => ev.stopPropagation();
+      fi.onchange = ev => {
+        ev.stopPropagation();
+        const bb = box(current);
+        if(ev.target.value) bb.ftime[id] = ev.target.value; else delete bb.ftime[id];
+        save(); renderAll();
+      };
+      fw.appendChild(fi);
+      main.appendChild(fw);
       const tb = document.createElement('button');
       tb.type = 'button'; tb.className = 'tried';
       const on = !!box(current).tried[id];
@@ -2161,8 +2190,10 @@ function buildReport(){
     out += '**Взято на день — приступал**\n';
     takenIds.forEach(id => {
       const it = ITEM_INDEX[id].item;
-      out += '- ' + mark(dayB, 'tried' + id + '=' + (dayB.tried[id] ? 1 : 0)) + code(id) + ' ' + it.name +
-             ' — ' + (dayB.tried[id] ? 'приступал' : 'не приступал') + ' · режим: ' + (fmode(id) === 'close' ? 'закрыть' : 'касание') + '\n';
+      const ft = (dayB.ftime && dayB.ftime[id]) || '';
+      out += '- ' + mark(dayB, 'tried' + id + '=' + (dayB.tried[id] ? 1 : 0) + '/' + ft) + code(id) + ' ' + it.name +
+             ' — ' + (dayB.tried[id] ? 'приступал' : 'не приступал') + ' · режим: ' + (fmode(id) === 'close' ? 'закрыть' : 'касание') +
+             (ft ? ' · время начала ' + ft : '') + '\n';
     });
     out += '\n';
   }
@@ -2506,6 +2537,46 @@ function buildWeekReport(){
       if(b.tried && b.tried[id]) takenAgg[id].tried++;
     });
   });
+  /* Взятие с названным временем — замер планирования */
+  let ftWith = 0, ftWithTried = 0, ftNo = 0, ftNoTried = 0;
+  DAYS.forEach(d => {
+    const b = store[d.id]; if(!b || !Array.isArray(b.focus)) return;
+    b.focus.forEach(id => {
+      if(!ITEM_INDEX[id]) return;
+      const named = !!(b.ftime && b.ftime[id]);
+      const tried = !!(b.tried && b.tried[id]);
+      if(named){ ftWith++; if(tried) ftWithTried++; }
+      else { ftNo++; if(tried) ftNoTried++; }
+    });
+  });
+  const ftTot = ftWith + ftNo;
+  if(ftTot){
+    const pc = (a, b2) => b2 ? Math.round(a / b2 * 100) + '%' : '—';
+    out += '\n### Взятие с названным временем — замер планирования\n\n';
+    out += '| Показатель | Значение |\n|---|---|\n';
+    out += '| Взято пунктов за неделю | ' + ftTot + ' |\n';
+    out += '| Из них с названным временем начала | ' + ftWith + ' · ' + pc(ftWith, ftTot) + ' |\n';
+    out += '| Приступал среди взятых **с временем** | ' + ftWithTried + ' из ' + ftWith + ' · ' + pc(ftWithTried, ftWith) + ' |\n';
+    out += '| Приступал среди взятых **без времени** | ' + ftNoTried + ' из ' + ftNo + ' · ' + pc(ftNoTried, ftNo) + ' |\n';
+    if(ftWith && ftNo){
+      const diff = Math.round(ftWithTried / ftWith * 100) - Math.round(ftNoTried / ftNo * 100);
+      out += '| Разрыв между группами | ' + (diff > 0 ? '+' : '') + diff + ' процентных пунктов |\n';
+      out += '\n- Разрыв в плюс — названное время работает как механизм. Около нуля — это ещё одно поле, не механизм\n';
+    } else {
+      out += '| Разрыв между группами | сравнение невозможно: одна из групп пуста |\n';
+    }
+    /* по дням */
+    out += '\n| День | Взято | С временем | Приступал |\n|---|---|---|---|\n';
+    DAYS.forEach(d => {
+      const b = store[d.id];
+      const foc = (b && Array.isArray(b.focus)) ? b.focus.filter(id => ITEM_INDEX[id]) : [];
+      const nm = foc.filter(id => b.ftime && b.ftime[id]).length;
+      const tr = foc.filter(id => b.tried && b.tried[id]).length;
+      out += '| ' + d.label + ' ' + d.date + ' | ' + foc.length + ' | ' + nm + ' | ' + tr + ' |\n';
+    });
+    out += '\n- Лимит на число взятых пунктов не введён — решение 13.09.2026\n';
+  }
+
   const takenKeys = Object.keys(takenAgg);
   if(takenKeys.length){
     out += '\n### Взято на день и приступал\n\n| Пункт | Дней взято | Из них приступал | Разрыв |\n|---|---|---|---|\n';
@@ -2636,7 +2707,7 @@ const MOVE_FMT = 2;
 /* Из бокса в блок идёт только заполненное: пустые поля и нули выбрасываются */
 function slimBox(b){
   const o = {};
-  ['status','comments','closed','tally','fmode'].forEach(m => {
+  ['status','comments','closed','tally','fmode','ftime'].forEach(m => {
     if(b[m] && Object.keys(b[m]).length) o[m] = b[m];
   });
   ['focus','notesList','chron','exported'].forEach(m => {
@@ -2677,7 +2748,7 @@ function knownBox(k){ return k === W || DAYS.some(d => d.id === k); }
 
 function cleanBox(raw){
   const b = {};
-  ['status','comments','closed','fmode'].forEach(m => {
+  ['status','comments','closed','fmode','ftime'].forEach(m => {
     b[m] = {};
     if(raw && raw[m]) Object.keys(raw[m]).forEach(id => { if(knownId(id) && raw[m][id] !== '' && raw[m][id] != null) b[m][id] = raw[m][id]; });
   });
