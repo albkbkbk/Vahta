@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-14 13:20 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-21 17:45 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -351,6 +351,7 @@ body.reorder .sec-head .count{margin-left:auto}
 .syncdot[data-s="ok"]{color:#1E6B3A;border-color:#9CCBAE}
 .syncdot[data-s="work"]{color:var(--ink-soft)}
 .syncdot[data-s="err"]{color:#9B2226;border-color:#E0A0A2}
+.engrev{font:500 11px/1 "IBM Plex Sans",sans-serif;padding:4px 7px;border-radius:99px;border:1px solid var(--rule);color:var(--ink-mute);white-space:nowrap;cursor:pointer}
 .sy-in label{display:block;font:500 12px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink-soft);margin:9px 0 3px}
 .sy-in input{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;border:1px solid var(--rule);border-radius:var(--radius);padding:9px 8px;background:var(--paper);color:var(--ink)}
 /* --- отрезки дня --- */
@@ -444,6 +445,7 @@ body.reorder .tried{display:none}
       <span class="week" id="week-label"></span>
       <button type="button" class="ordbtn" id="btn-order" aria-pressed="false">⇅ порядок</button>
       <span class="syncdot" id="sync-dot"></span>
+      <span class="engrev" id="eng-rev" title="Редакция движка. Нажми — проверю, нет ли на сервере более свежей"></span>
     </div>
     <nav class="watch" id="watch" aria-label="Выбор дня"></nav>
   </div>
@@ -490,6 +492,7 @@ body.reorder .tried{display:none}
   <section class="z-signal" data-panel="today">
     <div class="sec-head"><span class="fold">▸</span><h2>Сегодня под контролем</h2><span class="tag">выбираешь утром</span><span class="count" id="cnt-today"></span></div>
     <div class="pnl"><div class="pnl-in">
+      <button type="button" class="today-clear" id="pass-open">Проход дня — закрыть один день и набрать соседний</button>
       <div class="rows" id="today-rows"></div>
       <button type="button" class="today-clear" id="today-clear">Очистить список на сегодня</button>
     </div></div>
@@ -580,7 +583,7 @@ body.reorder .tried{display:none}
       <span class="cap">Н6, до 08.09 каждый день</span>
     </div>
     </div></div>
-    <div class="line"><span class="cap">Ночь перед этим днём — вносится утром. Часы сна, отбой ≤24:00 и разброс подъёма считаются сами · дневной сон не учитывается · ночь, помеченная как внешнее обязательство, провалом не считается</span></div>
+    <div class="line"><span class="cap">Замер — за прошедшую ночь: вносится утром того дня, к которому относится это поле. Привычка — за наступающую ночь: Е1 (отбой не позже 24:00) и Е2 (ночной сон не менее 7 часов) дня закрываются тем, что внесено на следующее утро. Часы сна и разброс подъёма считаются сами · дневной сон не учитывается · ночь, помеченная как внешнее обязательство, провалом не считается</span></div>
 
   </div></div>
   </section>
@@ -669,9 +672,15 @@ body.reorder .tried{display:none}
       <button type="button" id="sy-now">Синхронизировать</button>
     </div>
     <div class="mv-row">
+      <button type="button" id="sy-pull">Взять серверную</button>
+      <button type="button" id="sy-push">Отправить здешнюю</button>
+      <button type="button" id="sy-check">Проверить обновление листа</button>
+    </div>
+    <div class="mv-row">
       <button type="button" id="sy-off">Отключить</button>
       <button type="button" id="sy-close">Закрыть</button>
     </div>
+    <p class="mv-note" id="sy-diag"></p>
     <p class="mv-note" id="sy-note">Правило: отмечай на одном устройстве за раз. Если открыть страницу сразу на двух и править в обеих, сохранённое позже затрёт раннее — страница предупредит, но разрешить конфликт придётся тебе.</p>
   </div>
 </div>
@@ -695,6 +704,37 @@ body.reorder .tried{display:none}
   </div>
 </div>
 
+<div class="mv" id="cr" data-open="0">
+  <div class="mv-in">
+    <h3>Критерий закрытия</h3>
+    <p class="mv-hint" id="cr-name"></p>
+    <p class="mv-note" id="cr-text"></p>
+    <div class="mv-row">
+      <button type="button" class="solid" id="cr-ok">Критерий выполнен</button>
+      <button type="button" id="cr-no">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div class="mv" id="pass" data-open="0">
+  <div class="mv-in">
+    <h3>Проход дня</h3>
+    <div class="mv-row">
+      <button type="button" id="pass-swap">Поменять пару дней</button>
+      <span class="mv-hint" id="pass-mode"></span>
+    </div>
+    <div class="subhead" id="pass-h1"></div>
+    <div class="rows" id="pass-rows-close"></div>
+    <div class="subhead" id="pass-h2"></div>
+    <div class="rows" id="pass-rows-next"></div>
+    <p class="mv-note">Отметка «выполнил» пишется датой закрываемого дня. Кнопка «перенести» кладёт пункт в набираемый день. Добрать новое можно звёздочкой в разделах листа.</p>
+    <div class="mv-row">
+      <button type="button" class="solid" id="pass-done">Готово</button>
+      <button type="button" id="pass-cancel">Закрыть</button>
+    </div>
+  </div>
+</div>
+
 <div class="mv" id="pb" data-open="0">
   <div class="mv-in">
     <h3 id="pb-title"></h3>
@@ -711,6 +751,7 @@ body.reorder .tried{display:none}
 
 <script>
 /* ================= НЕДЕЛЯ ================= */
+const ENGINE_REV = '2026-09-21 17:45';   /* редакция движка: видна в шапке и в выгрузке */
 const CAT_KEY = 'vahta_catalog_v1';
 /* Состав недели, рычаги, задачи и коды в файле не хранятся: файл лежит публично.
    Каталог живёт в браузере и заливается блоком {"vahtacat":1,...} через кнопку переноса. */
@@ -725,6 +766,7 @@ const LEVERS  = CAT.LEVERS || [];
 const SECTIONS = CAT.SECTIONS;
 const CODE    = CAT.CODE || {};
 const DAYMEAS = CAT.DAYMEAS || [];   /* числовые замеры дня — состав задаётся каталогом, не движком */
+const MEASOFF = CAT.MEASOFF || [];   /* сроки снятия замеров: [{name, till:'ДД.ММ.ГГГГ'}] — назначаются на разборе */
 const code = id => CODE[id] || id;
 
 const _hb = SECTIONS.find(s => s.key === 'habits');
@@ -801,31 +843,52 @@ function sleepHours(bed, wake){
   if(wakeMin <= bedMin) wakeMin += 24*60;
   return (wakeMin - bedMin) / 60;
 }
-/* Пересчитывает E1 (отбой ≤24:00) и E2 (сон ≥7 ч) из времени и пишет прямо в status.
+/* ПРАВКА 18.09.2026 — замер и привычка разведены.
+   Замер: поля «лёг/встал» лежат в дне пробуждения и описывают ПРОШЕДШУЮ ночь. Часы сна считаются здесь же.
+   Привычка: Е1 (отбой не позже 24:00) и Е2 (ночной сон не менее 7 часов) относятся к НАСТУПАЮЩЕЙ ночи,
+   поэтому статус дня X ставится из полей дня X+1 — то есть закрывается на следующее утро.
    Логика "поздно": час 00–11 считается ночью ПОСЛЕ полуночи (сравнивается через +24ч), час 12–23 — обычное время суток. */
 function applySleepDerived(b){
-  if(b.bed){
-    const [bh,bm] = b.bed.split(':').map(Number);
-    const bedMin = bh*60+bm;
-    const norm = (bh < 12 ? bedMin + 24*60 : bedMin);
-    b.status['E1'] = norm <= 24*60 ? 'done' : (b.ext ? 'ext' : 'fail');
-  } else { delete b.status['E1']; }
   if(b.bed && b.wake){
     const h = sleepHours(b.bed, b.wake);
     b.sleep = h !== null ? String(Math.round(h*2)/2) : '';
   } else { b.sleep = ''; }
-  if(b.sleep !== '') b.status['E2'] = Number(b.sleep) >= 7 ? 'done' : 'fail';
-  else delete b.status['E2'];
+}
+function dayIdx(id){ return DAYS.findIndex(d => d.id === id); }
+/* Бокс, в котором лежит ночь, наступающая после дня dayId */
+function nightSrc(dayId){
+  const i = dayIdx(dayId);
+  return (i >= 0 && i + 1 < DAYS.length) ? (store[DAYS[i+1].id] || null) : null;
+}
+function nightFilled(dayId){ const x = nightSrc(dayId); return !!(x && x.bed); }
+/* Раскладывает Е1 и Е2 по дням. Нет данных — ручная отметка не трогается:
+   так закрывается последний день недели, чья ночь попадает уже в следующий каталог. */
+function recalcSleepHabits(){
+  DAYS.forEach((d, i) => {
+    const src = (i + 1 < DAYS.length) ? store[DAYS[i+1].id] : null;
+    if(!src || !src.bed) return;
+    const tgt = box(d.id);
+    const [bh,bm] = src.bed.split(':').map(Number);
+    const bedMin = bh*60+bm;
+    const norm = (bh < 12 ? bedMin + 24*60 : bedMin);
+    tgt.status['E1'] = norm <= 24*60 ? 'done' : (src.ext ? 'ext' : 'fail');
+    if(src.sleep !== '') tgt.status['E2'] = Number(src.sleep) >= 7 ? 'done' : 'fail';
+    else delete tgt.status['E2'];
+  });
 }
 
-/* Пересчёт E1/E2 и часов сна по всем дням при загрузке (нужно после предзаполнения) */
+/* Пересчёт Е1/Е2 и часов сна по всем дням при загрузке */
+function sleepSnap(){
+  return JSON.stringify(DAYS.map(d => {
+    const b = store[d.id] || {}; const st = b.status || {};
+    return [b.sleep || '', st['E1'] || '', st['E2'] || ''];
+  }));
+}
 (function recalcAll(){
-  let touched = false;
-  DAYS.forEach(d => {
-    const b = box(d.id);
-    if(b.bed){ applySleepDerived(b); touched = true; }
-  });
-  if(touched) save();
+  const before = sleepSnap();
+  DAYS.forEach(d => { const b = box(d.id); if(b.bed) applySleepDerived(b); });
+  recalcSleepHabits();
+  if(sleepSnap() !== before) save();
 })();
 
 /* Трек заполняется НА СЛЕДУЮЩИЙ ДЕНЬ: по умолчанию открывается вчерашний день.
@@ -1540,6 +1603,33 @@ function shell(item, b){
 
 const AUTO_IDS = ['E1','E2'];
 
+/* ПРАВКА 2 — критерий закрытия берётся из поля meta каталога: хвост после «закрыто, когда» */
+function closeCrit(item){
+  const m = /закрыто,\s*когда\s*([^·]+)/i.exec((item && item.meta) || '');
+  return m ? m[1].trim() : '';
+}
+let critCb = null;
+function critAsk(item, cb){
+  const t = closeCrit(item);
+  const wrap = document.getElementById('cr');
+  if(!t || !wrap){ cb(); return; }
+  critCb = cb;
+  document.getElementById('cr-name').textContent = code(item.id) + ' ' + item.name;
+  document.getElementById('cr-text').textContent = 'Закрыто, когда: ' + t;
+  wrap.dataset.open = '1';
+}
+function critClose(run){
+  const wrap = document.getElementById('cr');
+  if(wrap) wrap.dataset.open = '0';
+  const f = critCb; critCb = null;
+  if(run && f) f();
+}
+
+/* День, которым метится закрытие задачи. В обычной работе — выбранный день,
+   внутри окна «Проход дня» — тот день, который закрывается. */
+let MARKDAY = null;
+function markDay(){ return MARKDAY || current; }
+
 function renderRow(item, b, type){
   const st = b.status[item.id] || '';
   const s = shell(item, b);
@@ -1552,12 +1642,21 @@ function renderRow(item, b, type){
   }
 
   if(AUTO_IDS.indexOf(item.id) >= 0){
-    const tag = document.createElement('span');
-    tag.className = 'verdict ' + (st === 'done' ? 'ok' : st === 'fail' ? 'low' : st === 'ext' ? 'mid' : 'none');
-    tag.style.marginLeft = 'auto';
-    tag.textContent = st === 'done' ? 'взято' : st === 'fail' ? 'не взято' : st === 'ext' ? 'внешнее' : 'нет данных';
-    s.main.appendChild(tag);
-    return s.row;
+    const dayOf = DAYS.find(x => x.id === markDay());
+    const nxt = DAYS[dayIdx(markDay()) + 1];
+    const note = document.createElement('span');
+    note.className = 'closed';
+    note.textContent = nxt ? ' · ночь с ' + (dayOf ? dayOf.date : '') + ' на ' + nxt.date : ' · ночь за границей недели';
+    s.meta.appendChild(note);
+    if(nightFilled(markDay())){
+      const tag = document.createElement('span');
+      tag.className = 'verdict ' + (st === 'done' ? 'ok' : st === 'fail' ? 'low' : st === 'ext' ? 'mid' : 'none');
+      tag.style.marginLeft = 'auto';
+      tag.textContent = st === 'done' ? 'взято' : st === 'fail' ? 'не взято' : st === 'ext' ? 'внешнее' : 'нет данных';
+      s.main.appendChild(tag);
+      return s.row;
+    }
+    /* ночь ещё не внесена — отметка ставится руками */
   }
 
   const acts = document.createElement('div');
@@ -1569,12 +1668,15 @@ function renderRow(item, b, type){
     btn.setAttribute('aria-label', label + ': ' + item.name);
     btn.onclick = () => {
       const next = (st === code) ? '' : code;
-      b.status[item.id] = next;
-      if(type === 'task'){
-        if(next === 'done'){ const d = DAYS.find(x => x.id === current); b.closed[item.id] = d ? d.date : ''; }
-        else delete b.closed[item.id];
-      }
-      save(); renderAll();
+      const apply = () => {
+        b.status[item.id] = next;
+        if(type === 'task'){
+          if(next === 'done'){ const d = DAYS.find(x => x.id === markDay()); b.closed[item.id] = d ? d.date : ''; }
+          else delete b.closed[item.id];
+        }
+        save(); renderAll();
+      };
+      if(type === 'task' && next === 'done') critAsk(item, apply); else apply();
     };
     return btn;
   };
@@ -1637,8 +1739,8 @@ function renderSleep(){
   }
 }
 function onSleepInput(){
-  const b = box(current);
-  applySleepDerived(b);
+  applySleepDerived(box(current));
+  recalcSleepHabits();
   save(); renderAll();
 }
 document.getElementById('bed-input').oninput = e => { box(current).bed = e.target.value; onSleepInput(); };
@@ -1751,7 +1853,7 @@ document.querySelectorAll('.en-key').forEach(el => {
     if(sc.hasAttribute('hidden')) sc.removeAttribute('hidden'); else sc.setAttribute('hidden', '');
   };
 });
-document.getElementById('ext').onchange = e => { const b = box(current); b.ext = e.target.checked; applySleepDerived(b); save(); renderAll(); };
+document.getElementById('ext').onchange = e => { const b = box(current); b.ext = e.target.checked; applySleepDerived(b); recalcSleepHabits(); save(); renderAll(); };
 
 /* ================= ХРОНИКА (файл 13) ================= */
 const CHRON = {
@@ -1906,29 +2008,50 @@ function measMark(id, dd, on){
   if(!on && i >= 0) a.splice(i, 1);
   o[id] = a; measSave(o);
 }
-function measChain(id){
+/* ПРАВКА 21.09.2026. Цепочка считается на дату названного дня, а не на момент нажатия кнопки:
+   иначе отчёт за 17-е, скопированный 18-го, показывал цифру 18-го. */
+function measChain(id, dayId){
   const a = measDays()[id] || [];
   const st = a.map(measStamp).filter(x => x !== null).sort((x, y) => y - x);
   if(!st.length) return 0;
   const DAY = 864e5;
-  const today = measStamp((DAYS.find(x => x.id === current) || {}).date);
-  if(today !== null && st[0] < today - DAY) return 0;
+  const anchor = measStamp((DAYS.find(x => x.id === (dayId || current)) || {}).date);
+  let list = st;
+  if(anchor !== null){
+    list = st.filter(x => x <= anchor);
+    if(!list.length) return 0;
+    if(list[0] < anchor - DAY) return 0;
+  }
   let n = 1;
-  for(let i = 1; i < st.length; i++){
-    if(st[i - 1] - st[i] === DAY) n++;
-    else if(st[i - 1] - st[i] > DAY) break;
+  for(let i = 1; i < list.length; i++){
+    if(list[i - 1] - list[i] === DAY) n++;
+    else if(list[i - 1] - list[i] > DAY) break;
   }
   return n;
 }
 function measVal(b, id){ return (b.meas && typeof b.meas[id] === 'number') ? b.meas[id] : 0; }
-function measWeek(m){
-  let sum = 0, days = 0;
+/* Последний день недели, в котором замер отмечен: к нему привязывается цепочка в сводке */
+function lastMarked(m){
+  let id = DAYS[DAYS.length - 1].id;
   DAYS.forEach(d => {
-    const b = store[d.id]; if(!b || !b.meas) return;
-    const v = b.meas[m.id] || 0;
-    if(v >= (m.floor || 1)){ days++; sum += v; }
+    const b = store[d.id];
+    if(b && b.meas && (b.meas[m.id] || 0) >= (m.floor || 1)) id = d.id;
   });
-  return {sum, days};
+  return id;
+}
+/* ПРАВКА 21.09.2026. Считается нарастающим итогом ПО ДАТУ названного дня.
+   Раньше число было живым: все отчёты, скопированные в один заход, показывали одно и то же. */
+function measWeek(m, upto){
+  const lim = (upto && dayIdx(upto) >= 0) ? dayIdx(upto) : DAYS.length - 1;
+  let sum = 0, days = 0; const marks = [];
+  DAYS.forEach((d, i) => {
+    if(i > lim) return;
+    const b = store[d.id];
+    const v = (b && b.meas && b.meas[m.id]) || 0;
+    if(v >= (m.floor || 1)){ days++; sum += v; marks.push(d.label + ' ✓'); }
+    else marks.push(d.label + ' —');
+  });
+  return {sum, days, marks, of: lim + 1};
 }
 function setMeas(id, v){
   const m = DAYMEAS.find(x => x.id === id); if(!m) return;
@@ -1998,13 +2121,13 @@ function renderDayMeas(){
       const v = measVal(b, m.id);
       const cell = host.querySelector('[data-meas="' + m.id + '"]');
       if(!cell) return;
-      const mw = measWeek(m);
+      const mw = measWeek(m, current);
       if(m.kind === 'check'){
         const btn = cell.querySelector('button.soul-yes');
         btn.dataset.on = v ? '1' : '0';
         btn.textContent = v ? 'сделано' : 'отметить';
         cell.closest('.soul').classList.toggle('done', !!v);
-        parts.push(mw.days + '/7' + (m.norm ? ' при норме ' + m.norm : '') + (m.floorWeek ? ', порог ' + m.floorWeek : ''));
+        parts.push(mw.days + ' из ' + mw.of + (m.norm ? ' при норме ' + m.norm + '/7' : '') + (m.floorWeek ? ', порог ' + m.floorWeek + '/7' : ''));
       } else {
         const inp = cell.querySelector('input[data-m="' + m.id + '"]');
         if(document.activeElement !== inp) inp.value = v ? v : '';
@@ -2012,7 +2135,7 @@ function renderDayMeas(){
       }
       if(m.chain){
         const el = host.querySelector('[data-chain="' + m.id + '"]');
-        if(el){ const ch = measChain(m.id); el.textContent = ch + wordDays(ch) + ' подряд'; el.dataset.hot = ch >= 3 ? '1' : '0'; }
+        if(el){ const ch = measChain(m.id, current); el.textContent = ch + wordDays(ch) + ' подряд'; el.dataset.hot = ch >= 3 ? '1' : '0'; }
       }
     });
     const gw = host.querySelector('[data-gweek="' + g.key + '"]');
@@ -2026,7 +2149,138 @@ function renderAll(){ renderWatch(); renderLevers(); renderSleep(); renderSectio
   sortStatic('sleep_rows', document.querySelector('.pnl-in.sleep'), '.grp');
   const d = DAYS.find(x => x.id === current);
   document.getElementById('btn-copy').textContent = 'Отчёт ' + d.date;
+  const rev = document.getElementById('eng-rev');
+  if(rev && rev.textContent.indexOf('проверяю') < 0) rev.textContent = 'ред. ' + ENGINE_REV;
+  const pw = document.getElementById('pass');
+  if(pw && pw.dataset.open === '1') passRender();
 }
+
+/* ================= ПРОХОД ДНЯ =================
+   Один заход закрывает прошедший день и набирает соседний.
+   Утром пара «вчера → сегодня», вечером «сегодня → завтра»: определяется по времени, переключается кнопкой. */
+let PASS = {close:null, next:null, evening:true};
+
+function passPair(evening){
+  const i = Math.max(0, dayIdx(current));
+  let ci = evening ? i : i - 1;
+  let ni = ci + 1;
+  if(ci < 0){ ci = 0; ni = 1; }
+  if(ni > DAYS.length - 1){ ni = DAYS.length - 1; ci = Math.max(0, ni - 1); }
+  return {close: DAYS[ci].id, next: DAYS[ni].id, evening: evening};
+}
+
+function passOpen(){
+  PASS = passPair(new Date().getHours() >= 12);
+  MARKDAY = PASS.close;
+  document.getElementById('pass').dataset.open = '1';
+  passRender();
+}
+function passShut(){
+  document.getElementById('pass').dataset.open = '0';
+  MARKDAY = null;
+}
+
+function passRender(){
+  const cd = DAYS.find(d => d.id === PASS.close) || DAYS[0];
+  const nd = DAYS.find(d => d.id === PASS.next) || DAYS[0];
+  MARKDAY = cd.id;
+  document.getElementById('pass-mode').textContent =
+    (PASS.evening ? 'вечер: закрываю сегодня, набираю завтра' : 'утро: закрываю вчера, набираю сегодня');
+  document.getElementById('pass-h1').textContent = 'Закрываю — ' + cd.label + ' ' + cd.date;
+  document.getElementById('pass-h2').textContent = 'Набираю — ' + nd.label + ' ' + nd.date;
+
+  const cb = box(cd.id), nb = box(nd.id);
+
+  const host1 = document.getElementById('pass-rows-close');
+  host1.innerHTML = '';
+  const live = (cb.focus || []).filter(id => ITEM_INDEX[id]);
+  if(!live.length) host1.innerHTML = '<div class="today-empty">В этот день ничего не бралось. Закрывать нечего.</div>';
+  live.forEach(id => {
+    const rec = ITEM_INDEX[id];
+    const bx = rec.sec.type === 'habit' ? cb : box(W);
+    const r = rec.sec.type === 'ritual' ? renderRitual(rec.item, bx) : renderRow(rec.item, bx, rec.sec.type);
+    const main = r.querySelector('.row-main');
+    if(main){
+      const tb = document.createElement('button');
+      tb.type = 'button'; tb.className = 'tried';
+      const on = !!cb.tried[id];
+      tb.dataset.on = on ? '1' : '0';
+      tb.textContent = on ? 'приступал ✓' : 'приступал';
+      tb.onclick = ev => { ev.stopPropagation(); if(cb.tried[id]) delete cb.tried[id]; else cb.tried[id] = 1; save(); passRender(); };
+      const mv = document.createElement('button');
+      mv.type = 'button'; mv.className = 'mode';
+      const moved = (nb.focus || []).indexOf(id) >= 0;
+      mv.dataset.m = moved ? 'close' : 'touch';
+      mv.textContent = moved ? 'перенесено ✓' : 'перенести';
+      mv.onclick = ev => {
+        ev.stopPropagation();
+        const k = nb.focus.indexOf(id);
+        if(k >= 0) nb.focus.splice(k, 1); else nb.focus.push(id);
+        save(); passRender();
+      };
+      main.appendChild(tb); main.appendChild(mv);
+    }
+    host1.appendChild(r);
+  });
+
+  const host2 = document.getElementById('pass-rows-next');
+  host2.innerHTML = '';
+  const nlive = (nb.focus || []).filter(id => ITEM_INDEX[id]);
+  if(!nlive.length) host2.innerHTML = '<div class="today-empty">Пусто. Перенеси незакрытое сверху либо добери звёздочкой в разделах листа.</div>';
+  nlive.forEach(id => {
+    const rec = ITEM_INDEX[id];
+    const row = document.createElement('div');
+    row.className = 'row';
+    const main = document.createElement('div');
+    main.className = 'row-main';
+    main.innerHTML = '<div class="row-text"><div class="row-name"></div><div class="row-meta"></div></div>';
+    main.querySelector('.row-name').textContent = rec.item.name;
+    main.querySelector('.row-meta').textContent = rec.sec.title;
+
+    const dflt = (rec.sec.type === 'habit' || rec.sec.type === 'ritual') ? 'touch' : 'close';
+    const m = nb.fmode[id] || dflt;
+    const mb = document.createElement('button');
+    mb.type = 'button'; mb.className = 'mode';
+    mb.dataset.m = m;
+    mb.textContent = m === 'close' ? 'закрыть' : 'касание';
+    mb.onclick = () => { nb.fmode[id] = (m === 'close') ? 'touch' : 'close'; save(); passRender(); };
+
+    const fw = document.createElement('label');
+    fw.className = 'ftime';
+    fw.title = 'Во сколько планирую взяться. Поле необязательное';
+    const fi = document.createElement('input');
+    fi.type = 'time';
+    fi.value = (nb.ftime && nb.ftime[id]) || '';
+    fw.dataset.on = fi.value ? '1' : '0';
+    fi.onchange = e => { if(e.target.value) nb.ftime[id] = e.target.value; else delete nb.ftime[id]; save(); passRender(); };
+    fw.appendChild(fi);
+
+    const rm = document.createElement('button');
+    rm.type = 'button'; rm.className = 'pin'; rm.dataset.on = '1'; rm.textContent = '★';
+    rm.setAttribute('aria-label', 'Убрать из набираемого дня');
+    rm.onclick = () => { const k = nb.focus.indexOf(id); if(k >= 0) nb.focus.splice(k, 1); save(); passRender(); };
+
+    main.appendChild(mb); main.appendChild(fw); main.appendChild(rm);
+    row.appendChild(main);
+    host2.appendChild(row);
+  });
+}
+
+document.getElementById('pass-open').onclick = passOpen;
+document.getElementById('pass-cancel').onclick = passShut;
+document.getElementById('pass').onclick = e => { if(e.target.id === 'pass') passShut(); };
+document.getElementById('pass-swap').onclick = () => { PASS = passPair(!PASS.evening); MARKDAY = PASS.close; passRender(); };
+document.getElementById('pass-done').onclick = () => {
+  const stay = PASS.evening ? PASS.close : PASS.next;   /* сегодняшний день остаётся открытым */
+  passShut();
+  current = stay;
+  save(); renderAll(); window.scrollTo({top:0});
+  toast('Проход закрыт');
+};
+
+document.getElementById('cr-ok').onclick = () => critClose(true);
+document.getElementById('cr-no').onclick = () => critClose(false);
+document.getElementById('cr').onclick = e => { if(e.target.id === 'cr') critClose(false); };
 
 /* ================= ЗАМЕР ПОСЛЕ СОБЫТИЯ =================
    Ритуал с полем probe в каталоге: каждое +1 сопровождается вопросами.
@@ -2167,11 +2421,22 @@ const LBL = {done:'✅ выполнил', fail:'❌ не выполнил', wip:
 function buildReport(){
   const d = DAYS.find(x => x.id === current);
   const dayB = box(current), wB = box(W);
-  const time = new Date().toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
-  let out = '### ' + d.date + ' (' + d.label + ') — выгрузка ' + time + '\n\n';
+  const now = new Date();
+  const time = now.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+  const realDate = String(now.getDate()).padStart(2,'0') + '.' + String(now.getMonth() + 1).padStart(2,'0');
+  /* День разбора — воскресенье: раз в неделю состав выводится целиком */
+  const FULL = (d.label === 'Вс');
+  let out = '### ' + d.date + ' (' + d.label + ') — выгрузка ' + time +
+            (realDate !== d.date ? ' · скопировано ' + realDate : '') +
+            ' · движок ' + ENGINE_REV + '\n\n';
+  if(FULL) out += '_День разбора: состав недели выведен полностью._\n\n';
+  else out += '_Выведено только изменившееся с прошлой выгрузки._\n\n';
   const fresh = [];
   const isNew = (b, stamp) => b.exported.indexOf(stamp) < 0;
   const mark = (b, stamp) => { if(isNew(b, stamp)){ fresh.push({b, tag:stamp}); return '🆕 '; } return ''; };
+  /* то же, что mark, но без значка: в блоках «только изменившееся» значок на каждой строке бессмыслен */
+  const seen = (b, stamp) => { if(isNew(b, stamp)) fresh.push({b, tag:stamp}); return ''; };
+  const rowStamp = (b, id, val) => id + '=' + val + '#' + cmtList(b, id).length;
 
   /* --- сон --- */
   const sStamp = 'sleep=' + dayB.bed + '/' + dayB.wake;
@@ -2207,11 +2472,26 @@ function buildReport(){
   DAYMEAS.forEach(m => {
     const v = measVal(dayB, m.id);
     if(!v) return;
-    const mw = measWeek(m);
-    out += mark(dayB, 'meas' + m.id + '=' + v) + '**' + m.name + ' (вне счёта привычек)** ' + v + ' ' + (m.unit || '') +
-           ' · за неделю ' + mw.days + '/7 дней, ' + mw.sum + ' ' + (m.unit || '') +
-           (m.chain ? ' · цепочка ' + measChain(m.id) : '') + '\n\n';
+    const mw = measWeek(m, current);
+    const u = m.unit ? ' ' + m.unit : '';
+    out += mark(dayB, 'meas' + m.id + '=' + v) + '**' + m.name + ' (вне счёта привычек)** ' + v + u +
+           ' · на конец ' + d.date + ': ' + mw.days + ' из ' + mw.of + ' прошедших' + wordDays(mw.of) + ' недели' +
+           (m.norm ? ' при норме ' + m.norm + '/7' : '') + (m.unit ? ', всего ' + mw.sum + u : '') +
+           (m.chain ? ' · цепочка ' + measChain(m.id, current) : '') + '\n' +
+           '  по дням: ' + mw.marks.join(' · ') + '\n\n';
   });
+  /* ПРАВКА 4 — сроки снятия замеров. Назначаются на разборе, лежат в каталоге, напоминают в день разбора */
+  if(FULL && MEASOFF.length){
+    const anchor = measStamp(d.date);
+    const dmy = x => { const q = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(String(x || '').trim()); return q ? Date.UTC(+q[3], +q[2] - 1, +q[1]) : null; };
+    const due = MEASOFF.filter(x => { const t = dmy(x.till); return t !== null && anchor !== null && t <= anchor; });
+    const live = MEASOFF.filter(x => due.indexOf(x) < 0);
+    out += '**Сроки замеров**\n';
+    if(due.length) out += '- истёк срок, решить на разборе — снять или продлить: ' +
+      due.map(x => x.name + ' (до ' + x.till + ')').join(' · ') + '\n';
+    if(live.length) out += '- в силе: ' + live.map(x => x.name + ' до ' + x.till).join(' · ') + '\n';
+    out += '\n';
+  }
 
   /* --- замеры --- */
   const mStamp = 'meas=' + [dayB.en1, dayB.en2, dayB.en3, dayB.stool].join('/');
@@ -2293,48 +2573,62 @@ function buildReport(){
   const hSec = SECTIONS.find(x => x.key === 'habits');
   const hDone = hSec.items.filter(i => dayB.status[i.id] === 'done').length;
   out += '**Привычки — ' + hDone + ' из ' + hSec.items.length + '**\n';
-  /* Выполненные без комментария не перечисляются: в разбор идёт только то, что не закрыто */
-  const hRest = hSec.items.filter(i => dayB.status[i.id] !== 'done' || cmtList(dayB, i.id).length);
-  if(hRest.length){
-    hRest.forEach(i => {
-      const st = dayB.status[i.id];
-      const c = cmtText(dayB, i.id);
-      out += '- ' + (st ? mark(dayB, i.id + '=' + st) : '') + i.name + ' — ' +
-             (st ? LBL[st] : '⬜ не отмечено') + (c ? ' — ' + c : '') + '\n';
-    });
-  } else out += '- все закрыты\n';
+  let hShown = 0;
+  hSec.items.forEach(i => {
+    const st = dayB.status[i.id] || '';
+    const c = cmtText(dayB, i.id);
+    const stamp = rowStamp(dayB, i.id, st);
+    if(!FULL){
+      if(!isNew(dayB, stamp)) return;
+      if(!st && !c) return;
+    }
+    hShown++;
+    out += '- ' + seen(dayB, stamp) + i.name + ' — ' + (st ? LBL[st] : '⬜ не отмечено') + (c ? ' — ' + c : '') + '\n';
+  });
+  if(!hShown) out += '- без изменений с прошлой выгрузки, всего ' + hSec.items.length + '\n';
+  else if(!FULL && hSec.items.length - hShown > 0) out += '- ещё ' + (hSec.items.length - hShown) + ' без изменений\n';
   out += '\n';
 
   /* --- задачи и ритуалы недели: текущий статус целиком --- */
   /* Задачи и ритуалы: в дневной отчёт идёт только тронутое. Полный список — в сводке недели */
   SECTIONS.filter(x => x.type === 'task').forEach(sec => {
-    const live = sec.items.filter(i => wB.status[i.id] || cmtList(wB, i.id).length);
-    const idle = sec.items.length - live.length;
-    if(!live.length){ out += '**' + sec.title + '** — не тронуто ни одной из ' + sec.items.length + '\n\n'; return; }
-    out += '**' + sec.title + '**\n';
-    live.forEach(i => {
-      const st = wB.status[i.id];
+    let shown = 0, body = '';
+    sec.items.forEach(i => {
+      const st = wB.status[i.id] || '';
       const c = cmtText(wB, i.id);
+      const stamp = rowStamp(wB, i.id, st);
+      if(!FULL){
+        if(!isNew(wB, stamp)) return;
+        if(!st && !c) return;
+      }
+      shown++;
       const cl = (st === 'done' && wB.closed[i.id]) ? ' (' + wB.closed[i.id] + ')' : '';
-      out += '- ' + (st ? mark(wB, i.id + '=' + st) : '') + code(i.id) + ' ' + i.name + ' — ' +
-             (st ? LBL[st] : '⬜ не отмечено') + cl + (c ? ' — ' + c : '') + '\n';
+      body += '- ' + seen(wB, stamp) + code(i.id) + ' ' + i.name + ' — ' +
+              (st ? LBL[st] : '⬜ не отмечено') + cl + (c ? ' — ' + c : '') + '\n';
     });
-    if(idle) out += '- ещё ' + idle + ' не отмечено\n';
+    if(!shown){ out += '**' + sec.title + '** — без изменений с прошлой выгрузки, всего ' + sec.items.length + '\n\n'; return; }
+    out += '**' + sec.title + '**\n' + body;
+    if(!FULL && sec.items.length - shown > 0) out += '- ещё ' + (sec.items.length - shown) + ' без изменений\n';
     out += '\n';
   });
 
   SECTIONS.filter(x => x.type === 'ritual').forEach(sec => {
-    const live = sec.items.filter(i => (wB.tally[i.id] || 0) > 0 || cmtList(wB, i.id).length);
-    const idle = sec.items.length - live.length;
-    if(!live.length){ out += '**' + sec.title + '** — ни одного из ' + sec.items.length + '\n\n'; return; }
-    out += '**' + sec.title + '**\n';
-    live.forEach(i => {
-      const n = wB.tally[i.id] || 0;
+    let shown = 0, body = '';
+    sec.items.forEach(i => {
+      const k = wB.tally[i.id] || 0;
       const c = cmtText(wB, i.id);
-      out += '- ' + (n ? mark(wB, i.id + '=' + n) : '') + i.name + ' — ' + n + ' из ' + i.norm +
-             (n >= i.norm ? ' ✅' : n ? ' ⏳' : ' ⬜') + (c ? ' — ' + c : '') + '\n';
+      const stamp = rowStamp(wB, i.id, k);
+      if(!FULL){
+        if(!isNew(wB, stamp)) return;
+        if(!k && !c) return;
+      }
+      shown++;
+      body += '- ' + seen(wB, stamp) + i.name + ' — ' + k + ' из ' + i.norm +
+              (k >= i.norm ? ' ✅' : k ? ' ⏳' : ' ⬜') + (c ? ' — ' + c : '') + '\n';
     });
-    if(idle) out += '- ещё ' + idle + ' без отметок\n';
+    if(!shown){ out += '**' + sec.title + '** — без изменений с прошлой выгрузки, всего ' + sec.items.length + '\n\n'; return; }
+    out += '**' + sec.title + '**\n' + body;
+    if(!FULL && sec.items.length - shown > 0) out += '- ещё ' + (sec.items.length - shown) + ' без изменений\n';
     out += '\n';
   });
 
@@ -2628,11 +2922,11 @@ function buildWeekReport(){
   if(DAYMEAS.length){
     out += '\n### Числовые замеры дня — вне счёта привычек\n';
     DAYMEAS.forEach(m => {
-      const mw = measWeek(m);
+      const mw = measWeek(m, DAYS[DAYS.length - 1].id);
       out += '\n**' + m.name + '**\n\n| Замер | Значение |\n|---|---|\n' +
              '| Дней со значением | ' + mw.days + ' из 7 |\n' +
              '| Всего ' + (m.unit || '') + ' | ' + mw.sum + ' |\n' +
-             (m.chain ? '| Цепочка дней подряд | ' + measChain(m.id) + ' |\n' : '') +
+             (m.chain ? '| Цепочка дней подряд на последнюю отметку | ' + measChain(m.id, lastMarked(m)) + ' |\n' : '') +
              '| По дням | ' + DAYS.map(d => d.label + ' ' + (((store[d.id] || {}).meas || {})[m.id] || 0)).join(' · ') + ' |\n';
     });
   }
@@ -2835,6 +3129,7 @@ function applyMove(txt){
     Object.keys(src).forEach(f => { b[f] = src[f]; });
   });
   DAYS.forEach(d => { const b = box(d.id); if(b.bed) applySleepDerived(b); });
+  recalcSleepHabits();
   save();
 
   if(r.order && r.order.secs && r.order.secs.length){
@@ -3100,6 +3395,7 @@ const sy = document.getElementById('sy');
 function syOpen(on){
   sy.dataset.open = on ? '1' : '0';
   if(on){
+    syDiag();
     const c = syncCfg() || {};
     document.getElementById('sy-owner').value = c.owner || '';
     document.getElementById('sy-repo').value  = c.repo  || '';
@@ -3109,6 +3405,39 @@ function syOpen(on){
     document.getElementById('sy-token').value = c.token || '';
   }
 }
+
+/* ПРАВКА 5 — диагностика обмена. Одной строкой видно, включён ли обмен на этом устройстве,
+   с каким репозиторием он работает, когда была последняя удачная синхронизация и есть ли неотправленное. */
+function syDiag(){
+  const el = document.getElementById('sy-diag');
+  if(!el) return;
+  const c = syncCfg(), m = syncMeta();
+  el.textContent = c
+    ? 'Обмен включён · ' + c.owner + '/' + c.repo + '/' + (c.path || 'state.json') +
+      ' · последний обмен ' + (m.ts ? hhmm(m.ts) : 'не было') +
+      ' · здешние правки ' + (m.dirty ? 'НЕ отправлены' : 'отправлены') +
+      ' · редакция движка ' + ENGINE_REV
+    : 'Обмен на этом устройстве выключен: логин, репозиторий или ключ не заданы. Пока он выключен, ничего с другого устройства сюда не приедет.';
+}
+
+/* Сравнение редакции движка со свежей с сервера — мимо кеша браузера */
+async function checkEngine(){
+  const el = document.getElementById('eng-rev');
+  if(el) el.textContent = 'проверяю…';
+  try {
+    const r = await fetch('index.html?t=' + Date.now(), {cache:'no-store'});
+    const t = await r.text();
+    const m = /движок\s+(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})/.exec(t.slice(0, 500));
+    if(el) el.textContent = 'ред. ' + ENGINE_REV;
+    if(!m) alert('Редакцию на сервере прочитать не вышло. Здесь: ' + ENGINE_REV + '.');
+    else if(m[1] === ENGINE_REV) alert('Здесь самая свежая редакция: ' + ENGINE_REV + '.');
+    else alert('На сервере редакция ' + m[1] + ', здесь ' + ENGINE_REV + '.\n\nЗакрой вкладку полностью и открой лист заново. Если не помогло — потяни страницу вниз для обновления или очисти данные сайта в браузере.');
+  } catch(e){
+    if(el) el.textContent = 'ред. ' + ENGINE_REV;
+    alert('Проверка не вышла: нет связи с сервером.');
+  }
+}
+document.getElementById('eng-rev').onclick = checkEngine;
 
 document.getElementById('sync-dot').onclick = () => syOpen(true);
 document.getElementById('sync-dot').style.cursor = 'pointer';
@@ -3143,6 +3472,23 @@ document.getElementById('sy-save').onclick = async () => {
   }
 };
 document.getElementById('sy-now').onclick = () => { if(!syncCfg()){ toast('Синхронизация не настроена'); return; } syncPull(false); };
+document.getElementById('sy-check').onclick = () => checkEngine();
+document.getElementById('sy-pull').onclick = async () => {
+  const c = syncCfg();
+  if(!c){ toast('Обмен не настроен'); return; }
+  if(!confirm('Взять версию с сервера?\nВсё, что внесено здесь и ещё не отправлено, пропадёт.')) return;
+  syncDot('work', 'беру серверную…');
+  try {
+    const res = await ghGet(c);
+    if(res.missing){ syncDot('err', 'на сервере пусто'); toast('На сервере файла нет'); return; }
+    applyAll(res.body.data); setMeta({sha: res.sha, ts: res.body.ts, dirty:false}); location.reload();
+  } catch(e){ syncDot('err', '✕ ' + (e.message || 'сбой')); toast('Не вышло: ' + (e.message || 'сбой')); }
+};
+document.getElementById('sy-push').onclick = () => {
+  if(!syncCfg()){ toast('Обмен не настроен'); return; }
+  if(!confirm('Отправить здешнюю версию?\nСерверная будет затёрта здешней.')) return;
+  syncPush(true);
+};
 document.getElementById('sy-off').onclick = () => {
   if(!confirm('Отключить синхронизацию на этом устройстве? Данные останутся и здесь, и на сервере.')) return;
   localStorage.removeItem(SYNC_CFG); localStorage.removeItem(SYNC_META);
