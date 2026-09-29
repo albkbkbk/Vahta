@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-21 17:45 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-09-28 00:30 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -253,6 +253,11 @@ body.reorder .phrase-wrap{opacity:.45;pointer-events:none}
 .pin{flex-shrink:0;width:32px;height:32px;margin-left:auto;border:1px solid var(--rule);background:#fff;border-radius:var(--radius);
   cursor:pointer;color:var(--ink-mute);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}
 .pin[data-on="1"]{background:var(--amber-bg);border-color:var(--amber);color:var(--ink)}
+.pin.mv{margin-left:auto;font-size:17px}
+.pin.mv+.pin{margin-left:6px}
+.row.is-moved{background:linear-gradient(90deg,var(--rule) 0 3px,transparent 3px)}
+.row.is-moved .row-name{color:var(--ink-soft)}
+.moved-mark{font-size:11px;color:var(--ink-soft);letter-spacing:.02em}
 body.reorder .pin{display:none}
 .today-empty{font-size:13px;color:var(--ink-mute);line-height:1.45}
 .today-clear{margin-top:10px;width:100%;border:1px solid var(--rule);background:#fff;color:var(--ink-soft);
@@ -751,7 +756,7 @@ body.reorder .tried{display:none}
 
 <script>
 /* ================= НЕДЕЛЯ ================= */
-const ENGINE_REV = '2026-09-21 17:45';   /* редакция движка: видна в шапке и в выгрузке */
+const ENGINE_REV = '2026-09-28 00:30';   /* редакция движка: видна в шапке и в выгрузке */
 const CAT_KEY = 'vahta_catalog_v1';
 /* Состав недели, рычаги, задачи и коды в файле не хранятся: файл лежит публично.
    Каталог живёт в браузере и заливается блоком {"vahtacat":1,...} через кнопку переноса. */
@@ -771,6 +776,101 @@ const code = id => CODE[id] || id;
 
 const _hb = SECTIONS.find(s => s.key === 'habits');
 const HABIT_IDS = _hb ? _hb.items.map(i => i.id) : [];
+
+/* ================= РИТУАЛЫ ДЛИННОГО ТАКТА — СКОЛЬЗЯЩЕЕ ОКНО =================
+   ПРАВКА 28.09.2026. Раньше счёт таких ритуалов лежал в недельном боксе и обнулялся
+   с каждым новым каталогом: месячная норма («трижды в месяц») никогда не набиралась.
+   Теперь отметки копятся в отдельном журнале с датами, вне недели, а норма проверяется
+   по последним 30 дням на дату названного дня. Журнал едет между устройствами сам:
+   ключ начинается на vahta и попадает в обмен наравне с остальными. */
+const LONG_KEY = 'vahta_long_v1';
+const LONG_MIGR = 'vahta_long_migr_v1';
+const LONG_WIN = 30;
+
+function longLog(){
+  try { const o = JSON.parse(localStorage.getItem(LONG_KEY) || '{}'); return (o && typeof o === 'object') ? o : {}; }
+  catch(e){ return {}; }
+}
+function longSave(o){
+  try { localStorage.setItem(LONG_KEY, JSON.stringify(o)); } catch(e){}
+  if(typeof syncTouch === 'function') syncTouch();
+}
+/* 'ДД.ММ' каталога -> 'ГГГГ-ММ-ДД': год берётся из названия учётной недели */
+function longIso(dd){
+  const m = /^(\d{2})\.(\d{2})$/.exec(dd || ''); if(!m) return '';
+  const yr = (/(\d{4})/.exec(WEEK) || [])[1] || String(new Date().getFullYear());
+  return yr + '-' + m[2] + '-' + m[1];
+}
+function longStamp(iso){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+  return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : null;
+}
+function longFmt(iso){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+  return m ? m[3] + '.' + m[2] : '';
+}
+function dayDateOf(id){ return (DAYS.find(x => x.id === (id || current)) || {}).date || ''; }
+function isLong(id){ const rec = ITEM_INDEX[id]; return !!(rec && rec.sec.key === 'rituals_long'); }
+/* длина окна в днях: каталог задаёт полем win у пункта, иначе месяц */
+function longWin(id){
+  const rec = ITEM_INDEX[id];
+  const w = rec && rec.item && Number(rec.item.win);
+  return (w && w > 0) ? Math.round(w) : LONG_WIN;
+}
+
+/* отметки пункта за окно, считая назад от даты названного дня */
+function longMarks(id, dayId){
+  const a = longLog()[id] || [];
+  const anchor = longStamp(longIso(dayDateOf(dayId)));
+  const st = a.map(x => ({iso:x, t:longStamp(x)})).filter(x => x.t !== null);
+  const win = longWin(id);
+  const list = (anchor === null) ? st : st.filter(x => x.t <= anchor && x.t > anchor - win * 864e5);
+  return list.sort((x, y) => y.t - x.t);
+}
+function longCount(id, dayId){ return longMarks(id, dayId).length; }
+function longLast(id, dayId){ const m = longMarks(id, dayId); return m.length ? longFmt(m[0].iso) : ''; }
+function longAll(id){ return (longLog()[id] || []).slice().sort(); }
+
+function longAdd(id, dd){
+  const iso = longIso(dd); if(!iso) return;
+  const o = longLog(); const a = Array.isArray(o[id]) ? o[id] : [];
+  a.push(iso); o[id] = a; longSave(o);
+}
+/* снимается отметка этого же дня; её нет — самая свежая в окне */
+function longDrop(id, dd){
+  const o = longLog(); const a = Array.isArray(o[id]) ? o[id] : [];
+  if(!a.length) return;
+  const iso = longIso(dd);
+  let i = a.lastIndexOf(iso);
+  if(i < 0){
+    let best = -1, bv = -1;
+    a.forEach((x, k) => { const t = longStamp(x); if(t !== null && t > bv){ bv = t; best = k; } });
+    i = best;
+  }
+  if(i >= 0){ a.splice(i, 1); o[id] = a; longSave(o); }
+}
+/* разовый перенос накопленного недельного счёта в журнал: даты у старых отметок нет,
+   поэтому все они встают первым днём текущей недели — цифра не теряется */
+function longMigrate(){
+  if(localStorage.getItem(LONG_MIGR)) return;
+  const sec = SECTIONS.find(x => x.key === 'rituals_long');
+  if(sec){
+    const w = store[W];
+    const dd = (DAYS[0] || {}).date || '';
+    if(w && w.tally && dd){
+      const o = longLog();
+      sec.items.forEach(i => {
+        const n = Number(w.tally[i.id]) || 0;
+        if(n > 0 && !(Array.isArray(o[i.id]) && o[i.id].length)){
+          o[i.id] = [];
+          for(let k = 0; k < n; k++) o[i.id].push(longIso(dd));
+        }
+      });
+      try { localStorage.setItem(LONG_KEY, JSON.stringify(o)); } catch(e){}
+    }
+  }
+  try { localStorage.setItem(LONG_MIGR, '1'); } catch(e){}
+}
 
 /* ================= ХРАНИЛИЩЕ ================= */
 const KEY = 'vahta_11_v8_' + WEEK;
@@ -805,6 +905,7 @@ function box(name){
   if(!b.tally)    b.tally = {};
   if(!b.probes)   b.probes = {};
   if(!b.tried)    b.tried = {};   /* дневная отметка «приступал» по взятому на день */
+  if(!b.moved)    b.moved = {};   /* пункт перенесён на следующий день: день остаётся нейтральным */
   if(!b.exported) b.exported = [];
   if(typeof b.notes !== 'string') b.notes = '';
   if(!Array.isArray(b.notesList)) b.notesList = [];
@@ -1126,6 +1227,38 @@ function makePin(id){
   return btn;
 }
 
+/* ПРАВКА 28.09.2026. Перенос на следующий день прямо из строки раздела и из списка на сегодня:
+   раньше перенести можно было только через окно «Проход дня». День, с которого пункт перенесён,
+   остаётся нейтральным — это не выполнение и не провал, из знаменателя дня пункт выходит. */
+function nextDayOf(id){
+  const i = dayIdx(id || current);
+  return (i >= 0 && i + 1 < DAYS.length) ? DAYS[i + 1] : null;
+}
+function makeMove(id){
+  const nd = nextDayOf(current);
+  const nb0 = nd ? store[nd.id] : null;
+  const on = !!(nb0 && Array.isArray(nb0.focus) && nb0.focus.indexOf(id) >= 0);
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.className = 'pin mv';
+  btn.dataset.on = on ? '1' : '0';
+  btn.textContent = '\u2192';
+  const ttl = !nd ? 'Следующий день за границей недели'
+    : on ? ('Стоит на ' + nd.label + ' ' + nd.date + ' — снять перенос')
+         : ('Перенести на ' + nd.label + ' ' + nd.date);
+  btn.title = ttl;
+  btn.setAttribute('aria-label', ttl);
+  btn.onclick = ev => {
+    ev.stopPropagation();
+    if(!nd){ toast('Следующий день за границей недели — переносить некуда'); return; }
+    const nb = box(nd.id), cb = box(current);
+    const k = nb.focus.indexOf(id);
+    if(k >= 0){ nb.focus.splice(k, 1); delete cb.moved[id]; toast('Перенос снят'); }
+    else { nb.focus.push(id); cb.moved[id] = nd.date; toast('Перенесено на ' + nd.label + ' ' + nd.date); }
+    save(); renderAll();
+  };
+  return btn;
+}
+
 /* Режим пункта на день: закрыть сегодня или касание тянущейся работы */
 function fmode(id){
   const b = box(current);
@@ -1136,13 +1269,13 @@ function fmode(id){
 function itemDone(id){
   const {sec, item} = ITEM_INDEX[id];
   const bx = sec.type === 'habit' ? box(current) : box(W);
-  if(sec.type === 'ritual') return (bx.tally[id] || 0) >= item.norm;
+  if(sec.type === 'ritual') return (isLong(id) ? longCount(id) : (bx.tally[id] || 0)) >= item.norm;
   return bx.status[id] === 'done';
 }
 function itemTouched(id){
   const {sec} = ITEM_INDEX[id];
   const bx = sec.type === 'habit' ? box(current) : box(W);
-  if(sec.type === 'ritual') return (bx.tally[id] || 0) > 0;
+  if(sec.type === 'ritual') return (isLong(id) ? longCount(id) : (bx.tally[id] || 0)) > 0;
   return !!bx.status[id];
 }
 
@@ -1153,8 +1286,10 @@ function renderToday(){
   const live = b.focus.filter(id => ITEM_INDEX[id]);
   if(live.length !== b.focus.length){ b.focus = live; save(); }
 
-  const cl = live.filter(id => fmode(id) === 'close');
-  const tc = live.filter(id => fmode(id) === 'touch');
+  const mv = id => !!b.moved[id] && !itemDone(id);
+  const cl = live.filter(id => fmode(id) === 'close' && !mv(id));
+  const tc = live.filter(id => fmode(id) === 'touch' && !mv(id));
+  const movedN = live.filter(mv).length;
   const done = cl.filter(itemDone).length;
   const touched = tc.filter(itemTouched).length;
   let txt = '—';
@@ -1163,6 +1298,7 @@ function renderToday(){
     if(tc.length) txt += (txt ? ' · ' : '') + '≈' + touched + '/' + tc.length;
     const tr = live.filter(id => b.tried[id]).length;
     txt += (txt ? ' · ' : '') + 'приступал ' + tr + '/' + live.length;
+    if(movedN) txt += ' · перенесено ' + movedN;
   }
   document.getElementById('cnt-today').textContent = txt;
 
@@ -1226,6 +1362,15 @@ function renderToday(){
         save(); renderAll();
       };
       main.appendChild(tb);
+      if(mv(id)){
+        r.className += ' is-moved';
+        const mk = document.createElement('div');
+        mk.className = 'moved-mark';
+        mk.textContent = '\u21AA перенесено на ' + b.moved[id] + ' · день нейтральный';
+        const tx2 = main.querySelector('.row-text');
+        if(tx2) tx2.appendChild(mk);
+      }
+      main.appendChild(makeMove(id));
       main.appendChild(makePin(id));
       main.appendChild(makeGrip(r, host, '[data-id]', () => {
         box(current).focus = Array.from(host.children).map(n => n.dataset.id).filter(Boolean);
@@ -1485,7 +1630,7 @@ function renderSections(){
       cntTxt = (w.pain !== '' ? w.pain + '/10' : '—') + (w.photo ? ' 📷' : '');
     } else {
       const cnt = sec.type === 'ritual'
-        ? items.filter(i => (b.tally[i.id] || 0) >= i.norm).length
+        ? items.filter(i => (isLong(i.id) ? longCount(i.id) : (b.tally[i.id] || 0)) >= i.norm).length
         : items.filter(i => !i.trig && b.status[i.id] === 'done').length;
       const tot = sec.type === 'ritual' ? items.length : items.filter(i => !i.trig).length;
       cntTxt = cnt + ' / ' + tot;
@@ -1518,6 +1663,7 @@ function renderSections(){
         r.dataset.id = i.id;
         const main = r.querySelector('.row-main');
         if(main){
+          main.appendChild(makeMove(i.id));
           main.appendChild(makePin(i.id));
           main.appendChild(ordGroup(ids, i.id, d => moveItem(sec, i.id, d)));
           main.appendChild(makeGrip(r, rows, '[data-id]', () => commitItems(sec, rows)));
@@ -1689,9 +1835,19 @@ function renderRow(item, b, type){
 }
 
 function renderRitual(item, b){
-  const n = b.tally[item.id] || 0;
+  const lng = isLong(item.id);
+  const dd = dayDateOf(markDay ? markDay() : current);
+  const n = lng ? longCount(item.id, markDay ? markDay() : current) : (b.tally[item.id] || 0);
   const s = shell(item, b);
   s.row.className = 'row' + (n >= item.norm ? ' is-done' : n > 0 ? ' is-wip' : '');
+  if(lng){
+    const last = longLast(item.id, markDay ? markDay() : current);
+    const note = document.createElement('div');
+    note.className = 'moved-mark';
+    note.textContent = 'за ' + longWin(item.id) + ' дн.' + (last ? ' · последняя отметка ' + last : ' · отметок нет');
+    const tx = s.main.querySelector('.row-text');
+    if(tx) tx.appendChild(note);
+  }
 
   const t = document.createElement('div');
   t.className = 'tally';
@@ -1699,7 +1855,7 @@ function renderRitual(item, b){
   const minus = document.createElement('button');
   minus.type = 'button'; minus.innerHTML = '&minus;';
   minus.setAttribute('aria-label', 'Убрать отметку: ' + item.name);
-  minus.onclick = () => { b.tally[item.id] = Math.max(0, n - 1); save(); renderAll(); };
+  minus.onclick = () => { if(lng) longDrop(item.id, dd); else b.tally[item.id] = Math.max(0, n - 1); save(); renderAll(); };
 
   const val = document.createElement('span');
   val.className = 'val' + (n >= item.norm ? ' hit' : '');
@@ -1708,7 +1864,7 @@ function renderRitual(item, b){
   const plus = document.createElement('button');
   plus.type = 'button'; plus.className = 'plus'; plus.innerHTML = '+';
   plus.setAttribute('aria-label', 'Засчитать: ' + item.name);
-  plus.onclick = () => { if(item.probe && item.probe.length){ probeOpen(item); return; } b.tally[item.id] = n + 1; save(); renderAll(); };
+  plus.onclick = () => { if(item.probe && item.probe.length){ probeOpen(item); return; } if(lng) longAdd(item.id, dd); else b.tally[item.id] = n + 1; save(); renderAll(); };
 
   t.appendChild(minus); t.appendChild(val); t.appendChild(plus); t.appendChild(s.note);
   s.main.appendChild(t);
@@ -2215,7 +2371,8 @@ function passRender(){
       mv.onclick = ev => {
         ev.stopPropagation();
         const k = nb.focus.indexOf(id);
-        if(k >= 0) nb.focus.splice(k, 1); else nb.focus.push(id);
+        if(k >= 0){ nb.focus.splice(k, 1); delete cb.moved[id]; }
+        else { nb.focus.push(id); cb.moved[id] = nd.date; }
         save(); passRender();
       };
       main.appendChild(tb); main.appendChild(mv);
@@ -2331,7 +2488,8 @@ function probeSave(){
   if(miss){ toast('Не заполнено: ' + miss); return; }
   if(!Array.isArray(b.probes[probeItem.id])) b.probes[probeItem.id] = [];
   b.probes[probeItem.id].push(rec);
-  b.tally[probeItem.id] = (b.tally[probeItem.id] || 0) + 1;
+  if(isLong(probeItem.id)) longAdd(probeItem.id, dayDateOf(markDay ? markDay() : current));
+  else b.tally[probeItem.id] = (b.tally[probeItem.id] || 0) + 1;
   save(); document.getElementById('pb').dataset.open = '0'; probeItem = null; renderAll();
   toast('Заход записан');
 }
@@ -2551,12 +2709,17 @@ function buildReport(){
       const {sec, item} = ITEM_INDEX[id];
       const bx = sec.type === 'habit' ? dayB : wB;
       const st = sec.type === 'ritual'
-        ? (bx.tally[id] || 0) + ' из ' + item.norm
+        ? (isLong(id)
+            ? longCount(id, current) + ' из ' + item.norm + ' за ' + longWin(id) + ' дн.'
+            : (bx.tally[id] || 0) + ' из ' + item.norm)
         : (bx.status[id] ? LBL[bx.status[id]] : '⬜ не отмечено');
-      return '- ' + code(id) + ' ' + item.name + ' — ' + st + '\n';
+      const mvd = (dayB.moved && dayB.moved[id]) ? ' · ↪ перенесено на ' + dayB.moved[id] : '';
+      return '- ' + code(id) + ' ' + item.name + ' — ' + st + mvd + '\n';
     };
-    const cl = foc.filter(id => fmode(id) === 'close');
-    const tc = foc.filter(id => fmode(id) === 'touch');
+    const isMvd = id => !!(dayB.moved && dayB.moved[id]) && !itemDone(id);
+    const cl = foc.filter(id => fmode(id) === 'close' && !isMvd(id));
+    const tc = foc.filter(id => fmode(id) === 'touch' && !isMvd(id));
+    const mvList = foc.filter(isMvd);
     if(cl.length){
       out += '**Закрыть сегодня — ' + cl.filter(itemDone).length + ' из ' + cl.length + '** (идёт в удержание дня)\n';
       cl.forEach(id => { out += line(id); });
@@ -2565,6 +2728,11 @@ function buildReport(){
     if(tc.length){
       out += '**Касание — ' + tc.filter(itemTouched).length + ' из ' + tc.length + '** (тянущаяся работа, в удержание не идёт)\n';
       tc.forEach(id => { out += line(id); });
+      out += '\n';
+    }
+    if(mvList.length){
+      out += '**Перенесено на следующий день — ' + mvList.length + '** (день нейтральный: не выполнение и не провал)\n';
+      mvList.forEach(id => { out += line(id); });
       out += '\n';
     }
   }
@@ -2613,17 +2781,19 @@ function buildReport(){
   });
 
   SECTIONS.filter(x => x.type === 'ritual').forEach(sec => {
+    const lng = sec.key === 'rituals_long';
     let shown = 0, body = '';
     sec.items.forEach(i => {
-      const k = wB.tally[i.id] || 0;
+      const k = lng ? longCount(i.id, current) : (wB.tally[i.id] || 0);
       const c = cmtText(wB, i.id);
-      const stamp = rowStamp(wB, i.id, k);
+      const stamp = rowStamp(wB, i.id, (lng ? 'L' : '') + k);
       if(!FULL){
         if(!isNew(wB, stamp)) return;
         if(!k && !c) return;
       }
       shown++;
-      body += '- ' + seen(wB, stamp) + i.name + ' — ' + k + ' из ' + i.norm +
+      const tail = lng ? (' за ' + longWin(i.id) + ' дн.' + (longLast(i.id, current) ? ', последняя ' + longLast(i.id, current) : '')) : '';
+      body += '- ' + seen(wB, stamp) + i.name + ' — ' + k + ' из ' + i.norm + tail +
               (k >= i.norm ? ' ✅' : k ? ' ⏳' : ' ⬜') + (c ? ' — ' + c : '') + '\n';
     });
     if(!shown){ out += '**' + sec.title + '** — без изменений с прошлой выгрузки, всего ' + sec.items.length + '\n\n'; return; }
@@ -2953,6 +3123,38 @@ function buildWeekReport(){
     out += '| ' + i.name + ' | ' + (w.tally[i.id] || 0) + ' | ' + i.norm + ' | ' + (cmtList(w, i.id).length || '—') + ' |\n';
   });
 
+  /* ПРАВКА 28.09.2026. Длинный такт считается скользящим окном 30 дней и неделей не обнуляется */
+  const longSec = SECTIONS.find(s => s.key === 'rituals_long');
+  const lastDay = DAYS[DAYS.length - 1].id;
+  if(longSec && longSec.items.length){
+    out += '\n### Ритуалы длинного такта — скользящее окно\n\n';
+    out += '| Ритуал | Окно | В окне | Норма | Последняя отметка | Отметки в окне |\n|---|---|---|---|---|---|\n';
+    longSec.items.forEach(i => {
+      const marks = longMarks(i.id, lastDay);
+      const n = marks.length;
+      out += '| ' + i.name + ' | ' + longWin(i.id) + ' дн. | ' + n + (n >= i.norm ? ' ✅' : n ? ' ⏳' : ' ⬜') + ' | ' + i.norm + ' | ' +
+             (marks.length ? longFmt(marks[0].iso) : '—') + ' | ' +
+             (marks.length ? marks.map(x => longFmt(x.iso)).join(', ') : '—') + ' |\n';
+    });
+    out += '\n- Окно считается назад от ' + (DAYS[DAYS.length - 1].date || '—') + '. Недельного нуля у этих ритуалов нет\n';
+    out += '- Длина окна задаётся каталогом полем win у пункта; без него берётся 30 дней\n';
+  }
+
+  /* Перенос пунктов между днями — видно, что ушло дальше, а не провалилось */
+  const mvRows = [];
+  DAYS.forEach(d => {
+    const b2 = store[d.id];
+    if(!b2 || !b2.moved) return;
+    Object.keys(b2.moved).forEach(id => {
+      if(!ITEM_INDEX[id]) return;
+      mvRows.push('| ' + d.label + ' ' + d.date + ' | ' + code(id) + ' ' + ITEM_INDEX[id].item.name + ' | ' + b2.moved[id] + ' |');
+    });
+  });
+  if(mvRows.length){
+    out += '\n### Переносы внутри недели\n\n| С какого дня | Пункт | На какой день |\n|---|---|---|\n' + mvRows.join('\n') + '\n';
+    out += '\n- Перенос держит день нейтральным. Пункт, перенесённый дважды, разбирается на разборе\n';
+  }
+
   if(w.chron && w.chron.length){
     out += '\n### Хроника — в файл 13\n';
     ['ev','up','qt','sol'].forEach(t => {
@@ -3014,6 +3216,7 @@ function slimBox(b){
   if(b.meas && Object.keys(b.meas).length) o.meas = b.meas;
   if(b.probes && Object.keys(b.probes).length) o.probes = b.probes;
   if(b.tried && Object.keys(b.tried).length) o.tried = b.tried;
+  if(b.moved && Object.keys(b.moved).length) o.moved = b.moved;
   if(b.ext) o.ext = true;
   return Object.keys(o).length ? o : null;
 }
@@ -3055,6 +3258,7 @@ function cleanBox(raw){
   b.exported = (raw && Array.isArray(raw.exported)) ? raw.exported.slice() : [];
   b.meas = (raw && raw.meas && typeof raw.meas === 'object') ? raw.meas : {};
   b.tried = (raw && raw.tried && typeof raw.tried === 'object') ? raw.tried : {};
+  b.moved = (raw && raw.moved && typeof raw.moved === 'object') ? raw.moved : {};
   ['bed','wake','sleep','en1','en2','en3','ez1','ez2','ez3','pain','stool','notes','phrase','duty',
    'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => {
     b[k] = (raw && typeof raw[k] === 'string') ? raw[k] : '';
@@ -3203,6 +3407,7 @@ function toast(msg){
   clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2000);
 }
 
+longMigrate();
 renderAll();
 
 /* ================= СИНХРОНИЗАЦИЯ МЕЖДУ УСТРОЙСТВАМИ =================
