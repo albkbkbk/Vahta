@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-09-28 00:30 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-10-01 19:00 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -193,17 +193,25 @@ body.reorder .ordbar{display:flex}
 .mode[data-m="close"]{background:var(--ink);border-color:var(--ink);color:#fff}
 .mode[data-m="touch"]{background:var(--amber-bg);border-color:var(--amber);color:var(--ink)}
 body.reorder .mode{display:none}
-/* время начала: во сколько планирую взяться за пункт */
-.ftime{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--rule);
+/* окно якорного слота главного: минута старта, минута окончания, продления */
+.slotf{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--rule);
   background:#fff;border-radius:var(--radius);padding:3px 6px;cursor:pointer}
-.ftime::before{content:'в';font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.06em;
+.slotf::before{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink-mute)}
-.ftime input{border:0;background:transparent;font:inherit;font-size:12px;color:var(--ink-mute);
+#slot-from-w::before{content:'старт'}
+#slot-to-w::before{content:'стоп'}
+.slotf input{border:0;background:transparent;font:inherit;font-size:12px;color:var(--ink-mute);
   font-variant-numeric:tabular-nums;padding:0;width:58px;cursor:pointer}
-.ftime input:focus{outline:2px solid var(--ink);outline-offset:2px}
-.ftime[data-on="1"]{border-color:var(--sky);background:var(--sky-bg)}
-.ftime[data-on="1"] input{color:var(--sky)}
-body.reorder .ftime{display:none}
+.slotf input:focus{outline:2px solid var(--ink);outline-offset:2px}
+.slotf[data-on="1"]{border-color:var(--sky);background:var(--sky-bg)}
+.slotf[data-on="1"] input{color:var(--sky)}
+/* уровень слота: пусто -> полный -> минимум */
+.slvl{border:1px solid var(--rule);background:#fff;color:var(--ink-soft);border-radius:var(--radius);
+  font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  padding:7px 10px;cursor:pointer;white-space:nowrap}
+.slvl[data-l="full"]{background:var(--grass);border-color:var(--grass);color:#fff}
+.slvl[data-l="min"]{background:var(--amber-bg);border-color:var(--amber);color:var(--ink)}
+.slot-note{font-size:11.5px;color:var(--ink-mute);margin-top:4px;line-height:1.4}
 .phrase-wrap{display:flex;gap:7px;align-items:stretch;margin:14px 0 4px}
 .key-warn{margin:12px 0 0;padding:10px 12px;border-radius:var(--radius);border:1px solid #E0A0A2;
   background:var(--signal-bg);color:#7A1E1A;font-size:12.5px;line-height:1.45}
@@ -470,10 +478,12 @@ body.reorder .tried{display:none}
     </div>
     <div class="duty-ctl" id="duty-ctl" hidden>
       <button type="button" class="duty-first" id="duty-first">начал первым</button>
-      <button type="button" class="duty-add" data-add="15">+15</button>
-      <button type="button" class="duty-add" data-add="30">+30</button>
-      <input class="num" type="number" min="0" max="900" inputmode="numeric" id="duty-min" aria-label="Минуты на деле дня">
-      <span class="duty-unit">мин всего</span>
+      <label class="slotf" id="slot-from-w"><input type="time" id="slot-from" aria-label="Минута старта слота"></label>
+      <label class="slotf" id="slot-to-w"><input type="time" id="slot-to" aria-label="Минута окончания слота"></label>
+      <button type="button" class="duty-add" id="slot-ext">продлить</button>
+      <input class="num" type="number" min="0" max="900" inputmode="numeric" id="duty-min" aria-label="Поправка минут">
+      <span class="duty-unit">мин — поправка, если ушёл раньше</span>
+      <div class="slot-note" id="slot-note"></div>
     </div>
   </div>
 
@@ -518,7 +528,7 @@ body.reorder .tried{display:none}
         <button type="button" class="seg-v" id="segv1" title="Оценка отрезка">⬜</button>
         <div class="seg-en"><span class="en-key" data-scale="1" title="Шкала энергии">эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en1"></div>
         <div class="seg-ez"><span>лёг.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="ez1" title="Л9 — лёгкость отрезка, 1–10"></div>
-        <div class="seg-tg"><button type="button" id="st1" data-on="0" title="Л10 — следующий шаг загружен">шаг</button><button type="button" id="mn1" data-on="0" title="Л11 — работал по главному делу">глав.</button></div>
+        <div class="seg-tg"><button type="button" id="st1" data-on="0" title="Л10 — следующий шаг загружен">шаг</button></div>
         <div class="seg-tip" id="tip1" hidden>назови следующее действие сейчас</div>
         <textarea id="segt1" placeholder="надиктуй"></textarea>
       </div>
@@ -527,7 +537,7 @@ body.reorder .tried{display:none}
         <button type="button" class="seg-v" id="segv2" title="Оценка отрезка">⬜</button>
         <div class="seg-en"><span class="en-key" data-scale="1" title="Шкала энергии">эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en2"></div>
         <div class="seg-ez"><span>лёг.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="ez2" title="Л9 — лёгкость отрезка, 1–10"></div>
-        <div class="seg-tg"><button type="button" id="st2" data-on="0" title="Л10 — следующий шаг загружен">шаг</button><button type="button" id="mn2" data-on="0" title="Л11 — работал по главному делу">глав.</button></div>
+        <div class="seg-tg"><button type="button" id="st2" data-on="0" title="Л10 — следующий шаг загружен">шаг</button></div>
         <div class="seg-tip" id="tip2" hidden>назови следующее действие сейчас</div>
         <textarea id="segt2" placeholder="надиктуй"></textarea>
       </div>
@@ -536,7 +546,7 @@ body.reorder .tried{display:none}
         <button type="button" class="seg-v" id="segv3" title="Оценка отрезка">⬜</button>
         <div class="seg-en"><span class="en-key" data-scale="1" title="Шкала энергии">эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en3"></div>
         <div class="seg-ez"><span>лёг.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="ez3" title="Л9 — лёгкость отрезка, 1–10"></div>
-        <div class="seg-tg"><button type="button" id="st3" data-on="0" title="Л10 — следующий шаг загружен">шаг</button><button type="button" id="mn3" data-on="0" title="Л11 — работал по главному делу">глав.</button></div>
+        <div class="seg-tg"><button type="button" id="st3" data-on="0" title="Л10 — следующий шаг загружен">шаг</button></div>
         <div class="seg-tip" id="tip3" hidden>назови следующее действие сейчас</div>
         <textarea id="segt3" placeholder="надиктуй"></textarea>
       </div>
@@ -544,7 +554,7 @@ body.reorder .tried{display:none}
     <div class="seg-hint">Нажми на квадрат — 🟢 работал на цели · 🟡 времени не было · 🔴 время было, ушёл в ненужное.
       Оценивай по преобладанию, не по наличию: полчаса работы внутри шестичасового отрезка зелёным его не делают.
       «лёг.» — замер Л9, лёгкость отрезка 1–10. «шаг» — замер Л10, следующий шаг был загружен на входе в отрезок.
-      «глав.» — замер Л11, работал по главному делу дня; засчитывается только при заполненной заметке.
+      Отметка «главное дело в отрезке» снята 01.10.2026: её заменяет уровень якорного слота главного в блоке «Дело дня».
       Поле раскрывается при нажатии, диктуй голосом. Нажми «эн.» — шкала энергии.</div>
     <div class="en-scale" id="en-scale" hidden><b>Шкала энергии</b>
       1–2 — не могу работать, лежу, любое действие через силу<br>
@@ -740,6 +750,18 @@ body.reorder .tried{display:none}
   </div>
 </div>
 
+<div class="mv" id="dp" data-open="0">
+  <div class="mv-in">
+    <h3>Дело дня</h3>
+    <p class="mv-hint">Выбери пункт недели, потом напиши уточнение — что именно из него делаешь сегодня. Без уточнения дело дня не записывается.</p>
+    <div class="rows" id="dp-rows"></div>
+    <div class="mv-row">
+      <button type="button" id="dp-clear">Очистить дело дня</button>
+      <button type="button" id="dp-cancel">Закрыть</button>
+    </div>
+  </div>
+</div>
+
 <div class="mv" id="pb" data-open="0">
   <div class="mv-in">
     <h3 id="pb-title"></h3>
@@ -756,7 +778,7 @@ body.reorder .tried{display:none}
 
 <script>
 /* ================= НЕДЕЛЯ ================= */
-const ENGINE_REV = '2026-09-28 00:30';   /* редакция движка: видна в шапке и в выгрузке */
+const ENGINE_REV = '2026-10-01 19:00';   /* редакция движка: видна в шапке и в выгрузке */
 const CAT_KEY = 'vahta_catalog_v1';
 /* Состав недели, рычаги, задачи и коды в файле не хранятся: файл лежит публично.
    Каталог живёт в браузере и заливается блоком {"vahtacat":1,...} через кнопку переноса. */
@@ -872,6 +894,108 @@ function longMigrate(){
   try { localStorage.setItem(LONG_MIGR, '1'); } catch(e){}
 }
 
+/* ================= ЯКОРНЫЙ СЛОТ ГЛАВНОГО — ЖУРНАЛ ВНЕ НЕДЕЛИ =================
+   ПРАВКА 01.10.2026. Уровни слота копятся в отдельном журнале с датами, как ритуалы
+   длинного такта: недельный бокс для них не годится, потому что условие откатa рычага
+   5·Р2 (границы) проверяется по трём неделям подряд, а недели живут в разных каталогах.
+   Уровень ставится руками: лист его не вычисляет, а записывает вместе с окном и минутами. */
+const SLOT_KEY = 'vahta_slot_v1';
+const SLOT_ANCHOR = '2026-09-27';   /* отсчёт недель для условия отката рычага 5·Р2 */
+const SLOT_FLOOR = 4;               /* порог полного уровня за неделю; каталог может задать полем floor */
+const SLOT_LVL = ['', 'full', 'min'];
+const SLOT_LBL = {'':'⬜ уровень не поставлен', full:'✅ полный', min:'⏳ минимум'};
+const SLOT_SHORT = {'':'уровень', full:'✓ полный', min:'⏳ минимум'};
+
+function slotLog(){
+  try { const o = JSON.parse(localStorage.getItem(SLOT_KEY) || '{}'); return (o && typeof o === 'object') ? o : {}; }
+  catch(e){ return {}; }
+}
+function slotSaveLog(o){
+  try { localStorage.setItem(SLOT_KEY, JSON.stringify(o)); } catch(e){}
+  if(typeof syncTouch === 'function') syncTouch();
+}
+/* пункт-слот: каталог помечает его полем slot, иначе берётся П4 — так лист работает и со старым каталогом */
+function slotItem(){
+  const sec = SECTIONS.find(x => x.key === 'habits');
+  if(!sec) return null;
+  return sec.items.find(i => i.slot) || sec.items.find(i => i.id === 'P4') || null;
+}
+function isSlotItem(i){ const it = slotItem(); return !!(it && i && i.id === it.id); }
+function slotFloor(){ const it = slotItem(); const f = it && Number(it.floor); return (f && f > 0) ? f : SLOT_FLOOR; }
+/* бокс дня -> идентификатор дня: нужен там, где отрисовка получает только бокс */
+function boxDayId(b){
+  for(let k = 0; k < DAYS.length; k++) if(store[DAYS[k].id] === b) return DAYS[k].id;
+  return current;
+}
+/* имя slotMin, а не hhmm: hhmm уже занято форматированием времени в блоке синхронизации */
+function slotHHMM(t){
+  const m = /^(\d{1,2}):(\d{2})$/.exec(t || '');
+  if(!m) return null;
+  const h = +m[1], mi = +m[2];
+  return (h > 23 || mi > 59) ? null : h * 60 + mi;
+}
+function slotEnd(b){ const e = b.slotExt || []; return e.length ? e[e.length - 1] : (b.slotTo || ''); }
+/* минуты слота: от старта до последнего продления, через полночь считается вперёд */
+function slotPlanMin(b){
+  const a = slotHHMM(b.slotFrom), z = slotHHMM(slotEnd(b));
+  if(a === null || z === null) return 0;
+  let d = z - a; if(d < 0) d += 1440;
+  return d;
+}
+/* поправка руками сильнее окна: ушёл раньше — ставишь факт */
+function dutyMinutes(b){ return (b.dutyMin > 0) ? b.dutyMin : slotPlanMin(b); }
+function slotLine(b){
+  if(!b.slotFrom && !b.slotTo) return '';
+  const ext = b.slotExt || [];
+  return 'слот ' + (b.slotFrom || '—') + ' → ' + (b.slotTo || '—') +
+         (ext.length ? ' · продление до ' + ext[ext.length - 1] + (ext.length > 1 ? ' · продлений ' + ext.length : '') : '') +
+         ' · ' + dutyMinutes(b) + ' мин' + (b.dutyMin > 0 ? ' (поправка руками)' : '');
+}
+/* запись в журнал идёт, только когда уровень поставлен: окно без уровня — ещё не отметка */
+function slotSync(b, dayId){
+  const it = slotItem();
+  if(it) b.status[it.id] = b.slotLvl === 'full' ? 'done' : b.slotLvl === 'min' ? 'wip' : '';
+  const iso = longIso(dayDateOf(dayId));
+  if(!iso) return;
+  const o = slotLog();
+  if(b.slotLvl) o[iso] = {lvl:b.slotLvl, from:b.slotFrom || '', to:b.slotTo || '',
+                          ext:(b.slotExt || []).slice(), min:dutyMinutes(b)};
+  else delete o[iso];
+  slotSaveLog(o);
+}
+function slotCycle(b){
+  const id = boxDayId(b);
+  const i = SLOT_LVL.indexOf(b.slotLvl || '');
+  b.slotLvl = SLOT_LVL[(i + 1) % SLOT_LVL.length];
+  slotSync(b, id);
+  save(); renderAll();
+  toast('Уровень слота: ' + SLOT_LBL[b.slotLvl]);
+}
+/* недели вс→сб от текущей назад до 27.09.2026 — для условия «ниже порога три недели подряд» */
+function slotWeeks(){
+  const o = slotLog();
+  const t0 = longStamp(longIso((DAYS[0] || {}).date || ''));
+  const ta = longStamp(SLOT_ANCHOR);
+  if(t0 === null || ta === null) return [];
+  const out = [];
+  for(let t = t0; t >= ta; t -= 7 * 864e5){
+    let full = 0, mini = 0;
+    for(let k = 0; k < 7; k++){
+      const r = o[new Date(t + k * 864e5).toISOString().slice(0, 10)];
+      if(r && r.lvl === 'full') full++;
+      else if(r && r.lvl === 'min') mini++;
+    }
+    out.push({from: new Date(t).toISOString().slice(0, 10), full: full, min: mini});
+  }
+  return out;
+}
+function slotStreakBelow(){
+  const w = slotWeeks(), f = slotFloor();
+  let n = 0;
+  for(let i = 0; i < w.length; i++){ if(w[i].full < f) n++; else break; }
+  return n;
+}
+
 /* ================= ХРАНИЛИЩЕ ================= */
 const KEY = 'vahta_11_v8_' + WEEK;
 const W = '__week__';
@@ -921,9 +1045,14 @@ function box(name){
   if(!Array.isArray(b.focus)) b.focus = [];
   if(typeof b.fmode !== 'object' || !b.fmode) b.fmode = {};
   if(typeof b.ftime !== 'object' || !b.ftime) b.ftime = {};
-  if(typeof b.duty !== 'string') b.duty = '';
-  if(typeof b.dutyMin !== 'number') b.dutyMin = 0;
+  if(typeof b.duty !== 'string') b.duty = '';       /* уточнение: что именно из пункта делается сегодня */
+  if(typeof b.dutyId !== 'string') b.dutyId = '';   /* пункт недели, выбранный делом дня */
+  if(typeof b.dutyMin !== 'number') b.dutyMin = 0;  /* поправка минут: ставится руками, когда ушёл раньше окна */
   if(typeof b.dutyFirst !== 'number') b.dutyFirst = 0;
+  if(typeof b.slotLvl !== 'string') b.slotLvl = ''; /* уровень якорного слота: '' · full · min */
+  if(typeof b.slotFrom !== 'string') b.slotFrom = '';
+  if(typeof b.slotTo !== 'string') b.slotTo = '';
+  if(!Array.isArray(b.slotExt)) b.slotExt = [];     /* продления: каждое — новая минута окончания */
   if(typeof b.phrase !== 'string') b.phrase = '';
   if(typeof b.phraseN !== 'number') b.phraseN = 0;
 
@@ -1332,23 +1461,8 @@ function renderToday(){
         save(); renderAll();
       };
       main.appendChild(mb);
-      /* время начала — необязательное поле планирования */
-      const fw = document.createElement('label');
-      fw.className = 'ftime';
-      fw.title = 'Во сколько планирую взяться. Поле необязательное';
-      const fi = document.createElement('input');
-      fi.type = 'time';
-      fi.value = (box(current).ftime && box(current).ftime[id]) || '';
-      fw.dataset.on = fi.value ? '1' : '0';
-      fi.onclick = ev => ev.stopPropagation();
-      fi.onchange = ev => {
-        ev.stopPropagation();
-        const bb = box(current);
-        if(ev.target.value) bb.ftime[id] = ev.target.value; else delete bb.ftime[id];
-        save(); renderAll();
-      };
-      fw.appendChild(fi);
-      main.appendChild(fw);
+      /* ПРАВКА 01.10.2026. Поле времени начала снято у взятых пунктов: время называется
+         только у дела дня, окном слота. Замер планирования закрыт решением 01.10.2026. */
       const tb = document.createElement('button');
       tb.type = 'button'; tb.className = 'tried';
       const on = !!box(current).tried[id];
@@ -1393,37 +1507,91 @@ function phraseOf(id){
   return '';
 }
 
-/* Обещание дня: основное дело, признак «начал первым» и накопленные минуты. */
+/* Дело дня: пункт недели плюс обязательное уточнение, окно якорного слота и признак «начал первым».
+   ПРАВКА 01.10.2026. Свободный ввод заменён выбором из состава недели: без привязки к пункту
+   нельзя сравнить начатое у дела дня с начатым у остальных взятых пунктов. Уточнение обязательно —
+   делом дня обычно становится подзадача, а не весь пункт. Минуты считаются из окна слота,
+   кнопки +15 и +30 убраны: два источника одного числа давали два разных числа. */
+function dutyLabel(b){
+  if(b.dutyId && ITEM_INDEX[b.dutyId]){
+    return code(b.dutyId) + ' ' + ITEM_INDEX[b.dutyId].item.name + (b.duty ? ' — ' + b.duty : '');
+  }
+  return b.duty ? b.duty + ' · пункт не выбран' : '';
+}
 function renderDuty(){
   const b = box(current);
   const bar = document.getElementById('duty-bar');
   const txt = document.getElementById('duty-txt');
-  txt.textContent = b.duty || 'нажми ✎, чтобы назвать основное дело';
-  txt.classList.toggle('empty', !b.duty);
+  const lab = dutyLabel(b);
+  txt.textContent = lab || 'нажми ✎, чтобы выбрать пункт недели';
+  txt.classList.toggle('empty', !lab);
   bar.dataset.on = b.dutyFirst ? '1' : '0';
-  document.getElementById('duty-n').textContent = b.dutyMin || 0;
+  document.getElementById('duty-n').textContent = dutyMinutes(b);
   document.getElementById('duty-first').dataset.on = b.dutyFirst ? '1' : '0';
   document.getElementById('duty-first').textContent = b.dutyFirst ? 'начал первым ✓' : 'начал первым';
   const inp = document.getElementById('duty-min');
   if(document.activeElement !== inp) inp.value = b.dutyMin ? b.dutyMin : '';
+  const fw = document.getElementById('slot-from'), tw = document.getElementById('slot-to');
+  if(fw && document.activeElement !== fw) fw.value = b.slotFrom || '';
+  if(tw && document.activeElement !== tw) tw.value = b.slotTo || '';
+  const fwrap = document.getElementById('slot-from-w'), twrap = document.getElementById('slot-to-w');
+  if(fwrap) fwrap.dataset.on = b.slotFrom ? '1' : '0';
+  if(twrap) twrap.dataset.on = b.slotTo ? '1' : '0';
+  const sn = document.getElementById('slot-note');
+  if(sn){
+    const it = slotItem();
+    sn.textContent = (slotLine(b) || 'назови минуту старта и минуту окончания — длина окна любая') +
+      ' · уровень ставится отметкой у привычки' + (it ? ' «' + it.name + '»' : '') + ': ' + SLOT_LBL[b.slotLvl || ''];
+  }
   const ctl = document.getElementById('duty-ctl');
   if(collapsed['duty'] === 1) ctl.removeAttribute('hidden'); else ctl.setAttribute('hidden', '');
   document.getElementById('duty-bar').setAttribute('aria-expanded', collapsed['duty'] === 1 ? 'true' : 'false');
 }
-function dutyAdd(n){
+
+/* Окно выбора: все пункты недели, кроме недельного замера */
+function dpOpen(){
   const b = box(current);
-  if(!b.duty){ toast('Сначала назови дело — кнопка ✎'); return; }
-  b.dutyMin = Math.max(0, Math.min(900, (b.dutyMin || 0) + n));
-  save(); renderDuty(); renderPanels();
+  const host = document.getElementById('dp-rows');
+  host.innerHTML = '';
+  SECTIONS.filter(sec => sec.type === 'task' || sec.type === 'habit' || sec.type === 'ritual').forEach(sec => {
+    if(!sec.items.length) return;
+    const h = document.createElement('div');
+    h.className = 'subhead'; h.textContent = sec.title;
+    host.appendChild(h);
+    sec.items.forEach(i => {
+      const row = document.createElement('button');
+      row.type = 'button'; row.className = 'slvl';
+      row.style.display = 'block'; row.style.width = '100%'; row.style.textAlign = 'left';
+      row.style.margin = '4px 0'; row.style.textTransform = 'none';
+      row.style.fontFamily = 'inherit'; row.style.fontSize = '12.5px';
+      row.dataset.l = (b.dutyId === i.id) ? 'full' : '';
+      row.textContent = code(i.id) + ' ' + i.name;
+      row.onclick = () => dutyPick(i.id);
+      host.appendChild(row);
+    });
+  });
+  document.getElementById('dp').dataset.open = '1';
 }
-document.getElementById('duty-edit').onclick = () => {
+function dpShut(){ document.getElementById('dp').dataset.open = '0'; }
+function dutyPick(id){
   const b = box(current);
-  const v = prompt('Основное дело дня — одно, коротко:', b.duty || '');
+  const nm = ITEM_INDEX[id] ? ITEM_INDEX[id].item.name : id;
+  const v = prompt('Уточнение — что именно из «' + nm + '» делаешь сегодня:', (b.dutyId === id ? b.duty : '') || '');
   if(v === null) return;
-  b.duty = v.trim();
-  if(!b.duty){ b.dutyFirst = 0; b.dutyMin = 0; }
-  save(); renderDuty(); renderPanels();
-  toast(b.duty ? 'Дело дня записано' : 'Дело дня очищено');
+  const t = v.trim();
+  if(!t){ toast('Уточнение обязательно — дело дня не записано'); return; }
+  b.dutyId = id; b.duty = t;
+  save(); dpShut(); renderAll();
+  toast('Дело дня записано');
+}
+document.getElementById('duty-edit').onclick = () => dpOpen();
+document.getElementById('dp-cancel').onclick = dpShut;
+document.getElementById('dp').onclick = e => { if(e.target.id === 'dp') dpShut(); };
+document.getElementById('dp-clear').onclick = () => {
+  const b = box(current);
+  b.duty = ''; b.dutyId = ''; b.dutyFirst = 0;
+  save(); dpShut(); renderAll();
+  toast('Дело дня очищено');
 };
 document.getElementById('duty-bar').onclick = () => {
   const ctl = document.getElementById('duty-ctl');
@@ -1434,16 +1602,42 @@ document.getElementById('duty-bar').onclick = () => {
 };
 document.getElementById('duty-first').onclick = () => {
   const b = box(current);
-  if(!b.duty){ toast('Сначала назови дело — кнопка ✎'); return; }
+  if(!b.dutyId && !b.duty){ toast('Сначала выбери пункт — кнопка ✎'); return; }
   b.dutyFirst = b.dutyFirst ? 0 : 1;
   save(); renderDuty(); renderPanels();
   toast(b.dutyFirst ? 'Начал первым — засчитано' : 'Отметка снята');
 };
-document.querySelectorAll('.duty-add').forEach(btn => { btn.onclick = () => dutyAdd(+btn.dataset.add); });
+document.getElementById('slot-from').onchange = e => {
+  const b = box(current); b.slotFrom = e.target.value;
+  slotSync(b, current); save(); renderAll();
+};
+document.getElementById('slot-to').onchange = e => {
+  const b = box(current); b.slotTo = e.target.value;
+  slotSync(b, current); save(); renderAll();
+};
+/* продление на любое время: называется новая минута окончания. Пустой ответ снимает последнее */
+document.getElementById('slot-ext').onclick = () => {
+  const b = box(current);
+  if(!b.slotFrom || !b.slotTo){ toast('Сначала назови минуту старта и минуту окончания'); return; }
+  const v = prompt('Продление: до какой минуты работаешь, ЧЧ:ММ.\nПустое поле снимает последнее продление.', slotEnd(b));
+  if(v === null) return;
+  const t = (v || '').trim();
+  if(!t){
+    if((b.slotExt || []).length){ b.slotExt.pop(); slotSync(b, current); save(); renderAll(); toast('Последнее продление снято'); }
+    else toast('Продлений не было');
+    return;
+  }
+  const mm = slotHHMM(t);
+  if(mm === null || mm > 23 * 60 + 59){ toast('Нужно время от 00:00 до 23:59'); return; }
+  const norm = String(Math.floor(mm / 60)).padStart(2, '0') + ':' + String(mm % 60).padStart(2, '0');
+  b.slotExt = (b.slotExt || []).concat([norm]);
+  slotSync(b, current); save(); renderAll();
+  toast('Продление до ' + norm + ' записано');
+};
 document.getElementById('duty-min').oninput = e => {
   const b = box(current);
   b.dutyMin = Math.max(0, Math.min(900, parseInt(e.target.value, 10) || 0));
-  save(); renderPanels();
+  slotSync(b, current); save(); renderPanels();
 };
 
 /* Фраза дня: синяя полоса внизу. Нажал — засчитано: зеленеет на час, счётчик +1. */
@@ -1805,6 +1999,30 @@ function renderRow(item, b, type){
     /* ночь ещё не внесена — отметка ставится руками */
   }
 
+  /* ПРАВКА 01.10.2026. У якорного слота главного вместо галочки — уровень по кругу:
+     пусто -> полный -> минимум. Порог по минутам лист не проверяет: уровень ставлю я,
+     а рядом печатаются окно и минуты, чтобы расхождение было видно на разборе. */
+  if(type === 'habit' && isSlotItem(item)){
+    const sacts = document.createElement('div');
+    sacts.className = 'acts';
+    const lvl = b.slotLvl || '';
+    const lb = document.createElement('button');
+    lb.type = 'button'; lb.className = 'slvl'; lb.dataset.l = lvl;
+    lb.textContent = SLOT_SHORT[lvl];
+    lb.title = 'Уровень слота: пусто → полный → минимум. Окно и продления — в блоке «Дело дня»';
+    lb.setAttribute('aria-label', 'Уровень слота: ' + SLOT_LBL[lvl]);
+    lb.onclick = () => slotCycle(b);
+    sacts.appendChild(lb);
+    sacts.appendChild(s.note);
+    s.main.appendChild(sacts);
+    const sn = document.createElement('div');
+    sn.className = 'moved-mark';
+    sn.textContent = slotLine(b) || 'окно слота задаётся в блоке «Дело дня»';
+    const stx = s.main.querySelector('.row-text');
+    if(stx) stx.appendChild(sn);
+    return s.row;
+  }
+
   const acts = document.createElement('div');
   acts.className = 'acts';
   const mk = (cls, glyph, code, label) => {
@@ -1947,16 +2165,11 @@ function renderSegs(){
     /* Л9 лёгкость */
     const ez = document.getElementById('ez' + n);
     if(ez && document.activeElement !== ez) ez.value = b['ez' + n] || '';
-    /* Л10 шаг загружен · Л11 главное дело */
+    /* Л10 шаг загружен. Замер Л11 (главное дело в отрезке) снят 01.10.2026 */
     const st = document.getElementById('st' + n);
     if(st){
       st.dataset.on = b['st' + n] ? '1' : '0';
       st.textContent = b['st' + n] ? 'шаг ✓' : 'шаг';
-    }
-    const mn = document.getElementById('mn' + n);
-    if(mn){
-      mn.dataset.on = b['mn' + n] ? '1' : '0';
-      mn.textContent = b['mn' + n] ? 'глав. ✓' : 'глав.';
     }
     /* подсказка появляется только когда шаг явно не загружен */
     const tip = document.getElementById('tip' + n);
@@ -1991,17 +2204,7 @@ function renderSegs(){
     const b = box(current);
     b['st' + n] = b['st' + n] ? 0 : 1; save(); renderSegs();
   };
-  const mn = document.getElementById('mn' + n);
-  if(mn) mn.onclick = () => {
-    const b = box(current);
-    if(!b['mn' + n] && !(b['segt' + n] || '').trim()){
-      toast('Л11 (главное дело) не засчитывается: заметка отрезка пуста');
-    }
-    b['mn' + n] = b['mn' + n] ? 0 : 1; save(); renderSegs();
-  };
 });
-/* Л11 засчитывается только при заполненной заметке отрезка */
-function mnHit(b, n){ return (b['mn' + n] ? 1 : 0) && (b['segt' + n] || '').trim() ? 1 : 0; }
 document.querySelectorAll('.en-key').forEach(el => {
   el.onclick = () => {
     const sc = document.getElementById('en-scale');
@@ -2402,22 +2605,12 @@ function passRender(){
     mb.textContent = m === 'close' ? 'закрыть' : 'касание';
     mb.onclick = () => { nb.fmode[id] = (m === 'close') ? 'touch' : 'close'; save(); passRender(); };
 
-    const fw = document.createElement('label');
-    fw.className = 'ftime';
-    fw.title = 'Во сколько планирую взяться. Поле необязательное';
-    const fi = document.createElement('input');
-    fi.type = 'time';
-    fi.value = (nb.ftime && nb.ftime[id]) || '';
-    fw.dataset.on = fi.value ? '1' : '0';
-    fi.onchange = e => { if(e.target.value) nb.ftime[id] = e.target.value; else delete nb.ftime[id]; save(); passRender(); };
-    fw.appendChild(fi);
-
     const rm = document.createElement('button');
     rm.type = 'button'; rm.className = 'pin'; rm.dataset.on = '1'; rm.textContent = '★';
     rm.setAttribute('aria-label', 'Убрать из набираемого дня');
     rm.onclick = () => { const k = nb.focus.indexOf(id); if(k >= 0) nb.focus.splice(k, 1); save(); passRender(); };
 
-    main.appendChild(mb); main.appendChild(fw); main.appendChild(rm);
+    main.appendChild(mb); main.appendChild(rm);
     row.appendChild(main);
     host2.appendChild(row);
   });
@@ -2613,18 +2806,21 @@ function buildReport(){
     out += '**Взято на день — приступал**\n';
     takenIds.forEach(id => {
       const it = ITEM_INDEX[id].item;
-      const ft = (dayB.ftime && dayB.ftime[id]) || '';
-      out += '- ' + mark(dayB, 'tried' + id + '=' + (dayB.tried[id] ? 1 : 0) + '/' + ft) + code(id) + ' ' + it.name +
+      out += '- ' + mark(dayB, 'tried' + id + '=' + (dayB.tried[id] ? 1 : 0)) + code(id) + ' ' + it.name +
              ' — ' + (dayB.tried[id] ? 'приступал' : 'не приступал') + ' · режим: ' + (fmode(id) === 'close' ? 'закрыть' : 'касание') +
-             (ft ? ' · время начала ' + ft : '') + '\n';
+             (id === dayB.dutyId ? ' · дело дня' : '') + '\n';
     });
     out += '\n';
   }
 
-  if(dayB.duty){
-    out += mark(dayB, 'duty=' + dayB.duty + '/' + dayB.dutyFirst + '/' + dayB.dutyMin) +
-           '**Дело дня** ' + dayB.duty + ' · начал первым: ' + (dayB.dutyFirst ? 'да' : 'нет') +
-           ' · ' + (dayB.dutyMin || 0) + ' мин\n\n';
+  if(dayB.duty || dayB.dutyId){
+    out += mark(dayB, 'duty=' + dayB.dutyId + '/' + dayB.duty + '/' + dayB.dutyFirst + '/' +
+                      (dayB.slotLvl || '') + '/' + slotEnd(dayB) + '/' + dutyMinutes(dayB)) +
+           '**Дело дня** ' + dutyLabel(dayB) +
+           ' · ' + (slotLine(dayB) || 'окно слота не задано') +
+           ' · якорный слот главного: ' + SLOT_LBL[dayB.slotLvl || ''] +
+           ' · начал первым: ' + (dayB.dutyFirst ? 'да' : 'нет') +
+           (dayB.dutyId && (dayB.focus || []).indexOf(dayB.dutyId) < 0 ? ' · пункт на день не взят' : '') + '\n\n';
   }
 
   DAYMEAS.forEach(m => {
@@ -2680,12 +2876,8 @@ function buildReport(){
       const parts = [];
       if(dayB['en' + n]) parts.push('энергия ' + dayB['en' + n]);
       if(dayB['ez' + n]) parts.push('лёгкость ' + dayB['ez' + n]);
-      const touched = v || t || dayB['en' + n] || dayB['ez' + n] || dayB['st' + n] || dayB['mn' + n];
-      if(touched){
-        parts.push('шаг загружен: ' + (dayB['st' + n] ? 'да' : 'нет'));
-        parts.push('главное дело: ' + (mnHit(dayB, n) ? 'да'
-                   : (dayB['mn' + n] ? 'нет — заметка отрезка пуста' : 'нет')));
-      }
+      const touched = v || t || dayB['en' + n] || dayB['ez' + n] || dayB['st' + n];
+      if(touched) parts.push('шаг загружен: ' + (dayB['st' + n] ? 'да' : 'нет'));
       out += '- ' + (touched ? mark(dayB, stamp) : '') + SEG_WHEN[n] + ' — ' + SEG_LBL[v] +
              (parts.length ? ' · ' + parts.join(' · ') : '') + (t ? '\n  ' + t : '') + '\n';
     });
@@ -2737,24 +2929,20 @@ function buildReport(){
     }
   }
 
-  /* --- привычки: полный список --- */
+  /* --- привычки: полный список в любой выгрузке --- */
+  /* ПРАВКА 01.10.2026. Привычки больше не сворачиваются в строку «ещё N без изменений»:
+     по сокращённой выгрузке нельзя было отличить «не отмечено» от «отмечено вчера и не менялось».
+     Остальные разделы сокращаются как раньше. */
   const hSec = SECTIONS.find(x => x.key === 'habits');
   const hDone = hSec.items.filter(i => dayB.status[i.id] === 'done').length;
   out += '**Привычки — ' + hDone + ' из ' + hSec.items.length + '**\n';
-  let hShown = 0;
   hSec.items.forEach(i => {
     const st = dayB.status[i.id] || '';
     const c = cmtText(dayB, i.id);
     const stamp = rowStamp(dayB, i.id, st);
-    if(!FULL){
-      if(!isNew(dayB, stamp)) return;
-      if(!st && !c) return;
-    }
-    hShown++;
-    out += '- ' + seen(dayB, stamp) + i.name + ' — ' + (st ? LBL[st] : '⬜ не отмечено') + (c ? ' — ' + c : '') + '\n';
+    out += '- ' + seen(dayB, stamp) + i.name + ' — ' + (st ? LBL[st] : '⬜ не отмечено') + (c ? ' — ' + c : '') +
+           (isSlotItem(i) ? ' · ' + SLOT_LBL[dayB.slotLvl || ''] + (slotLine(dayB) ? ' · ' + slotLine(dayB) : '') : '') + '\n';
   });
-  if(!hShown) out += '- без изменений с прошлой выгрузки, всего ' + hSec.items.length + '\n';
-  else if(!FULL && hSec.items.length - hShown > 0) out += '- ещё ' + (hSec.items.length - hShown) + ' без изменений\n';
   out += '\n';
 
   /* --- задачи и ритуалы недели: текущий статус целиком --- */
@@ -2880,20 +3068,20 @@ function buildWeekReport(){
     out += '\n**Средняя энергия за неделю: ' + (enAll.reduce((a,c)=>a+c,0)/enAll.length).toFixed(1) + '**\n';
   }
 
-  /* --- Лёгкость и переходы: замеры Л9, Л10, Л11 --- */
+  /* --- Лёгкость и переходы: замеры Л9 и Л10. Замер Л11 снят 01.10.2026 --- */
   const segBoxes = [];
   DAYS.forEach(d => {
     const b = store[d.id];
     if(!b) return;
     [1,2,3].forEach(n => {
-      const touched = b['segv'+n] || b['segt'+n] || b['en'+n] || b['ez'+n] || b['st'+n] || b['mn'+n];
+      const touched = b['segv'+n] || b['segt'+n] || b['en'+n] || b['ez'+n] || b['st'+n];
       if(touched) segBoxes.push({d:d, n:n, b:b});
     });
   });
   const ezAll = segBoxes.filter(x => x.b['ez'+x.n] !== '' && typeof x.b['ez'+x.n] !== 'undefined')
                         .map(x => Number(x.b['ez'+x.n]));
   if(ezAll.length || segBoxes.length){
-    out += '\n### Лёгкость и переходы — замеры Л9, Л10, Л11\n\n';
+    out += '\n### Лёгкость и переходы — замеры Л9 и Л10\n\n';
     out += '| Показатель | Значение |\n|---|---|\n';
     const den = segBoxes.length;
     out += '| Отрезков заполнено | ' + den + ' из 21 |\n';
@@ -2910,20 +3098,8 @@ function buildWeekReport(){
       }
     }
     const stYes = segBoxes.filter(x => x.b['st'+x.n]).length;
-    const mnYes = segBoxes.filter(x => mnHit(x.b, x.n)).length;
-    const mnClaim = segBoxes.filter(x => x.b['mn'+x.n]).length;
     out += '| Шаг загружен (замер Л10) | ' + stYes + ' из ' + den +
            (den ? ' · ' + Math.round(stYes/den*100) + '%' : '') + ' |\n';
-    out += '| Главное дело (замер Л11) | ' + mnYes + ' из ' + den +
-           (den ? ' · ' + Math.round(mnYes/den*100) + '%' : '') +
-           (mnClaim > mnYes ? ' · снято при пустой заметке: ' + (mnClaim - mnYes) : '') + ' |\n';
-    const firstDays = DAYS.filter(d => store[d.id] && store[d.id].dutyFirst).length;
-    out += '| Кнопка «начал первым» (дело дня) | ' + firstDays + ' из 7 · норма 3/7, порог 2/7 |\n';
-    if(den){
-      const mnDays = DAYS.filter(d => store[d.id] && [1,2,3].some(n => mnHit(store[d.id], n))).length;
-      out += '| Расхождение Л11 против «начал первым» | дней с главным делом в отрезках ' + mnDays +
-             ', дней с кнопкой ' + firstDays + ' · разрыв ' + (mnDays - firstDays) + ' |\n';
-    }
     /* по дням: лёгкость построчно */
     if(ezAll.length){
       out += '\n| Лёгкость по отрезкам | ' + DAYS.map(d => d.label + ' ' + d.date).join(' | ') + ' | Ср. |\n|---|' +
@@ -3001,74 +3177,122 @@ function buildWeekReport(){
       if(b.tried && b.tried[id]) takenAgg[id].tried++;
     });
   });
-  /* Взятие с названным временем — замер планирования */
-  let ftWith = 0, ftWithTried = 0, ftNo = 0, ftNoTried = 0;
-  DAYS.forEach(d => {
-    const b = store[d.id]; if(!b || !Array.isArray(b.focus)) return;
-    b.focus.forEach(id => {
-      if(!ITEM_INDEX[id]) return;
-      const named = !!(b.ftime && b.ftime[id]);
-      const tried = !!(b.tried && b.tried[id]);
-      if(named){ ftWith++; if(tried) ftWithTried++; }
-      else { ftNo++; if(tried) ftNoTried++; }
-    });
-  });
-  const ftTot = ftWith + ftNo;
-  if(ftTot){
-    const pc = (a, b2) => b2 ? Math.round(a / b2 * 100) + '%' : '—';
-    out += '\n### Взятие с названным временем — замер планирования\n\n';
-    out += '| Показатель | Значение |\n|---|---|\n';
-    out += '| Взято пунктов за неделю | ' + ftTot + ' |\n';
-    out += '| Из них с названным временем начала | ' + ftWith + ' · ' + pc(ftWith, ftTot) + ' |\n';
-    out += '| Приступал среди взятых **с временем** | ' + ftWithTried + ' из ' + ftWith + ' · ' + pc(ftWithTried, ftWith) + ' |\n';
-    out += '| Приступал среди взятых **без времени** | ' + ftNoTried + ' из ' + ftNo + ' · ' + pc(ftNoTried, ftNo) + ' |\n';
-    if(ftWith && ftNo){
-      const diff = Math.round(ftWithTried / ftWith * 100) - Math.round(ftNoTried / ftNo * 100);
-      out += '| Разрыв между группами | ' + (diff > 0 ? '+' : '') + diff + ' процентных пунктов |\n';
-      out += '\n- Разрыв в плюс — названное время работает как механизм. Около нуля — это ещё одно поле, не механизм\n';
-    } else {
-      out += '| Разрыв между группами | сравнение невозможно: одна из групп пуста |\n';
-    }
-    /* по дням */
-    out += '\n| День | Взято | С временем | Приступал |\n|---|---|---|---|\n';
-    DAYS.forEach(d => {
-      const b = store[d.id];
-      const foc = (b && Array.isArray(b.focus)) ? b.focus.filter(id => ITEM_INDEX[id]) : [];
-      const nm = foc.filter(id => b.ftime && b.ftime[id]).length;
-      const tr = foc.filter(id => b.tried && b.tried[id]).length;
-      out += '| ' + d.label + ' ' + d.date + ' | ' + foc.length + ' | ' + nm + ' | ' + tr + ' |\n';
-    });
-    out += '\n- Лимит на число взятых пунктов не введён — решение 13.09.2026\n';
-  }
-
+  /* Замер планирования снят 01.10.2026 вместе с полем времени начала у взятых пунктов:
+     время называется только у дела дня, сравнивать две группы стало нечем. */
   const takenKeys = Object.keys(takenAgg);
   if(takenKeys.length){
+    const takenTot = takenKeys.reduce((a, id) => a + takenAgg[id].took, 0);
+    const takenTried = takenKeys.reduce((a, id) => a + takenAgg[id].tried, 0);
     out += '\n### Взято на день и приступал\n\n| Пункт | Дней взято | Из них приступал | Разрыв |\n|---|---|---|---|\n';
     takenKeys.forEach(id => {
       const a = takenAgg[id];
       out += '| ' + code(id) + ' ' + ITEM_INDEX[id].item.name + ' | ' + a.took + ' | ' + a.tried + ' | ' + (a.took - a.tried) + ' |\n';
     });
+    out += '\n| День | Взято | Приступал |\n|---|---|---|\n';
+    DAYS.forEach(d => {
+      const b = store[d.id];
+      const foc = (b && Array.isArray(b.focus)) ? b.focus.filter(id => ITEM_INDEX[id]) : [];
+      const tr = foc.filter(id => b.tried && b.tried[id]).length;
+      out += '| ' + d.label + ' ' + d.date + ' | ' + foc.length + ' | ' + tr + ' |\n';
+    });
+    out += '\n- Взято за неделю ' + takenTot + ' пунктов, приступал ' + takenTried +
+           ' · ' + Math.round(takenTried / takenTot * 100) + '%\n';
+    out += '- Лимит на число взятых пунктов не введён — решение 13.09.2026\n';
   }
 
-  const duties = DAYS.map(d => ({d, b: store[d.id]})).filter(x => x.b && x.b.duty);
+  /* ПРАВКА 01.10.2026. Дело дня и якорный слот главного сведены в один раздел:
+     дело дня теперь пункт недели с уточнением, слот даёт окно, минуты и уровень. */
+  const duties = DAYS.map(d => ({d, b: store[d.id]})).filter(x => x.b && (x.b.duty || x.b.dutyId || x.b.slotLvl));
   if(duties.length){
-    const agg = {};
+    out += '\n### Дело дня и якорный слот главного\n\n';
+    out += '| День | Пункт | Уточнение | Окно | Продления | Минут | Уровень | Начал первым |\n|---|---|---|---|---|---|---|---|\n';
     duties.forEach(x => {
-      const k = x.b.duty.trim();
-      if(!agg[k]) agg[k] = {min:0, first:0, days:0, zero:0};
-      agg[k].min += x.b.dutyMin || 0;
-      agg[k].days++;
-      if(x.b.dutyFirst) agg[k].first++;
-      if(!(x.b.dutyMin || 0)) agg[k].zero++;
+      const b = x.b;
+      const ext = b.slotExt || [];
+      out += '| ' + x.d.label + ' ' + x.d.date +
+             ' | ' + (b.dutyId && ITEM_INDEX[b.dutyId] ? code(b.dutyId) + ' ' + ITEM_INDEX[b.dutyId].item.name : '— пункт не выбран') +
+             ' | ' + (b.duty || '—') +
+             ' | ' + (b.slotFrom || b.slotTo ? (b.slotFrom || '—') + ' → ' + (b.slotTo || '—') : '—') +
+             ' | ' + (ext.length ? 'до ' + ext[ext.length - 1] + (ext.length > 1 ? ' · ' + ext.length + ' раза' : '') : '—') +
+             ' | ' + dutyMinutes(b) +
+             ' | ' + SLOT_LBL[b.slotLvl || ''] +
+             ' | ' + (b.dutyFirst ? 'да' : 'нет') + ' |\n';
     });
-    const firstAll = duties.filter(x => x.b.dutyFirst).length;
-    const zeroAll  = duties.filter(x => !(x.b.dutyMin || 0)).length;
-    out += '\n### Дело дня\n\n| Дело | Дней | Минут всего | Начал первым | Дней с нулём |\n|---|---|---|---|---|\n';
-    Object.keys(agg).forEach(k => {
-      const a = agg[k];
-      out += '| ' + k + ' | ' + a.days + ' | ' + a.min + ' | ' + a.first + ' | ' + a.zero + ' |\n';
+
+    /* по пунктам: один пункт может быть делом дня несколько дней подряд */
+    const byItem = {};
+    duties.forEach(x => {
+      const k = x.b.dutyId || '__none__';
+      if(!byItem[k]) byItem[k] = {days:0, min:0, full:0, first:0};
+      byItem[k].days++;
+      byItem[k].min += dutyMinutes(x.b);
+      if(x.b.slotLvl === 'full') byItem[k].full++;
+      if(x.b.dutyFirst) byItem[k].first++;
     });
-    out += '\nИтого за неделю: начато первым ' + firstAll + ' из 7 дней · дней с нулём минут ' + zeroAll + ' из ' + duties.length + ' названных\n';
+    out += '\n| Пункт | Дней делом дня | Минут всего | Дней с полным слотом | Начал первым |\n|---|---|---|---|---|\n';
+    Object.keys(byItem).forEach(k => {
+      const a = byItem[k];
+      const nm = (k !== '__none__' && ITEM_INDEX[k]) ? code(k) + ' ' + ITEM_INDEX[k].item.name : '— пункт не выбран';
+      out += '| ' + nm + ' | ' + a.days + ' | ' + a.min + ' | ' + a.full + ' | ' + a.first + ' |\n';
+    });
+
+    const fullN = DAYS.filter(d => store[d.id] && store[d.id].slotLvl === 'full').length;
+    const miniN = DAYS.filter(d => store[d.id] && store[d.id].slotLvl === 'min').length;
+    const zeroN = DAYS.length - fullN - miniN;
+    const extN = DAYS.reduce((a, d) => a + (((store[d.id] || {}).slotExt) || []).length, 0);
+    const extDays = DAYS.filter(d => (((store[d.id] || {}).slotExt) || []).length).length;
+    const minSum = DAYS.reduce((a, d) => a + (store[d.id] ? dutyMinutes(store[d.id]) : 0), 0);
+    const firstN = DAYS.filter(d => store[d.id] && store[d.id].dutyFirst).length;
+    const bothN = DAYS.filter(d => store[d.id] && store[d.id].slotLvl === 'full' && store[d.id].dutyFirst).length;
+    const flr = slotFloor();
+    out += '\n| Показатель | Значение |\n|---|---|\n';
+    out += '| Дней с полным уровнем | ' + fullN + ' из 7 · порог ' + flr + '/7 ' +
+           (fullN >= flr ? '✅ взят' : '🔴 не взят') + ' |\n';
+    out += '| Дней с минимумом | ' + miniN + ' · в норму не идут, цепочку сохраняют |\n';
+    out += '| Дней с нулём | ' + zeroN + ' |\n';
+    out += '| Продлений за неделю | ' + extN + ' в ' + extDays + ' дн. |\n';
+    out += '| Сумма минут дела дня | ' + minSum + ' мин' + (fullN + miniN ? ' · в среднем ' + Math.round(minSum / (fullN + miniN)) + ' мин в день со слотом' : '') + ' |\n';
+    out += '| Кнопка «начал первым» | ' + firstN + ' из 7 · норма 3/7, порог 2/7 |\n';
+    out += '| Совпадение полного слота и «начал первым» | ' + bothN + ' дн.' +
+           ' · слот без кнопки ' + (fullN - bothN) + ' · кнопка без слота ' + (firstN - bothN) + ' |\n';
+
+    /* приступал у дела дня против остальных взятых пунктов */
+    let dOn = 0, dTot = 0, oOn = 0, oTot = 0, notTaken = 0;
+    DAYS.forEach(d => {
+      const b = store[d.id]; if(!b) return;
+      const foc = (b.focus || []).filter(id => ITEM_INDEX[id]);
+      if(b.dutyId && foc.indexOf(b.dutyId) < 0) notTaken++;
+      foc.forEach(id => {
+        const tr = !!(b.tried && b.tried[id]);
+        if(id === b.dutyId){ dTot++; if(tr) dOn++; }
+        else { oTot++; if(tr) oOn++; }
+      });
+    });
+    if(dTot || oTot){
+      const pc = (a, n) => n ? Math.round(a / n * 100) + '%' : '—';
+      out += '| Приступал у дела дня | ' + dOn + ' из ' + dTot + ' · ' + pc(dOn, dTot) + ' |\n';
+      out += '| Приступал у остальных взятых пунктов | ' + oOn + ' из ' + oTot + ' · ' + pc(oOn, oTot) + ' |\n';
+      if(dTot && oTot){
+        const diff = Math.round(dOn / dTot * 100) - Math.round(oOn / oTot * 100);
+        out += '| Разрыв дело дня против остальных | ' + (diff > 0 ? '+' : '') + diff + ' процентных пунктов |\n';
+      }
+    }
+    if(notTaken) out += '| Дней, где дело дня названо, но пункт на день не взят | ' + notTaken + ' |\n';
+
+    /* условие отката рычага 5·Р2: уровни лежат в журнале вне недели, отсчёт с 27.09.2026 */
+    const wks = slotWeeks();
+    if(wks.length){
+      out += '\n| Неделя с | Полных | Минимумов | Порог ' + flr + '/7 |\n|---|---|---|---|\n';
+      wks.forEach(x => {
+        out += '| ' + x.from.slice(8) + '.' + x.from.slice(5, 7) + ' | ' + x.full + ' | ' + x.min + ' | ' +
+               (x.full >= flr ? '✅ взят' : '🔴 ниже') + ' |\n';
+      });
+      const streak = slotStreakBelow();
+      out += '\n- **Недель подряд ниже порога: ' + streak + '**' +
+             (streak >= 3 ? ' · условие отката рычага 5·Р2 (границы: контракты стопа, выхода, входа) выполнено — разобрать на разборе' : '') + '\n';
+      out += '- Отсчёт с ' + SLOT_ANCHOR.slice(8) + '.' + SLOT_ANCHOR.slice(5, 7) + '.' + SLOT_ANCHOR.slice(0, 4) +
+             '. Журнал уровней лежит вне недели и каталогом не обнуляется\n';
+    }
   }
 
   const probed = [];
@@ -3106,7 +3330,7 @@ function buildWeekReport(){
   SECTIONS.find(s => s.key === 'habits').items.forEach(i => {
     const cells = DAYS.map(d => {
       const s = (store[d.id] && store[d.id].status[i.id]) || '';
-      return s === 'done' ? '✅' : s === 'fail' ? '❌' : '';
+      return s === 'done' ? '✅' : s === 'wip' ? '⏳' : s === 'fail' ? '❌' : '';
     });
     out += '| ' + i.name + ' | ' + cells.join(' | ') + ' | ' + cells.filter(c => c === '✅').length + ' |\n';
   });
@@ -3209,10 +3433,12 @@ function slimBox(b){
   ['focus','notesList','chron','exported'].forEach(m => {
     if(Array.isArray(b[m]) && b[m].length) o[m] = b[m];
   });
-  ['bed','wake','en1','en2','en3','ez1','ez2','ez3','pain','stool','phrase','notes',
+  ['bed','wake','en1','en2','en3','ez1','ez2','ez3','pain','stool','phrase','notes','duty','dutyId',
+   'slotLvl','slotFrom','slotTo',
    'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => { if(b[k]) o[k] = b[k]; });
   ['prom','hit','phraseN','dutyMin','dutyFirst',
-   'st1','st2','st3','mn1','mn2','mn3'].forEach(k => { if(b[k]) o[k] = b[k]; });
+   'st1','st2','st3'].forEach(k => { if(b[k]) o[k] = b[k]; });
+  if(Array.isArray(b.slotExt) && b.slotExt.length) o.slotExt = b.slotExt.slice();
   if(b.meas && Object.keys(b.meas).length) o.meas = b.meas;
   if(b.probes && Object.keys(b.probes).length) o.probes = b.probes;
   if(b.tried && Object.keys(b.tried).length) o.tried = b.tried;
@@ -3259,12 +3485,15 @@ function cleanBox(raw){
   b.meas = (raw && raw.meas && typeof raw.meas === 'object') ? raw.meas : {};
   b.tried = (raw && raw.tried && typeof raw.tried === 'object') ? raw.tried : {};
   b.moved = (raw && raw.moved && typeof raw.moved === 'object') ? raw.moved : {};
-  ['bed','wake','sleep','en1','en2','en3','ez1','ez2','ez3','pain','stool','notes','phrase','duty',
+  ['bed','wake','sleep','en1','en2','en3','ez1','ez2','ez3','pain','stool','notes','phrase','duty','dutyId',
+   'slotLvl','slotFrom','slotTo',
    'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => {
     b[k] = (raw && typeof raw[k] === 'string') ? raw[k] : '';
   });
   ['prom','hit','phraseN','phraseTill','dutyMin','dutyFirst',
-   'st1','st2','st3','mn1','mn2','mn3'].forEach(k => { b[k] = (raw && typeof raw[k] === 'number') ? raw[k] : 0; });
+   'st1','st2','st3'].forEach(k => { b[k] = (raw && typeof raw[k] === 'number') ? raw[k] : 0; });
+  b.slotExt = (raw && Array.isArray(raw.slotExt)) ? raw.slotExt.filter(x => typeof x === 'string') : [];
+  if(b.dutyId && !knownId(b.dutyId)) b.dutyId = '';
   ['photo','ext'].forEach(k => { b[k] = !!(raw && raw[k]); });
   return b;
 }
@@ -3304,7 +3533,9 @@ function applyCat(r){
   if(r.err){ mvSay('err', r.err); return; }
   const c = r.cat;
   if(CAT_LOADED && c.WEEK !== WEEK && !confirm('Загружается каталог недели ' + c.WEEK + ' вместо ' + WEEK + '.\nОтметки этой недели останутся в браузере и вернутся при возврате к её каталогу. Продолжить?')) return;
-  try { localStorage.setItem(CAT_KEY, JSON.stringify({WEEK:c.WEEK, DAYS:c.DAYS, LEVERS:c.LEVERS || [], SECTIONS:c.SECTIONS, CODE:c.CODE || {}, DAYMEAS:c.DAYMEAS || []})); }
+  /* ИСПРАВЛЕНО 01.10.2026: блок MEASOFF (сроки снятия замеров) не сохранялся и терялся
+     при первой же перезагрузке — напоминание в выгрузке дня разбора не выводилось никогда */
+  try { localStorage.setItem(CAT_KEY, JSON.stringify({WEEK:c.WEEK, DAYS:c.DAYS, LEVERS:c.LEVERS || [], SECTIONS:c.SECTIONS, CODE:c.CODE || {}, DAYMEAS:c.DAYMEAS || [], MEASOFF:c.MEASOFF || []})); }
   catch(e){ mvSay('err', 'Браузер не дал сохранить каталог — возможно, кончилось место'); return; }
   location.reload();
 }
@@ -3566,6 +3797,49 @@ async function ghSha(c){
   return j.sha;
 }
 
+/* ПРАВКА 01.10.2026. Офлайн-кеш больше не заливается руками через веб-интерфейс:
+   лист собирает sw.js сам и кладёт рядом с движком при обновлении. Имя кеша привязано
+   к редакции движка, поэтому старый кеш чистится при активации сам. */
+function swText(){
+  const cache = 'vahta-' + ENGINE_REV.replace(/[^0-9]/g, '');
+  const L = [];
+  L.push('/* Вахтенный лист · офлайн-кеш · собран движком ' + ENGINE_REV);
+  L.push('   Файл собирается самим листом при обновлении движка. Руками не правится.');
+  L.push('   Стратегия: сеть первой, кеш запасным.');
+  L.push('   Есть связь — всегда свежая версия. Нет связи — открывается последняя сохранённая. */');
+  L.push("const CACHE = '" + cache + "';");
+  L.push('');
+  L.push("self.addEventListener('install', e => {");
+  L.push('  self.skipWaiting();');
+  L.push("  e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './index.html'])).catch(() => {}));");
+  L.push('});');
+  L.push('');
+  L.push("self.addEventListener('activate', e => {");
+  L.push('  e.waitUntil(');
+  L.push('    caches.keys()');
+  L.push('      .then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))');
+  L.push('      .then(() => self.clients.claim())');
+  L.push('  );');
+  L.push('});');
+  L.push('');
+  L.push("self.addEventListener('fetch', e => {");
+  L.push('  const req = e.request;');
+  L.push("  if (req.method !== 'GET') return;");
+  L.push('  e.respondWith(');
+  L.push('    fetch(req)');
+  L.push('      .then(res => {');
+  L.push('        if (res && res.ok && new URL(req.url).origin === location.origin) {');
+  L.push('          const copy = res.clone();');
+  L.push('          caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});');
+  L.push('        }');
+  L.push('        return res;');
+  L.push('      })');
+  L.push("      .catch(() => caches.match(req).then(hit => hit || caches.match('./index.html')))");
+  L.push('  );');
+  L.push('});');
+  return L.join('\n') + '\n';
+}
+
 async function pushEngine(file){
   const c = syncCfg();
   if(!c){ toast('Сначала настрой синхронизацию — облачко в шапке'); return; }
@@ -3580,8 +3854,17 @@ async function pushEngine(file){
     const sha = await ghSha(ec);
     const r = await ghPut(ec, null, sha, text);
     if(r && r.conflict) throw new Error('Файл на сервере изменился, повтори');
-    syncDot('ok', 'лист залит');
-    alert('Готово. Новая версия появится через одну–две минуты — GitHub пересобирает страницу. После этого закрой и открой лист заново.');
+    /* офлайн-кеш едет тем же заходом: отдельного файла держать не нужно */
+    let swOk = true, swErr = '';
+    try {
+      const sc = {owner:ec.owner, repo:ec.repo, path:'sw.js', token:c.token, branch:'main'};
+      const ssha = await ghSha(sc);
+      const sr = await ghPut(sc, null, ssha, swText());
+      if(sr && sr.conflict) throw new Error('файл кеша на сервере изменился');
+    } catch(e2){ swOk = false; swErr = e2.message || 'сбой'; }
+    syncDot('ok', swOk ? 'лист и кеш залиты' : 'лист залит, кеш нет');
+    alert('Готово. Движок залит' + (swOk ? ', офлайн-кеш обновлён тем же заходом.' : '.\nОфлайн-кеш не обновился: ' + swErr + '.') +
+          '\nНовая версия появится через одну–две минуты — GitHub пересобирает страницу. После этого закрой и открой лист заново.');
   } catch(e){
     syncDot('err', '✕ ' + (e.message || 'сбой'));
     alert('Не вышло: ' + (e.message || 'сбой') + '.\nПроверь, что ключ имеет права Contents: Read and write на репозиторий ' + ec.repo + '.');
@@ -3739,7 +4022,7 @@ if(syncCfg()){
 /* Офлайн-режим: страница открывается без связи. Данные и так лежат в браузере. */
 if('serviceWorker' in navigator && location.protocol === 'https:'){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
+    navigator.serviceWorker.register('sw.js?v=' + encodeURIComponent(ENGINE_REV)).catch(function(){});
   });
 }
 </script>
