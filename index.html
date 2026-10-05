@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Вахтенный лист · движок 2026-10-01 19:00 · данные и каталог в файле не хранятся -->
+<!-- Вахтенный лист · движок 2026-10-05 20:00 · данные и каталог в файле не хранятся -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -367,39 +367,17 @@ body.reorder .sec-head .count{margin-left:auto}
 .engrev{font:500 11px/1 "IBM Plex Sans",sans-serif;padding:4px 7px;border-radius:99px;border:1px solid var(--rule);color:var(--ink-mute);white-space:nowrap;cursor:pointer}
 .sy-in label{display:block;font:500 12px/1.4 "IBM Plex Sans",sans-serif;color:var(--ink-soft);margin:9px 0 3px}
 .sy-in input{width:100%;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;border:1px solid var(--rule);border-radius:var(--radius);padding:9px 8px;background:var(--paper);color:var(--ink)}
-/* --- отрезки дня --- */
-.segs3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 6px}
-.seg{border:1px solid var(--rule);border-radius:var(--radius);padding:7px;background:var(--card);
-  display:flex;flex-direction:column;gap:5px;margin:0;min-width:0}
-.seg.on{border-color:var(--grass);background:var(--grass-bg)}
-.seg.half{border-color:var(--azure);background:var(--azure-bg)}
-.seg.lost{border-color:var(--signal);background:var(--signal-bg)}
-.seg-when{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.03em;text-transform:uppercase;
-  color:var(--ink-soft);line-height:1.25}
-.seg-v{font-size:17px;line-height:1;border:1px solid var(--rule);background:var(--paper);color:var(--ink);
-  border-radius:var(--radius);padding:5px 0;cursor:pointer;width:100%}
-.seg-v:hover{opacity:.8}
-.seg-en{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--ink-mute)}
-.seg-en .num{width:100%;min-width:0}
-.seg textarea{width:100%;height:30px;border:1px solid var(--rule);border-radius:var(--radius);
-  padding:5px 6px;font-size:12.5px;line-height:1.35;background:var(--paper);color:var(--ink);
-  resize:none;font-family:inherit;transition:height .15s ease}
-.seg textarea:focus{height:132px;outline:2px solid var(--ink);outline-offset:-1px}
-.seg textarea.filled{border-color:var(--ink-soft)}
-.seg-hint{font-size:11px;color:var(--ink-mute);line-height:1.4;margin:0 0 10px}
-/* Л9 лёгкость · Л10 шаг загружен · Л11 главное дело */
-.seg-ez{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--ink-mute);margin-top:4px}
-.seg-ez .num{width:100%;min-width:0}
-.seg-tg{display:flex;gap:4px;margin-top:5px}
-.seg-tg button{flex:1;min-width:0;border:1px solid var(--rule);background:#fff;color:var(--ink-mute);
-  border-radius:var(--radius);font:inherit;font-size:10.5px;padding:5px 2px;cursor:pointer;line-height:1.1}
-.seg-tg button[data-on="1"]{background:var(--grass);border-color:var(--grass);color:#fff}
-.seg-tip{font-size:10px;color:var(--signal);line-height:1.25;margin-top:4px}
-.en-key{cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}
-.en-scale{font-size:11.5px;color:var(--ink-soft);line-height:1.55;margin:0 0 10px;
-  border:1px solid var(--rule);border-radius:var(--radius);background:var(--card);padding:9px 11px}
-.en-scale b{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--ink-mute);display:block;margin-bottom:5px}
+/* --- режимы дня: без отметок · тихий день · вводная · сниженная неделя --- */
+.daymode{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 0}
+.daymode button{flex:1 1 auto;min-width:132px;border:1px solid var(--rule);background:#fff;color:var(--ink-soft);
+  border-radius:var(--radius);font:inherit;font-size:12.5px;padding:8px 10px;cursor:pointer}
+.daymode button[data-on="1"]{background:var(--steel);border-color:var(--steel);color:#fff}
+.daymode button#dm-quiet[data-on="1"]{background:var(--amber);border-color:var(--amber);color:#fff}
+.daymode button#dm-week[data-on="1"]{background:var(--sky);border-color:var(--sky);color:#fff}
+.daymode-note{flex:1 1 100%;font-size:11.5px;color:var(--ink-mute);line-height:1.4}
+body.reorder .daymode{display:none}
+.row.is-off{opacity:.55}
+.row.is-off .row-name{color:var(--ink-soft)}
 .soul{border:1px solid var(--rule);background:var(--card);border-radius:var(--radius);padding:10px;margin:0 0 10px}
 .soul-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .soul-cell{display:flex;align-items:center;gap:4px}
@@ -467,6 +445,14 @@ body.reorder .tried{display:none}
 <main class="wrap">
   <div class="key-warn" id="key-warn" hidden></div>
 
+  <div class="daymode" id="daymode">
+    <button type="button" id="dm-blank">день без отметок</button>
+    <button type="button" id="dm-quiet">тихий день</button>
+    <button type="button" id="dm-crowd">вводная вытеснила пункт</button>
+    <button type="button" id="dm-week">сниженная неделя</button>
+    <div class="daymode-note" id="dm-note"></div>
+  </div>
+
   <div class="duty" id="duty">
     <div class="phrase-wrap">
       <button type="button" class="phrase-bar duty-bar" id="duty-bar" data-on="0" aria-expanded="false">
@@ -522,48 +508,6 @@ body.reorder .tried{display:none}
   <section class="z-steel" data-panel="day">
   <div class="sec-head"><span class="fold">▸</span><h2>Замеры дня</h2><span class="tag">в течение дня</span><span class="count" id="cnt-day"></span></div>
   <div class="pnl"><div class="pnl-in sleep">
-    <div class="segs3" id="segs3">
-      <div class="seg" data-seg="1" id="seg1">
-        <div class="seg-when">подъём<br>→ 13:00</div>
-        <button type="button" class="seg-v" id="segv1" title="Оценка отрезка">⬜</button>
-        <div class="seg-en"><span class="en-key" data-scale="1" title="Шкала энергии">эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en1"></div>
-        <div class="seg-ez"><span>лёг.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="ez1" title="Л9 — лёгкость отрезка, 1–10"></div>
-        <div class="seg-tg"><button type="button" id="st1" data-on="0" title="Л10 — следующий шаг загружен">шаг</button></div>
-        <div class="seg-tip" id="tip1" hidden>назови следующее действие сейчас</div>
-        <textarea id="segt1" placeholder="надиктуй"></textarea>
-      </div>
-      <div class="seg" data-seg="2" id="seg2">
-        <div class="seg-when">13:00<br>→ 19:00</div>
-        <button type="button" class="seg-v" id="segv2" title="Оценка отрезка">⬜</button>
-        <div class="seg-en"><span class="en-key" data-scale="1" title="Шкала энергии">эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en2"></div>
-        <div class="seg-ez"><span>лёг.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="ez2" title="Л9 — лёгкость отрезка, 1–10"></div>
-        <div class="seg-tg"><button type="button" id="st2" data-on="0" title="Л10 — следующий шаг загружен">шаг</button></div>
-        <div class="seg-tip" id="tip2" hidden>назови следующее действие сейчас</div>
-        <textarea id="segt2" placeholder="надиктуй"></textarea>
-      </div>
-      <div class="seg" data-seg="3" id="seg3">
-        <div class="seg-when">19:00<br>→ отбой</div>
-        <button type="button" class="seg-v" id="segv3" title="Оценка отрезка">⬜</button>
-        <div class="seg-en"><span class="en-key" data-scale="1" title="Шкала энергии">эн.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="en3"></div>
-        <div class="seg-ez"><span>лёг.</span><input class="num" type="number" min="1" max="10" inputmode="numeric" id="ez3" title="Л9 — лёгкость отрезка, 1–10"></div>
-        <div class="seg-tg"><button type="button" id="st3" data-on="0" title="Л10 — следующий шаг загружен">шаг</button></div>
-        <div class="seg-tip" id="tip3" hidden>назови следующее действие сейчас</div>
-        <textarea id="segt3" placeholder="надиктуй"></textarea>
-      </div>
-    </div>
-    <div class="seg-hint">Нажми на квадрат — 🟢 работал на цели · 🟡 времени не было · 🔴 время было, ушёл в ненужное.
-      Оценивай по преобладанию, не по наличию: полчаса работы внутри шестичасового отрезка зелёным его не делают.
-      «лёг.» — замер Л9, лёгкость отрезка 1–10. «шаг» — замер Л10, следующий шаг был загружен на входе в отрезок.
-      Отметка «главное дело в отрезке» снята 01.10.2026: её заменяет уровень якорного слота главного в блоке «Дело дня».
-      Поле раскрывается при нажатии, диктуй голосом. Нажми «эн.» — шкала энергии.</div>
-    <div class="en-scale" id="en-scale" hidden><b>Шкала энергии</b>
-      1–2 — не могу работать, лежу, любое действие через силу<br>
-      3–4 — делаю только механическое, сложное не берётся<br>
-      5–6 — работаю, но без запаса: хватает на текущее, не на новое<br>
-      7–8 — рабочее состояние, сложное берётся без раскачки<br>
-      9–10 — подъём, беру больше обычного и не устаю</div>
-
-
     <div class="grp" data-id="g-d1"><div class="grp-body"><div id="daymeas"></div></div></div>
 
     <div class="grp" data-id="g-sleep"><div class="grp-body">
@@ -574,21 +518,6 @@ body.reorder .tried{display:none}
       <span class="verdict none" id="sleep-verdict">не внесено</span>
       <label class="tick"><input type="checkbox" id="ext"> поздний отбой по службе или мероприятию</label>
     </div>
-    </div></div>
-
-    <div class="grp" data-id="g-word"><div class="grp-body">
-    <div class="line">
-      <span class="lbl">Слово</span>
-      <span class="cap" style="min-width:118px">назвал время</span>
-      <button type="button" class="step" data-k="prom" data-d="-1">−</button><span class="cnt" id="prom-n">0</span><button type="button" class="step" data-k="prom" data-d="1">+</button>
-      <span class="verdict none" id="prom-verdict">Л8</span>
-    </div>
-    <div class="line">
-      <span class="lbl"></span>
-      <span class="cap" style="min-width:118px">из них попал</span>
-      <button type="button" class="step" data-k="hit" data-d="-1">−</button><span class="cnt" id="hit-n">0</span><button type="button" class="step" data-k="hit" data-d="1">+</button>
-    </div>
-    <div class="line"><span class="cap">Назвал время — каждый раз, когда назвал конкретное время кому-то или себе. Попал — приехал или сделал в пределах ±10 минут. Второй счётчик не может быть больше первого</span></div>
     </div></div>
 
     <div class="grp" data-id="g-stool"><div class="grp-body">
@@ -752,8 +681,8 @@ body.reorder .tried{display:none}
 
 <div class="mv" id="dp" data-open="0">
   <div class="mv-in">
-    <h3>Дело дня</h3>
-    <p class="mv-hint">Выбери пункт недели, потом напиши уточнение — что именно из него делаешь сегодня. Без уточнения дело дня не записывается.</p>
+    <h3 id="dp-title">Дело дня</h3>
+    <p class="mv-hint" id="dp-hint">Выбери пункт недели, потом напиши уточнение — что именно из него делаешь сегодня. Без уточнения дело дня не записывается.</p>
     <div class="rows" id="dp-rows"></div>
     <div class="mv-row">
       <button type="button" id="dp-clear">Очистить дело дня</button>
@@ -778,7 +707,7 @@ body.reorder .tried{display:none}
 
 <script>
 /* ================= НЕДЕЛЯ ================= */
-const ENGINE_REV = '2026-10-01 19:00';   /* редакция движка: видна в шапке и в выгрузке */
+const ENGINE_REV = '2026-10-05 20:00';   /* редакция движка: видна в шапке и в выгрузке */
 const CAT_KEY = 'vahta_catalog_v1';
 /* Состав недели, рычаги, задачи и коды в файле не хранятся: файл лежит публично.
    Каталог живёт в браузере и заливается блоком {"vahtacat":1,...} через кнопку переноса. */
@@ -795,6 +724,17 @@ const CODE    = CAT.CODE || {};
 const DAYMEAS = CAT.DAYMEAS || [];   /* числовые замеры дня — состав задаётся каталогом, не движком */
 const MEASOFF = CAT.MEASOFF || [];   /* сроки снятия замеров: [{name, till:'ДД.ММ.ГГГГ'}] — назначаются на разборе */
 const code = id => CODE[id] || id;
+/* ПРАВКА 05.10.2026. Код и название печатались подряд, а у ритуалов код стоит ещё и в начале
+   названия: выходило «Р-1 Р-1 — звонок Варе». Теперь код добавляется, только если названия с него
+   не начинается. Одна функция на все места печати — в листе и в обоих отчётах. */
+function label(id){
+  const rec = (typeof ITEM_INDEX === 'object' && ITEM_INDEX) ? ITEM_INDEX[id] : null;
+  const nm = rec && rec.item ? String(rec.item.name || '') : '';
+  const c = code(id);
+  if(!nm) return c;
+  const low = nm.trim().toLowerCase(), cl = String(c).trim().toLowerCase();
+  return (cl && low.indexOf(cl) === 0) ? nm : (c + ' ' + nm);
+}
 
 const _hb = SECTIONS.find(s => s.key === 'habits');
 const HABIT_IDS = _hb ? _hb.items.map(i => i.id) : [];
@@ -807,7 +747,8 @@ const HABIT_IDS = _hb ? _hb.items.map(i => i.id) : [];
    ключ начинается на vahta и попадает в обмен наравне с остальными. */
 const LONG_KEY = 'vahta_long_v1';
 const LONG_MIGR = 'vahta_long_migr_v1';
-const LONG_WIN = 30;
+const MONTHS = ['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+const MONTHS_IN = ['январе','феврале','марте','апреле','мае','июне','июле','августе','сентябре','октябре','ноябре','декабре'];
 
 function longLog(){
   try { const o = JSON.parse(localStorage.getItem(LONG_KEY) || '{}'); return (o && typeof o === 'object') ? o : {}; }
@@ -833,43 +774,72 @@ function longFmt(iso){
 }
 function dayDateOf(id){ return (DAYS.find(x => x.id === (id || current)) || {}).date || ''; }
 function isLong(id){ const rec = ITEM_INDEX[id]; return !!(rec && rec.sec.key === 'rituals_long'); }
-/* длина окна в днях: каталог задаёт полем win у пункта, иначе месяц */
-function longWin(id){
-  const rec = ITEM_INDEX[id];
-  const w = rec && rec.item && Number(rec.item.win);
-  return (w && w > 0) ? Math.round(w) : LONG_WIN;
+/* ПРАВКА 05.10.2026 (решение 181). Скользящее окно заменено календарным месяцем: счёт обнуляется
+   первого числа. Поле win у пункта больше не читается — один такт вместо трёх, совпадает с
+   денежными ритуалами сферы 8. Работает вместе с правкой «отметка ставится датой события». */
+function longMonthKey(dayId){
+  const iso = longIso(dayDateOf(dayId));
+  return iso ? iso.slice(0, 7) : '';
+}
+/* название месяца словами: «за октябрь» */
+function longMonthName(dayId){
+  const k = longMonthKey(dayId);
+  if(!k) return 'месяц';
+  const m = Number(k.slice(5, 7));
+  return MONTHS[m - 1] || 'месяц';
+}
+/* предложный падеж: «тихих дней в октябре» */
+function longMonthIn(dayId){
+  const k = longMonthKey(dayId);
+  if(!k) return 'месяце';
+  const m = Number(k.slice(5, 7));
+  return MONTHS_IN[m - 1] || 'месяце';
 }
 
-/* отметки пункта за окно, считая назад от даты названного дня */
+/* отметки пункта за календарный месяц того дня, который открыт в листе */
 function longMarks(id, dayId){
   const a = longLog()[id] || [];
-  const anchor = longStamp(longIso(dayDateOf(dayId)));
+  const key = longMonthKey(dayId);
   const st = a.map(x => ({iso:x, t:longStamp(x)})).filter(x => x.t !== null);
-  const win = longWin(id);
-  const list = (anchor === null) ? st : st.filter(x => x.t <= anchor && x.t > anchor - win * 864e5);
+  const list = key ? st.filter(x => x.iso.slice(0, 7) === key) : st;
   return list.sort((x, y) => y.t - x.t);
 }
 function longCount(id, dayId){ return longMarks(id, dayId).length; }
 function longLast(id, dayId){ const m = longMarks(id, dayId); return m.length ? longFmt(m[0].iso) : ''; }
 function longAll(id){ return (longLog()[id] || []).slice().sort(); }
 
-function longAdd(id, dd){
-  const iso = longIso(dd); if(!iso) return;
+/* ПРАВКА 05.10.2026 (решение 181). Отметка ставится датой события, а не датой нажатия:
+   раньше три платёжные даты сентября вставали одним днём и норма месяца считалась неверно.
+   Формат ввода — ДД.ММ.ГГГГ. */
+function longIsoFull(v){
+  const m = /^(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{4})$/.exec(String(v || '').trim());
+  if(!m) return '';
+  const dd = +m[1], mm = +m[2], yy = +m[3];
+  if(dd < 1 || dd > 31 || mm < 1 || mm > 12) return '';
+  return yy + '-' + String(mm).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
+}
+function longDmy(iso){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+  return m ? m[3] + '.' + m[2] + '.' + m[1] : '';
+}
+function longAddIso(id, iso){
+  if(!iso) return;
   const o = longLog(); const a = Array.isArray(o[id]) ? o[id] : [];
   a.push(iso); o[id] = a; longSave(o);
 }
-/* снимается отметка этого же дня; её нет — самая свежая в окне */
-function longDrop(id, dd){
+/* снимается отметка названной даты; её нет — самая свежая внутри месяца */
+function longDropIso(id, iso){
   const o = longLog(); const a = Array.isArray(o[id]) ? o[id] : [];
-  if(!a.length) return;
-  const iso = longIso(dd);
-  let i = a.lastIndexOf(iso);
+  if(!a.length) return false;
+  let i = iso ? a.lastIndexOf(iso) : -1;
   if(i < 0){
     let best = -1, bv = -1;
-    a.forEach((x, k) => { const t = longStamp(x); if(t !== null && t > bv){ bv = t; best = k; } });
+    const key = iso ? iso.slice(0, 7) : '';
+    a.forEach((x, k) => { const t = longStamp(x); if(t === null) return; if(key && x.slice(0, 7) !== key) return; if(t > bv){ bv = t; best = k; } });
     i = best;
   }
-  if(i >= 0){ a.splice(i, 1); o[id] = a; longSave(o); }
+  if(i < 0) return false;
+  a.splice(i, 1); o[id] = a; longSave(o); return true;
 }
 /* разовый перенос накопленного недельного счёта в журнал: даты у старых отметок нет,
    поэтому все они встают первым днём текущей недели — цифра не теряется */
@@ -1038,9 +1008,7 @@ function box(name){
   if(typeof b.sleep === 'undefined') b.sleep = '';
   if(typeof b.bed === 'undefined') b.bed = '';
   if(typeof b.wake === 'undefined') b.wake = '';
-  ['en1','en2','en3','ez1','ez2','ez3','pain','stool'].forEach(k => { if(typeof b[k] === 'undefined') b[k] = ''; });
-  ['st1','st2','st3','mn1','mn2','mn3'].forEach(k => { if(typeof b[k] !== 'number') b[k] = 0; });
-  ['prom','hit'].forEach(k => { if(typeof b[k] !== 'number') b[k] = 0; });
+  ['pain','stool'].forEach(k => { if(typeof b[k] === 'undefined') b[k] = ''; });
   if(!Array.isArray(b.chron)) b.chron = [];
   if(!Array.isArray(b.focus)) b.focus = [];
   if(typeof b.fmode !== 'object' || !b.fmode) b.fmode = {};
@@ -1057,6 +1025,10 @@ function box(name){
   if(typeof b.phraseN !== 'number') b.phraseN = 0;
 
   if(typeof b.phraseTill !== 'number') b.phraseTill = 0;
+  if(typeof b.blank !== 'number') b.blank = 0;      /* день объявлен без отметок */
+  if(typeof b.quiet !== 'number') b.quiet = 0;      /* тихий день: ядро остаётся, остальное снимается */
+  if(typeof b.reduced !== 'string') b.reduced = ''; /* недельный бокс: дата объявления сниженной недели */
+  if(!Array.isArray(b.crowd)) b.crowd = [];         /* недельный бокс: вытеснённые вводными пункты */
   if(!b.meas) b.meas = {};
   if(typeof b.pract === 'number' && b.pract && b.meas.pract === undefined) b.meas.pract = b.pract;
   if(typeof b.photo === 'undefined') b.photo = false;
@@ -1138,6 +1110,7 @@ function leverProgress(levId){
   SECTIONS.forEach(sec => sec.items.forEach(i => {
     if(i.lev !== levId) return;
     if(sec.key === 'queue' || sec.key === 'rituals_long' || i.trig) return;
+    if(crowdOf(i.id)) return;
     if(sec.type === 'task'){
       total++; if(w.status[i.id] === 'done') done++;
     } else if(sec.type === 'ritual'){
@@ -1170,6 +1143,121 @@ function renderLevers(){
   sortStatic('levers_rows', host, '.lev');
 }
 
+
+/* ================= РЕЖИМЫ ДНЯ И НЕДЕЛИ =================
+   ПРАВКА 05.10.2026. Четыре механизма, введённые решениями 191–195 и 205:
+   · день без отметок — отличает «не вёл учёт» от «не делал»: день выходит из знаменателей;
+   · тихий день — объявляется до конца дня, снимает всё, кроме ядра; 4 в месяц, не более 2 подряд;
+   · сниженная неделя — лимит и зачёт режутся, не более двух подряд;
+   · вытеснение — вводная с названным источником выбивает пункт, и он в знаменатель не идёт.
+   Лимиты месяца и «две подряд» живут в журнале вне недели: недели лежат в разных каталогах. */
+const MODE_KEY = 'vahta_mode_v1';
+const QUIET_MONTH = 4;      /* тихих дней в календарный месяц */
+const RED_LIMIT = 3;        /* лимит задач на сниженной неделе; каталог задаёт полем limitLow */
+const RED_PASS = 2;         /* зачёт на сниженной неделе; каталог задаёт полем passLow */
+
+function modeLog(){
+  try { const o = JSON.parse(localStorage.getItem(MODE_KEY) || '{}'); return (o && typeof o === 'object') ? o : {}; }
+  catch(e){ return {}; }
+}
+function modeSave(o){
+  try { localStorage.setItem(MODE_KEY, JSON.stringify(o)); } catch(e){}
+  if(typeof syncTouch === 'function') syncTouch();
+}
+function modeQuiet(){ const o = modeLog(); return (o.quiet && typeof o.quiet === 'object') ? o.quiet : {}; }
+function modeWeeks(){ const o = modeLog(); return (o.reduced && typeof o.reduced === 'object') ? o.reduced : {}; }
+function quietMark(dayId, on){
+  const iso = longIso(dayDateOf(dayId)); if(!iso) return;
+  const o = modeLog(); const q = modeQuiet();
+  if(on) q[iso] = 1; else delete q[iso];
+  o.quiet = q; modeSave(o);
+}
+function weekMark(on){
+  const iso = longIso((DAYS[0] || {}).date || ''); if(!iso) return;
+  const o = modeLog(); const r = modeWeeks();
+  if(on) r[iso] = 1; else delete r[iso];
+  o.reduced = r; modeSave(o);
+}
+/* тихих дней в календарном месяце того дня, который открыт */
+function quietMonthN(dayId){
+  const key = (longIso(dayDateOf(dayId)) || '').slice(0, 7);
+  if(!key) return 0;
+  return Object.keys(modeQuiet()).filter(x => x.slice(0, 7) === key).length;
+}
+/* сколько тихих дней подряд непосредственно перед этим днём */
+function quietRunBefore(dayId){
+  const t0 = longStamp(longIso(dayDateOf(dayId)));
+  if(t0 === null) return 0;
+  const q = modeQuiet();
+  let n = 0;
+  for(let k = 1; k <= 7; k++){
+    const iso = new Date(t0 - k * 864e5).toISOString().slice(0, 10);
+    if(q[iso]) n++; else break;
+  }
+  return n;
+}
+/* сколько сниженных недель подряд, считая текущую */
+function reducedRun(){
+  const t0 = longStamp(longIso((DAYS[0] || {}).date || ''));
+  if(t0 === null) return 0;
+  const r = modeWeeks();
+  let n = 0;
+  for(let k = 0; k < 12; k++){
+    const iso = new Date(t0 - k * 7 * 864e5).toISOString().slice(0, 10);
+    if(r[iso]) n++; else break;
+  }
+  return n;
+}
+function isReduced(){ return !!box(W).reduced; }
+/* лимит и зачёт недели: числа берутся из каталога, у раздела задач */
+function taskSec(){ return SECTIONS.find(x => x.key === 'tasks') || null; }
+function taskLimit(){
+  const sec = taskSec(); if(!sec) return 0;
+  const n = Number(isReduced() ? (sec.limitLow || RED_LIMIT) : sec.limit);
+  return (n && n > 0) ? n : (isReduced() ? RED_LIMIT : 0);
+}
+function taskPass(){
+  const sec = taskSec(); if(!sec) return 0;
+  const n = Number(isReduced() ? (sec.passLow || RED_PASS) : sec.pass);
+  return (n && n > 0) ? n : (isReduced() ? RED_PASS : 0);
+}
+function limitNums(){
+  const l = taskLimit(), p = taskPass();
+  return l ? ('лимит ' + l + ' · зачёт при ' + p) : '';
+}
+function limitLine(){
+  const n = limitNums();
+  if(!n) return isReduced() ? 'неделя объявлена сниженной' : '';
+  return n + (isReduced() ? ' · неделя сниженная' : '');
+}
+/* ядро: каталог помечает пункт полем core — оно не снимается ни тихим днём, ни вытеснением */
+function isCore(id){
+  const r = ITEM_INDEX[id];
+  return !!(r && (r.item.core === true || r.sec.core === true));
+}
+/* вытеснение: пункт выбит вводной, источник назван одним словом */
+function crowdAll(){ const w = box(W); return Array.isArray(w.crowd) ? w.crowd : []; }
+function crowdOf(id){ return crowdAll().find(x => x && x.id === id) || null; }
+function crowdAdd(id, src, dayId){
+  const w = box(W);
+  if(!Array.isArray(w.crowd)) w.crowd = [];
+  w.crowd.push({id: id, src: src, day: dayDateOf(dayId)});
+  save();
+}
+function crowdDrop(id){
+  const w = box(W);
+  w.crowd = crowdAll().filter(x => x.id !== id);
+  save();
+}
+/* пункт не считается в этот день: тихий день снял всё, кроме ядра, либо пункт вытеснен вводной */
+function itemOff(id, dayId){
+  if(isCore(id)) return '';
+  if(crowdOf(id)) return 'вытеснено';
+  const b = store[dayId || current];
+  if(b && b.quiet) return 'тихий день';
+  return '';
+}
+
 /* ================= ОТРИСОВКА ================= */
 function renderWatch(){
   const el = document.getElementById('watch');
@@ -1200,7 +1288,7 @@ const BUILTIN_ORDER = {
     queue:['SH2','V7','SH4','Z4'],
     rituals:['R1','R2','R3','R8','R9'],
     rituals_long:['R4','R7','R6','R12','R11v'],
-    sleep_rows:['g-d1','g-word','g-stool','g-sleep']
+    sleep_rows:['g-d1','g-stool','g-sleep']
   }
 };
 let ORDER = JSON.parse(JSON.stringify(BUILTIN_ORDER));
@@ -1416,18 +1504,24 @@ function renderToday(){
   if(live.length !== b.focus.length){ b.focus = live; save(); }
 
   const mv = id => !!b.moved[id] && !itemDone(id);
-  const cl = live.filter(id => fmode(id) === 'close' && !mv(id));
-  const tc = live.filter(id => fmode(id) === 'touch' && !mv(id));
+  const off = id => !!itemOff(id, current);
+  const cl = live.filter(id => fmode(id) === 'close' && !mv(id) && !off(id));
+  const tc = live.filter(id => fmode(id) === 'touch' && !mv(id) && !off(id));
   const movedN = live.filter(mv).length;
+  const offN = live.filter(off).length;
   const done = cl.filter(itemDone).length;
   const touched = tc.filter(itemTouched).length;
   let txt = '—';
-  if(live.length){
+  if(b.blank){
+    txt = 'день без отметок';
+  } else if(live.length){
     txt = cl.length ? done + ' / ' + cl.length : '';
     if(tc.length) txt += (txt ? ' · ' : '') + '≈' + touched + '/' + tc.length;
-    const tr = live.filter(id => b.tried[id]).length;
-    txt += (txt ? ' · ' : '') + 'приступал ' + tr + '/' + live.length;
+    const act = live.filter(id => !off(id) && !mv(id));
+    const tr = act.filter(id => b.tried[id]).length;
+    txt += (txt ? ' · ' : '') + 'приступал ' + tr + '/' + act.length;
     if(movedN) txt += ' · перенесено ' + movedN;
+    if(offN) txt += ' · вне счёта ' + offN;
   }
   document.getElementById('cnt-today').textContent = txt;
 
@@ -1476,6 +1570,18 @@ function renderToday(){
         save(); renderAll();
       };
       main.appendChild(tb);
+      const offTag = itemOff(id, current);
+      if(offTag){
+        r.className += ' is-off';
+        const ok = document.createElement('div');
+        ok.className = 'moved-mark';
+        const cr = crowdOf(id);
+        ok.textContent = offTag === 'вытеснено'
+          ? '⇥ вытеснено вводной «' + cr.src + '» ' + cr.day + ' · в знаменатель недели не идёт'
+          : '⇥ тихий день · в знаменатель дня не идёт';
+        const tx3 = main.querySelector('.row-text');
+        if(tx3) tx3.appendChild(ok);
+      }
       if(mv(id)){
         r.className += ' is-moved';
         const mk = document.createElement('div');
@@ -1514,7 +1620,7 @@ function phraseOf(id){
    кнопки +15 и +30 убраны: два источника одного числа давали два разных числа. */
 function dutyLabel(b){
   if(b.dutyId && ITEM_INDEX[b.dutyId]){
-    return code(b.dutyId) + ' ' + ITEM_INDEX[b.dutyId].item.name + (b.duty ? ' — ' + b.duty : '');
+    return label(b.dutyId) + (b.duty ? ' — ' + b.duty : '');
   }
   return b.duty ? b.duty + ' · пункт не выбран' : '';
 }
@@ -1548,8 +1654,18 @@ function renderDuty(){
   document.getElementById('duty-bar').setAttribute('aria-expanded', collapsed['duty'] === 1 ? 'true' : 'false');
 }
 
-/* Окно выбора: все пункты недели, кроме недельного замера */
-function dpOpen(){
+/* Окно выбора: все пункты недели, кроме недельного замера.
+   Режим 'duty' — дело дня, режим 'crowd' — какой пункт выбила вводная. */
+let DP_MODE = 'duty';
+let CROWD_SRC = '';
+function dpOpen(mode){
+  DP_MODE = mode === 'crowd' ? 'crowd' : 'duty';
+  const ttl = document.getElementById('dp-title');
+  const hint = document.getElementById('dp-hint');
+  if(ttl) ttl.textContent = DP_MODE === 'crowd' ? 'Вводная вытеснила пункт' : 'Дело дня';
+  if(hint) hint.textContent = DP_MODE === 'crowd'
+    ? 'Выбери пункт, который выбила вводная «' + CROWD_SRC + '». Он выйдет из знаменателя недели. Пункт ядра вытеснить нельзя.'
+    : 'Выбери пункт недели, потом напиши уточнение — что именно из него делаешь сегодня. Без уточнения дело дня не записывается.';
   const b = box(current);
   const host = document.getElementById('dp-rows');
   host.innerHTML = '';
@@ -1564,15 +1680,28 @@ function dpOpen(){
       row.style.display = 'block'; row.style.width = '100%'; row.style.textAlign = 'left';
       row.style.margin = '4px 0'; row.style.textTransform = 'none';
       row.style.fontFamily = 'inherit'; row.style.fontSize = '12.5px';
-      row.dataset.l = (b.dutyId === i.id) ? 'full' : '';
-      row.textContent = code(i.id) + ' ' + i.name;
-      row.onclick = () => dutyPick(i.id);
+      row.dataset.l = (DP_MODE === 'crowd' ? !!crowdOf(i.id) : (b.dutyId === i.id)) ? 'full' : '';
+      row.textContent = label(i.id) + (DP_MODE === 'crowd' && isCore(i.id) ? ' · ядро, вытеснить нельзя' : '');
+      row.onclick = () => (DP_MODE === 'crowd' ? crowdPick(i.id) : dutyPick(i.id));
       host.appendChild(row);
     });
   });
   document.getElementById('dp').dataset.open = '1';
 }
 function dpShut(){ document.getElementById('dp').dataset.open = '0'; }
+/* вытеснение: повторный выбор того же пункта снимает отметку */
+function crowdPick(id){
+  if(isCore(id)){ toast('Это ядро — вытеснению не подлежит'); return; }
+  if(crowdOf(id)){
+    crowdDrop(id); dpShut(); renderAll();
+    toast('Вытеснение снято: ' + label(id));
+    return;
+  }
+  crowdAdd(id, CROWD_SRC, current);
+  dpShut(); renderAll();
+  const n = crowdAll().length;
+  toast(n > 3 ? 'Вытеснено ' + n + ' за неделю — выносится на разбор' : 'Вытеснено: ' + label(id));
+}
 function dutyPick(id){
   const b = box(current);
   const nm = ITEM_INDEX[id] ? ITEM_INDEX[id].item.name : id;
@@ -1584,7 +1713,7 @@ function dutyPick(id){
   save(); dpShut(); renderAll();
   toast('Дело дня записано');
 }
-document.getElementById('duty-edit').onclick = () => dpOpen();
+document.getElementById('duty-edit').onclick = () => dpOpen('duty');
 document.getElementById('dp-cancel').onclick = dpShut;
 document.getElementById('dp').onclick = e => { if(e.target.id === 'dp') dpShut(); };
 document.getElementById('dp-clear').onclick = () => {
@@ -1638,6 +1767,91 @@ document.getElementById('duty-min').oninput = e => {
   const b = box(current);
   b.dutyMin = Math.max(0, Math.min(900, parseInt(e.target.value, 10) || 0));
   slotSync(b, current); save(); renderPanels();
+};
+
+/* ================= ПОЛОСА РЕЖИМОВ ДНЯ =================
+   Четыре кнопки над делом дня: день без отметок · тихий день · вводная · сниженная неделя.
+   Вытеснение заведено одной кнопкой, а не третьей кнопкой в каждой строке: в строке уже две,
+   а вытеснений за неделю больше трёх не бывает — дальше идёт разбор (решение 193). */
+function renderDayMode(){
+  const b = box(current), w = box(W);
+  const bl = document.getElementById('dm-blank');
+  const q = document.getElementById('dm-quiet');
+  const cw = document.getElementById('dm-crowd');
+  const wk = document.getElementById('dm-week');
+  const note = document.getElementById('dm-note');
+  if(!bl || !q || !cw || !wk) return;
+  bl.dataset.on = b.blank ? '1' : '0';
+  bl.textContent = b.blank ? 'день без отметок ✓' : 'день без отметок';
+  q.dataset.on = b.quiet ? '1' : '0';
+  q.textContent = b.quiet ? 'тихий день ✓' : 'тихий день';
+  const cn = crowdAll().length;
+  cw.textContent = cn ? 'вытеснено за неделю: ' + cn : 'вводная вытеснила пункт';
+  cw.dataset.on = cn ? '1' : '0';
+  wk.dataset.on = w.reduced ? '1' : '0';
+  wk.textContent = w.reduced ? 'сниженная неделя ✓ с ' + w.reduced : 'сниженная неделя';
+  if(note){
+    const parts = [];
+    if(b.blank) parts.push('день без отметок: из знаменателей недели он выходит, провалом не считается');
+    if(b.quiet) parts.push('тихий день: в счёте осталось только ядро, тихих в ' + longMonthIn(current) + ' — ' + quietMonthN(current) + ' из ' + QUIET_MONTH);
+    if(w.reduced) parts.push((limitNums() || 'числа лимита каталог не дал') + ' · сниженных недель подряд ' + reducedRun());
+    if(cn) parts.push('вытеснено пунктов: ' + crowdAll().map(x => label(x.id) + ' — ' + x.src + ' (' + x.day + ')').join(' · '));
+    if(!parts.length) parts.push('режимы дня: объявляются в момент, а не задним числом на разборе');
+    note.textContent = parts.join(' · ');
+  }
+}
+
+document.getElementById('dm-blank').onclick = () => {
+  const b = box(current);
+  b.blank = b.blank ? 0 : 1;
+  if(b.blank) b.quiet = 0;
+  save(); renderAll();
+  toast(b.blank ? 'День объявлен без отметок' : 'Отметка снята');
+};
+
+document.getElementById('dm-quiet').onclick = () => {
+  const b = box(current);
+  if(b.quiet){
+    b.quiet = 0; quietMark(current, false); save(); renderAll(); toast('Тихий день снят');
+    return;
+  }
+  const used = quietMonthN(current);
+  const run = quietRunBefore(current);
+  let ask = 'Объявить тихий день ' + dayDateOf(current) + '?\nВ счёте остаётся только ядро, остальное из знаменателя дня выходит.';
+  ask += '\nТихих дней в этом месяце: ' + used + ' из ' + QUIET_MONTH + '.';
+  if(used >= QUIET_MONTH) ask += '\nЛимит месяца уже выбран — это перерасход.';
+  if(run >= 2) ask += '\nДва тихих дня подряд уже были — третий подряд правилом не предусмотрен.';
+  if(!confirm(ask)) return;
+  b.quiet = 1; b.blank = 0;
+  quietMark(current, true);
+  save(); renderAll();
+  toast('Тихий день объявлен · ядро осталось');
+};
+
+document.getElementById('dm-week').onclick = () => {
+  const w = box(W);
+  if(w.reduced){
+    w.reduced = ''; weekMark(false); save(); renderAll(); toast('Сниженная неделя снята');
+    return;
+  }
+  const run = reducedRun();
+  let ask = 'Объявить неделю сниженной?\nЛимит станет ' + (taskSec() && taskSec().limitLow ? taskSec().limitLow : RED_LIMIT) +
+            ', зачёт ' + (taskSec() && taskSec().passLow ? taskSec().passLow : RED_PASS) + '.';
+  if(run >= 2) ask += '\nДве сниженные недели подряд уже были — третья требует разбора причины.';
+  if(!confirm(ask)) return;
+  w.reduced = dayDateOf(current);
+  weekMark(true);
+  save(); renderAll();
+  toast('Неделя объявлена сниженной');
+};
+
+document.getElementById('dm-crowd').onclick = () => {
+  const src = prompt('Источник вводной одним словом — кто или что прилетело:', '');
+  if(src === null) return;
+  const t = src.trim();
+  if(!t){ toast('Источник обязателен — одним словом'); return; }
+  CROWD_SRC = t;
+  dpOpen('crowd');
 };
 
 /* Фраза дня: синяя полоса внизу. Нажал — засчитано: зеленеет на час, счётчик +1. */
@@ -1750,11 +1964,10 @@ function renderWeekMeas(){
 /* Сворачивание статических панелей: рычаги, сон, заметки, хроника */
 function renderPanels(){
   const w = box(W), b = box(current);
-  const segDone = [1,2,3].filter(n => segV(b, n) !== '').length;
   const counts = {
     today:  '',
     levers: (() => { let d=0,t=0; LEVERS.forEach(l => { const p = leverProgress(l.id); d+=p.done; t+=p.total; }); return d + ' / ' + t; })(),
-    day:    (b.sleep !== '' ? b.sleep + ' ч' : 'сон не внесён') + ' · отрезки ' + segDone + '/3' +
+    day:    (b.sleep !== '' ? b.sleep + ' ч' : 'сон не внесён') +
             DAYMEAS.map(m => {
               const v = measVal(b, m.id);
               if(!v) return '';
@@ -1797,6 +2010,7 @@ function renderOnce(){
     const src = sec.type === 'habit' ? b : w;
     sec.items.forEach(i => {
       if(i.trig || sec.key === 'queue' || sec.key === 'rituals_long') return;
+      if(crowdOf(i.id)) return;
       total++;
       if(sec.type === 'ritual'){ if((src.tally[i.id] || 0) >= i.norm) done++; }
       else if(src.status[i.id] === 'done') done++;
@@ -1825,15 +2039,15 @@ function renderSections(){
     } else {
       const cnt = sec.type === 'ritual'
         ? items.filter(i => (isLong(i.id) ? longCount(i.id) : (b.tally[i.id] || 0)) >= i.norm).length
-        : items.filter(i => !i.trig && b.status[i.id] === 'done').length;
-      const tot = sec.type === 'ritual' ? items.length : items.filter(i => !i.trig).length;
+        : items.filter(i => !i.trig && !crowdOf(i.id) && b.status[i.id] === 'done').length;
+      const tot = sec.type === 'ritual' ? items.length : items.filter(i => !i.trig && !crowdOf(i.id)).length;
       cntTxt = cnt + ' / ' + tot;
     }
     const head = document.createElement('div');
     head.className = 'sec-head';
     head.innerHTML = '<span class="fold">' + (open ? '▾' : '▸') + '</span><h2></h2><span class="tag"></span><span class="count">' + cntTxt + '</span>';
     head.querySelector('h2').textContent = sec.title;
-    head.querySelector('.tag').textContent = sec.tag;
+    head.querySelector('.tag').textContent = (sec.key === 'tasks' && limitLine()) ? limitLine() : sec.tag;
     head.onclick = () => { collapsed[sec.key] = open ? 0 : 1; saveUI(); renderSections(); };
     head.appendChild(ordGroup(so, sec.key, d => moveSection(sec.key, d)));
     head.appendChild(makeGrip(el, document.querySelector('main'), 'section[data-panel]', commitSections));
@@ -1855,6 +2069,15 @@ function renderSections(){
         }
         const r = sec.type === 'ritual' ? renderRitual(i, b) : renderRow(i, b, sec.type);
         r.dataset.id = i.id;
+        const cr0 = crowdOf(i.id);
+        if(cr0){
+          r.className += ' is-off';
+          const ct = document.createElement('div');
+          ct.className = 'moved-mark';
+          ct.textContent = '⇥ вытеснено вводной «' + cr0.src + '» ' + cr0.day + ' · в знаменатель недели не идёт';
+          const ctx = r.querySelector('.row-text');
+          if(ctx) ctx.appendChild(ct);
+        }
         const main = r.querySelector('.row-main');
         if(main){
           main.appendChild(makeMove(i.id));
@@ -1954,7 +2177,7 @@ function critAsk(item, cb){
   const wrap = document.getElementById('cr');
   if(!t || !wrap){ cb(); return; }
   critCb = cb;
-  document.getElementById('cr-name').textContent = code(item.id) + ' ' + item.name;
+  document.getElementById('cr-name').textContent = label(item.id);
   document.getElementById('cr-text').textContent = 'Закрыто, когда: ' + t;
   wrap.dataset.open = '1';
 }
@@ -2062,7 +2285,8 @@ function renderRitual(item, b){
     const last = longLast(item.id, markDay ? markDay() : current);
     const note = document.createElement('div');
     note.className = 'moved-mark';
-    note.textContent = 'за ' + longWin(item.id) + ' дн.' + (last ? ' · последняя отметка ' + last : ' · отметок нет');
+    note.textContent = 'за ' + longMonthName(markDay ? markDay() : current) +
+      (last ? ' · последняя отметка ' + last : ' · отметок нет');
     const tx = s.main.querySelector('.row-text');
     if(tx) tx.appendChild(note);
   }
@@ -2073,7 +2297,19 @@ function renderRitual(item, b){
   const minus = document.createElement('button');
   minus.type = 'button'; minus.innerHTML = '&minus;';
   minus.setAttribute('aria-label', 'Убрать отметку: ' + item.name);
-  minus.onclick = () => { if(lng) longDrop(item.id, dd); else b.tally[item.id] = Math.max(0, n - 1); save(); renderAll(); };
+  minus.onclick = () => {
+    if(lng){
+      const marks = longMarks(item.id, markDay ? markDay() : current);
+      const def = marks.length ? longDmy(marks[0].iso) : longDmy(longIso(dd));
+      const v = prompt('Дата отметки, которую снимаем, ДД.ММ.ГГГГ:', def);
+      if(v === null) return;
+      const iso = longIsoFull(v);
+      if(!iso){ toast('Нужна дата в формате ДД.ММ.ГГГГ'); return; }
+      if(!longDropIso(item.id, iso)){ toast('Отметки за эту дату нет'); return; }
+      toast('Отметка за ' + longDmy(iso) + ' снята');
+    } else b.tally[item.id] = Math.max(0, n - 1);
+    save(); renderAll();
+  };
 
   const val = document.createElement('span');
   val.className = 'val' + (n >= item.norm ? ' hit' : '');
@@ -2082,7 +2318,18 @@ function renderRitual(item, b){
   const plus = document.createElement('button');
   plus.type = 'button'; plus.className = 'plus'; plus.innerHTML = '+';
   plus.setAttribute('aria-label', 'Засчитать: ' + item.name);
-  plus.onclick = () => { if(item.probe && item.probe.length){ probeOpen(item); return; } if(lng) longAdd(item.id, dd); else b.tally[item.id] = n + 1; save(); renderAll(); };
+  plus.onclick = () => {
+    if(item.probe && item.probe.length){ probeOpen(item); return; }
+    if(lng){
+      const v = prompt('Дата события, ДД.ММ.ГГГГ. Ставится день, когда это произошло, а не день отметки:', longDmy(longIso(dd)));
+      if(v === null) return;
+      const iso = longIsoFull(v);
+      if(!iso){ toast('Нужна дата в формате ДД.ММ.ГГГГ'); return; }
+      longAddIso(item.id, iso);
+      toast('Отметка за ' + longDmy(iso) + ' записана');
+    } else b.tally[item.id] = n + 1;
+    save(); renderAll();
+  };
 
   t.appendChild(minus); t.appendChild(val); t.appendChild(plus); t.appendChild(s.note);
   s.main.appendChild(t);
@@ -2100,17 +2347,8 @@ function renderSleep(){
   else if(h >= 7){ v.className = 'verdict mid'; v.textContent = h + ' ч · норма, без запаса'; }
   else { v.className = 'verdict low'; v.textContent = h + ' ч · дефицит'; }
 
-  ['en1','en2','en3','stool'].forEach(k => { document.getElementById(k).value = b[k] || ''; });
+  document.getElementById('stool').value = b.stool || '';
   document.getElementById('ext').checked = !!b.ext;
-  document.getElementById('prom-n').textContent = b.prom;
-  document.getElementById('hit-n').textContent = b.hit;
-  const pv = document.getElementById('prom-verdict');
-  if(b.prom === 0){ pv.className = 'verdict none'; pv.textContent = 'Л8 · нет данных'; }
-  else {
-    const r = b.hit / b.prom;
-    pv.className = 'verdict ' + (r >= 0.8 ? 'ok' : r >= 0.5 ? 'mid' : 'low');
-    pv.textContent = b.hit + ' из ' + b.prom + ' · ' + Math.round(r*100) + '%';
-  }
 }
 function onSleepInput(){
   applySleepDerived(box(current));
@@ -2119,99 +2357,8 @@ function onSleepInput(){
 }
 document.getElementById('bed-input').oninput = e => { box(current).bed = e.target.value; onSleepInput(); };
 document.getElementById('wake-input').oninput = e => { box(current).wake = e.target.value; onSleepInput(); };
-['en1','en2','en3'].forEach(k => {
-  document.getElementById(k).oninput = e => {
-    let v = e.target.value;
-    if(v !== ''){ v = String(Math.max(0, Math.min(10, Math.round(Number(v))))); }
-    box(current)[k] = v; save(); renderSleep();
-  };
-});
-document.querySelectorAll('.sleep .step').forEach(btn => {
-  btn.onclick = () => {
-    const b = box(current), k = btn.dataset.k, d = Number(btn.dataset.d);
-    b[k] = Math.max(0, (b[k] || 0) + d);
-    if(k === 'prom' && b.hit > b.prom) b.hit = b.prom;
-    if(k === 'hit' && b.hit > b.prom) b.prom = b.hit;
-    save(); renderSleep();
-  };
-});
 document.getElementById('stool').oninput = e => { box(current).stool = e.target.value; save(); };
 
-/* ================= ОТРЕЗКИ ДНЯ =================
-   Три разбора за день на границах отрезков: подъём→13:00, 13:00→19:00, 19:00→отбой.
-   Один заход закрывает и замер энергии, и разбор — отдельных поводов открывать лист не добавляется. */
-const SEG_WHEN = {1:'подъём → 13:00', 2:'13:00 → 19:00', 3:'19:00 → отбой'};
-const SEG_V = ['', 'on', 'half', 'lost'];
-const SEG_LBL = {'':'⬜ не разобран', on:'🟢 работал на цели',
-                 half:'🟡 времени не было — отрезок занят внешним',
-                 lost:'🔴 время было, ушёл в ненужное'};
-const SEG_ICON = {'':'⬜', on:'🟢', half:'🟡', lost:'🔴'};
-
-function segV(b, n){ return b['segv' + n] || ''; }
-
-function renderSegs(){
-  const b = box(current);
-  let done = 0;
-  [1,2,3].forEach(n => {
-    const v = segV(b, n);
-    const wrap = document.getElementById('seg' + n);
-    wrap.className = 'seg' + (v ? ' ' + v : '');
-    const btn = document.getElementById('segv' + n);
-    btn.textContent = SEG_ICON[v];
-    btn.title = SEG_LBL[v];
-    const ta = document.getElementById('segt' + n);
-    if(document.activeElement !== ta) ta.value = b['segt' + n] || '';
-    ta.classList.toggle('filled', !!(b['segt' + n] || '').trim());
-    /* Л9 лёгкость */
-    const ez = document.getElementById('ez' + n);
-    if(ez && document.activeElement !== ez) ez.value = b['ez' + n] || '';
-    /* Л10 шаг загружен. Замер Л11 (главное дело в отрезке) снят 01.10.2026 */
-    const st = document.getElementById('st' + n);
-    if(st){
-      st.dataset.on = b['st' + n] ? '1' : '0';
-      st.textContent = b['st' + n] ? 'шаг ✓' : 'шаг';
-    }
-    /* подсказка появляется только когда шаг явно не загружен */
-    const tip = document.getElementById('tip' + n);
-    if(tip){
-      const asked = b['st' + n] === 0 && (v || b['ez' + n] || b['en' + n]);
-      if(asked) tip.removeAttribute('hidden'); else tip.setAttribute('hidden', '');
-    }
-    if(v) done++;
-  });
-  const c = document.getElementById('cnt-segs');
-  if(c) c.textContent = done ? done + ' из 3' : '';
-}
-
-[1,2,3].forEach(n => {
-  document.getElementById('segv' + n).onclick = () => {
-    const b = box(current);
-    const i = SEG_V.indexOf(segV(b, n));
-    b['segv' + n] = SEG_V[(i + 1) % SEG_V.length];
-    save(); renderSegs();
-  };
-  document.getElementById('segt' + n).oninput = e => {
-    box(current)['segt' + n] = e.target.value; save(); renderSegs();
-  };
-  const ez = document.getElementById('ez' + n);
-  if(ez) ez.oninput = e => {
-    const v = e.target.value.replace(/[^0-9]/g, '');
-    const num = v === '' ? '' : String(Math.max(1, Math.min(10, parseInt(v, 10) || 1)));
-    box(current)['ez' + n] = num; save(); renderSegs();
-  };
-  const st = document.getElementById('st' + n);
-  if(st) st.onclick = () => {
-    const b = box(current);
-    b['st' + n] = b['st' + n] ? 0 : 1; save(); renderSegs();
-  };
-});
-document.querySelectorAll('.en-key').forEach(el => {
-  el.onclick = () => {
-    const sc = document.getElementById('en-scale');
-    if(!sc) return;
-    if(sc.hasAttribute('hidden')) sc.removeAttribute('hidden'); else sc.setAttribute('hidden', '');
-  };
-});
 document.getElementById('ext').onchange = e => { const b = box(current); b.ext = e.target.checked; applySleepDerived(b); recalcSleepHabits(); save(); renderAll(); };
 
 /* ================= ХРОНИКА (файл 13) ================= */
@@ -2503,7 +2650,7 @@ function renderDayMeas(){
 }
 
 function renderAll(){ renderWatch(); renderLevers(); renderSleep(); renderSections(); renderNotes(); renderChronForm(); renderChronList(); renderPanels();
-  renderToday(); renderDuty(); renderPhrase(); renderSegs(); renderDayMeas(); renderFixes();
+  renderToday(); renderDuty(); renderPhrase(); renderDayMeas(); renderFixes(); renderDayMode();
   if(typeof keyWarn === 'function') keyWarn();
   sortStatic('sleep_rows', document.querySelector('.pnl-in.sleep'), '.grp');
   const d = DAYS.find(x => x.id === current);
@@ -2681,7 +2828,7 @@ function probeSave(){
   if(miss){ toast('Не заполнено: ' + miss); return; }
   if(!Array.isArray(b.probes[probeItem.id])) b.probes[probeItem.id] = [];
   b.probes[probeItem.id].push(rec);
-  if(isLong(probeItem.id)) longAdd(probeItem.id, dayDateOf(markDay ? markDay() : current));
+  if(isLong(probeItem.id)) longAddIso(probeItem.id, longIso(dayDateOf(markDay ? markDay() : current)));
   else b.tally[probeItem.id] = (b.tally[probeItem.id] || 0) + 1;
   save(); document.getElementById('pb').dataset.open = '0'; probeItem = null; renderAll();
   toast('Заход записан');
@@ -2782,6 +2929,13 @@ function buildReport(){
             ' · движок ' + ENGINE_REV + '\n\n';
   if(FULL) out += '_День разбора: состав недели выведен полностью._\n\n';
   else out += '_Выведено только изменившееся с прошлой выгрузки._\n\n';
+  /* ПРАВКА 05.10.2026. Режимы дня и недели идут первыми строками: без них незаполненный день
+     неотличим от несделанного, а сниженный лимит — от проваленного обычного. */
+  if(dayB.blank) out += '**День объявлен без отметок** — учёт в этот день не вёлся. Из знаменателей недели день выходит, провалом не считается\n\n';
+  if(dayB.quiet) out += '**Тихий день** — в счёте осталось только ядро, остальные взятые пункты из знаменателя дня выведены. Тихих дней в ' +
+                        longMonthIn(current) + ': ' + quietMonthN(current) + ' из ' + QUIET_MONTH + '\n\n';
+  if(wB.reduced) out += '**Неделя объявлена сниженной** ' + wB.reduced + ' — ' + (limitNums() || 'числа лимита каталог не дал') +
+                        ' · сниженных недель подряд ' + reducedRun() + '\n\n';
   const fresh = [];
   const isNew = (b, stamp) => b.exported.indexOf(stamp) < 0;
   const mark = (b, stamp) => { if(isNew(b, stamp)){ fresh.push({b, tag:stamp}); return '🆕 '; } return ''; };
@@ -2806,9 +2960,11 @@ function buildReport(){
     out += '**Взято на день — приступал**\n';
     takenIds.forEach(id => {
       const it = ITEM_INDEX[id].item;
-      out += '- ' + mark(dayB, 'tried' + id + '=' + (dayB.tried[id] ? 1 : 0)) + code(id) + ' ' + it.name +
+      const offTag = itemOff(id, current);
+      out += '- ' + mark(dayB, 'tried' + id + '=' + (dayB.tried[id] ? 1 : 0)) + label(id) +
              ' — ' + (dayB.tried[id] ? 'приступал' : 'не приступал') + ' · режим: ' + (fmode(id) === 'close' ? 'закрыть' : 'касание') +
-             (id === dayB.dutyId ? ' · дело дня' : '') + '\n';
+             (id === dayB.dutyId ? ' · дело дня' : '') +
+             (offTag ? ' · вне счёта: ' + offTag : '') + '\n';
     });
     out += '\n';
   }
@@ -2848,47 +3004,11 @@ function buildReport(){
   }
 
   /* --- замеры --- */
-  const mStamp = 'meas=' + [dayB.en1, dayB.en2, dayB.en3, dayB.stool].join('/');
-  const es = [dayB.en1, dayB.en2, dayB.en3];
-  const mp = [];
-  if(es.some(x => x !== '')) mp.push('энергия ' + es.map(x => x === '' ? '—' : x).join(' / ') + ' (подъём / 13:00 / 19:00)');
-  if(dayB.stool !== '') mp.push('стул (тест элиминации Н6): ' + dayB.stool);
-  out += (mp.length ? mark(dayB, mStamp) + '**Замеры** ' + mp.join(' · ') : '**Замеры** не внесены') + '\n\n';
-
-  /* --- Л8 слово о времени --- */
-  const pStamp = 'prom=' + dayB.prom + '/' + dayB.hit;
-  if(dayB.prom > 0 || dayB.hit > 0){
-    const pct = dayB.prom > 0 ? Math.round(dayB.hit / dayB.prom * 100) : 0;
-    out += mark(dayB, pStamp) + '**Слово о времени (замер Л8)** назвал время ' + dayB.prom +
-           ', попал ' + dayB.hit + ' — ' + pct + '%\n\n';
-  } else {
-    out += '**Слово о времени (замер Л8)** за день не назначалось ни одного времени\n\n';
-  }
-
-  /* --- отрезки дня --- */
-  const segAny = [1,2,3].some(n => dayB['segv' + n] || dayB['segt' + n]);
-  if(segAny){
-    out += '**Отрезки дня**\n';
-    [1,2,3].forEach(n => {
-      const v = dayB['segv' + n] || '';
-      const t = dayB['segt' + n] || '';
-      const stamp = 'seg' + n + '=' + v + '/' + t.length;
-      const parts = [];
-      if(dayB['en' + n]) parts.push('энергия ' + dayB['en' + n]);
-      if(dayB['ez' + n]) parts.push('лёгкость ' + dayB['ez' + n]);
-      const touched = v || t || dayB['en' + n] || dayB['ez' + n] || dayB['st' + n];
-      if(touched) parts.push('шаг загружен: ' + (dayB['st' + n] ? 'да' : 'нет'));
-      out += '- ' + (touched ? mark(dayB, stamp) : '') + SEG_WHEN[n] + ' — ' + SEG_LBL[v] +
-             (parts.length ? ' · ' + parts.join(' · ') : '') + (t ? '\n  ' + t : '') + '\n';
-    });
-    const lost = [1,2,3].filter(n => dayB['segv' + n] === 'lost').length;
-    const half = [1,2,3].filter(n => dayB['segv' + n] === 'half').length;
-    const onT = [1,2,3].filter(n => dayB['segv' + n] === 'on').length;
-    out += '- **Итог дня: на целях ' + onT + ' из 3 · времени не было ' + half +
-           ' · время было, ушёл в ненужное ' + lost + '**\n\n';
-  } else {
-    out += '**Отрезки дня** не разобраны\n\n';
-  }
+  /* ПРАВКА 05.10.2026. Замеры Л2 (энергия трижды в день), Л8 (слово о времени), Л9 (лёгкость отрезка),
+     Л10 (шаг загружен) и оценка отрезков дня сняты решением 05.10: цена входа в лист была выше
+     цены самого дела. Осталась энергия при подъёме — она идёт из каталога строкой Э1. */
+  const mStamp = 'meas=' + dayB.stool;
+  if(dayB.stool !== '') out += mark(dayB, mStamp) + '**Замеры** стул (тест элиминации Н6): ' + dayB.stool + '\n\n';
 
   /* --- фраза дня --- */
   if(phraseOf(current)) out += '**Фраза дня** — ' + phraseOf(current) +
@@ -2902,16 +3022,18 @@ function buildReport(){
       const bx = sec.type === 'habit' ? dayB : wB;
       const st = sec.type === 'ritual'
         ? (isLong(id)
-            ? longCount(id, current) + ' из ' + item.norm + ' за ' + longWin(id) + ' дн.'
+            ? longCount(id, current) + ' из ' + item.norm + ' за ' + longMonthName(current)
             : (bx.tally[id] || 0) + ' из ' + item.norm)
         : (bx.status[id] ? LBL[bx.status[id]] : '⬜ не отмечено');
       const mvd = (dayB.moved && dayB.moved[id]) ? ' · ↪ перенесено на ' + dayB.moved[id] : '';
-      return '- ' + code(id) + ' ' + item.name + ' — ' + st + mvd + '\n';
+      return '- ' + label(id) + ' — ' + st + mvd + '\n';
     };
     const isMvd = id => !!(dayB.moved && dayB.moved[id]) && !itemDone(id);
-    const cl = foc.filter(id => fmode(id) === 'close' && !isMvd(id));
-    const tc = foc.filter(id => fmode(id) === 'touch' && !isMvd(id));
+    const isOff = id => !!itemOff(id, current);
+    const cl = foc.filter(id => fmode(id) === 'close' && !isMvd(id) && !isOff(id));
+    const tc = foc.filter(id => fmode(id) === 'touch' && !isMvd(id) && !isOff(id));
     const mvList = foc.filter(isMvd);
+    const offList = foc.filter(id => isOff(id) && !isMvd(id));
     if(cl.length){
       out += '**Закрыть сегодня — ' + cl.filter(itemDone).length + ' из ' + cl.length + '** (идёт в удержание дня)\n';
       cl.forEach(id => { out += line(id); });
@@ -2925,6 +3047,11 @@ function buildReport(){
     if(mvList.length){
       out += '**Перенесено на следующий день — ' + mvList.length + '** (день нейтральный: не выполнение и не провал)\n';
       mvList.forEach(id => { out += line(id); });
+      out += '\n';
+    }
+    if(offList.length){
+      out += '**Вне счёта дня — ' + offList.length + '** (тихий день либо вытеснение вводной: в знаменатель не идёт)\n';
+      offList.forEach(id => { out += line(id).replace('\n', ' · ' + itemOff(id, current) + '\n'); });
       out += '\n';
     }
   }
@@ -2959,7 +3086,7 @@ function buildReport(){
       }
       shown++;
       const cl = (st === 'done' && wB.closed[i.id]) ? ' (' + wB.closed[i.id] + ')' : '';
-      body += '- ' + seen(wB, stamp) + code(i.id) + ' ' + i.name + ' — ' +
+      body += '- ' + seen(wB, stamp) + label(i.id) + ' — ' +
               (st ? LBL[st] : '⬜ не отмечено') + cl + (c ? ' — ' + c : '') + '\n';
     });
     if(!shown){ out += '**' + sec.title + '** — без изменений с прошлой выгрузки, всего ' + sec.items.length + '\n\n'; return; }
@@ -2980,7 +3107,7 @@ function buildReport(){
         if(!k && !c) return;
       }
       shown++;
-      const tail = lng ? (' за ' + longWin(i.id) + ' дн.' + (longLast(i.id, current) ? ', последняя ' + longLast(i.id, current) : '')) : '';
+      const tail = lng ? (' за ' + longMonthName(current) + (longLast(i.id, current) ? ', последняя ' + longLast(i.id, current) : '')) : '';
       body += '- ' + seen(wB, stamp) + i.name + ' — ' + k + ' из ' + i.norm + tail +
               (k >= i.norm ? ' ✅' : k ? ' ⏳' : ' ⬜') + (c ? ' — ' + c : '') + '\n';
     });
@@ -2989,6 +3116,14 @@ function buildReport(){
     if(!FULL && sec.items.length - shown > 0) out += '- ещё ' + (sec.items.length - shown) + ' без изменений\n';
     out += '\n';
   });
+
+  /* --- вытеснение вводными --- */
+  const crowdToday = crowdAll().filter(x => x.day === d.date);
+  if(crowdToday.length){
+    out += '**Вытеснено сегодня — ' + crowdToday.length + '** (вводная прилетела, пункт из знаменателя недели выведен)\n';
+    crowdToday.forEach(x => { out += '- ' + label(x.id) + ' — источник: ' + x.src + '\n'; });
+    out += '\n';
+  }
 
   /* --- хроника за этот день --- */
   const ch = (wB.chron || []).filter(e => e.d === d.date);
@@ -3055,98 +3190,10 @@ function buildWeekReport(){
            (sj < 1 ? '✅ нет' : sj < 2 ? '🟡 умеренный' : '🔴 высокий') + ' |\n';
   }
 
-  const enRow = k => DAYS.map(d => (store[d.id] && store[d.id][k]) || '—');
-  const enAll = DAYS.map(d => store[d.id]).filter(Boolean)
-    .flatMap(b => [b.en1, b.en2, b.en3]).filter(x => x !== '' && typeof x !== 'undefined').map(Number);
-  if(enAll.length){
-    out += '\n### Энергия (1–10)\n\n| Замер | ' + DAYS.map(d => d.label + ' ' + d.date).join(' | ') + ' | Ср. |\n|---|' +
-           DAYS.map(() => '---').join('|') + '|---|\n';
-    [['en1','Подъём'],['en2','14:00'],['en3','20:00']].forEach(([k,t]) => {
-      const r = enRow(k); const n = r.filter(x => x !== '—').map(Number);
-      out += '| ' + t + ' | ' + r.join(' | ') + ' | ' + (n.length ? (n.reduce((a,c)=>a+c,0)/n.length).toFixed(1) : '—') + ' |\n';
-    });
-    out += '\n**Средняя энергия за неделю: ' + (enAll.reduce((a,c)=>a+c,0)/enAll.length).toFixed(1) + '**\n';
-  }
-
-  /* --- Лёгкость и переходы: замеры Л9 и Л10. Замер Л11 снят 01.10.2026 --- */
-  const segBoxes = [];
-  DAYS.forEach(d => {
-    const b = store[d.id];
-    if(!b) return;
-    [1,2,3].forEach(n => {
-      const touched = b['segv'+n] || b['segt'+n] || b['en'+n] || b['ez'+n] || b['st'+n];
-      if(touched) segBoxes.push({d:d, n:n, b:b});
-    });
-  });
-  const ezAll = segBoxes.filter(x => x.b['ez'+x.n] !== '' && typeof x.b['ez'+x.n] !== 'undefined')
-                        .map(x => Number(x.b['ez'+x.n]));
-  if(ezAll.length || segBoxes.length){
-    out += '\n### Лёгкость и переходы — замеры Л9 и Л10\n\n';
-    out += '| Показатель | Значение |\n|---|---|\n';
-    const den = segBoxes.length;
-    out += '| Отрезков заполнено | ' + den + ' из 21 |\n';
-    if(ezAll.length){
-      out += '| Средняя лёгкость (замер Л9) | ' +
-             (ezAll.reduce((a,c)=>a+c,0)/ezAll.length).toFixed(1) + ' по ' + ezAll.length + ' отрезкам |\n';
-      const pairs = segBoxes.filter(x => x.b['ez'+x.n] !== '' && x.b['en'+x.n] !== ''
-                                    && typeof x.b['ez'+x.n] !== 'undefined' && typeof x.b['en'+x.n] !== 'undefined')
-                            .map(x => Number(x.b['ez'+x.n]) - Number(x.b['en'+x.n]));
-      if(pairs.length){
-        const avg = pairs.reduce((a,c)=>a+c,0)/pairs.length;
-        out += '| Расхождение лёгкость − энергия | ' + (avg >= 0 ? '+' : '') + avg.toFixed(1) +
-               ' в среднем по ' + pairs.length + ' парам |\n';
-      }
-    }
-    const stYes = segBoxes.filter(x => x.b['st'+x.n]).length;
-    out += '| Шаг загружен (замер Л10) | ' + stYes + ' из ' + den +
-           (den ? ' · ' + Math.round(stYes/den*100) + '%' : '') + ' |\n';
-    /* по дням: лёгкость построчно */
-    if(ezAll.length){
-      out += '\n| Лёгкость по отрезкам | ' + DAYS.map(d => d.label + ' ' + d.date).join(' | ') + ' | Ср. |\n|---|' +
-             DAYS.map(() => '---').join('|') + '|---|\n';
-      [[1,'подъём → 13:00'],[2,'13:00 → 19:00'],[3,'19:00 → отбой']].forEach(([n,t]) => {
-        const r = DAYS.map(d => (store[d.id] && store[d.id]['ez'+n]) || '—');
-        const num = r.filter(x => x !== '—').map(Number);
-        out += '| ' + t + ' | ' + r.join(' | ') + ' | ' +
-               (num.length ? (num.reduce((a,c)=>a+c,0)/num.length).toFixed(1) : '—') + ' |\n';
-      });
-    }
-  }
-
-  /* --- Отрезки дня: куда ушло время --- */
-  const segCnt = {on:0, half:0, lost:0};
-  DAYS.forEach(d => {
-    const b = store[d.id];
-    if(!b) return;
-    [1,2,3].forEach(n => { const v = b['segv'+n]; if(v && segCnt[v] !== undefined) segCnt[v]++; });
-  });
-  const segTot = segCnt.on + segCnt.half + segCnt.lost;
-  if(segTot){
-    out += '\n### Отрезки дня — куда ушло время\n\n';
-    out += '| Оценка | Отрезков | Доля |\n|---|---|---|\n';
-    out += '| 🟢 работал на цели | ' + segCnt.on + ' | ' + Math.round(segCnt.on/segTot*100) + '% |\n';
-    out += '| 🟡 времени не было — внешнее | ' + segCnt.half + ' | ' + Math.round(segCnt.half/segTot*100) + '% |\n';
-    out += '| 🔴 время было, ушёл в ненужное | ' + segCnt.lost + ' | ' + Math.round(segCnt.lost/segTot*100) + '% |\n';
-    out += '\n- Оценено отрезков ' + segTot + ' из 21\n';
-    out += '- 🟡 лечится расписанием, 🔴 лечится приоритетами. В одно число не сводить\n';
-  }
-
   if(w.pain !== '' || w.photo){
     out += '\n### III палец правой стопы — замер за неделю\n\n';
     out += '- Боль: ' + (w.pain !== '' ? w.pain + ' / 10' : 'не внесено') + '\n';
     out += '- Фото: ' + (w.photo ? 'сделано' : 'не сделано') + '\n';
-  }
-
-  const promRow = DAYS.map(d => (store[d.id] && store[d.id].prom) || 0);
-  const hitRow = DAYS.map(d => (store[d.id] && store[d.id].hit) || 0);
-  const promSum = promRow.reduce((a,c) => a + c, 0);
-  if(promSum > 0){
-    const hitSum = hitRow.reduce((a,c) => a + c, 0);
-    out += '\n### Слово о времени — замер Л8\n\n| Метрика | ' + DAYS.map(d => d.label + ' ' + d.date).join(' | ') + ' | Итог |\n|---|' +
-           DAYS.map(() => '---').join('|') + '|---|\n';
-    out += '| Назвал время | ' + promRow.join(' | ') + ' | ' + promSum + ' |\n';
-    out += '| Попал | ' + hitRow.join(' | ') + ' | ' + hitSum + ' |\n';
-    out += '\n- **Держу слово о времени: ' + Math.round(hitSum/promSum*100) + '% (' + hitSum + ' из ' + promSum + ')**\n';
   }
 
   const extDays = DAYS.filter(d => store[d.id] && store[d.id].ext);
@@ -3165,6 +3212,27 @@ function buildWeekReport(){
   if(stoolRows.length){
     out += '\n### Стул — тест элиминации Н6 (до 08.09)\n\n| День | Запись |\n|---|---|\n';
     stoolRows.forEach(([d,v]) => { out += '| ' + d.label + ' ' + d.date + ' | ' + v + ' |\n'; });
+  }
+
+  /* ПРАВКА 05.10.2026. Режимы недели: дни без отметок, тихие дни, сниженная неделя, вытеснение.
+     Всё это меняет знаменатель, поэтому печатается до долей, а не после них. */
+  const blankDays = DAYS.filter(d => store[d.id] && store[d.id].blank);
+  const quietDays = DAYS.filter(d => store[d.id] && store[d.id].quiet);
+  const crowdRows = crowdAll().filter(x => ITEM_INDEX[x.id]);
+  if(blankDays.length || quietDays.length || w.reduced || crowdRows.length){
+    out += '\n### Режимы недели\n\n| Показатель | Значение |\n|---|---|\n';
+    out += '| Дней без отметок | ' + blankDays.length + (blankDays.length ? ' · ' + blankDays.map(d => d.label + ' ' + d.date).join(', ') : '') + ' |\n';
+    out += '| Тихих дней | ' + quietDays.length + (quietDays.length ? ' · ' + quietDays.map(d => d.label + ' ' + d.date).join(', ') : '') +
+           ' · за ' + longMonthName(DAYS[DAYS.length - 1].id) + ' всего ' + quietMonthN(DAYS[DAYS.length - 1].id) + ' из ' + QUIET_MONTH + ' |\n';
+    out += '| Сниженная неделя | ' + (w.reduced ? 'объявлена ' + w.reduced + ' · ' + (limitNums() || 'числа лимита каталог не дал') + ' · подряд ' + reducedRun() : 'нет') + ' |\n';
+    out += '| Вытеснено пунктов | ' + crowdRows.length + (crowdRows.length > 3 ? ' · больше трёх — разбор причины' : '') + ' |\n';
+    out += '| Действующий лимит задач | ' + (taskLimit() ? taskLimit() + ' · зачёт при ' + taskPass() : 'каталог чисел не дал') + ' |\n';
+    if(crowdRows.length){
+      out += '\n| Пункт | Источник вводной | День |\n|---|---|---|\n';
+      crowdRows.forEach(x => { out += '| ' + label(x.id) + ' | ' + x.src + ' | ' + x.day + ' |\n'; });
+      out += '\n- Вытесненный пункт в знаменатель недели не идёт. Больше трёх за неделю — разбор причины, решение 193\n';
+    }
+    if(blankDays.length) out += '\n- Дни без отметок из знаменателей выведены: это «учёт не вёлся», а не «не сделано»\n';
   }
 
   const takenAgg = {};
@@ -3186,7 +3254,7 @@ function buildWeekReport(){
     out += '\n### Взято на день и приступал\n\n| Пункт | Дней взято | Из них приступал | Разрыв |\n|---|---|---|---|\n';
     takenKeys.forEach(id => {
       const a = takenAgg[id];
-      out += '| ' + code(id) + ' ' + ITEM_INDEX[id].item.name + ' | ' + a.took + ' | ' + a.tried + ' | ' + (a.took - a.tried) + ' |\n';
+      out += '| ' + label(id) + ' | ' + a.took + ' | ' + a.tried + ' | ' + (a.took - a.tried) + ' |\n';
     });
     out += '\n| День | Взято | Приступал |\n|---|---|---|\n';
     DAYS.forEach(d => {
@@ -3210,7 +3278,7 @@ function buildWeekReport(){
       const b = x.b;
       const ext = b.slotExt || [];
       out += '| ' + x.d.label + ' ' + x.d.date +
-             ' | ' + (b.dutyId && ITEM_INDEX[b.dutyId] ? code(b.dutyId) + ' ' + ITEM_INDEX[b.dutyId].item.name : '— пункт не выбран') +
+             ' | ' + (b.dutyId && ITEM_INDEX[b.dutyId] ? label(b.dutyId) : '— пункт не выбран') +
              ' | ' + (b.duty || '—') +
              ' | ' + (b.slotFrom || b.slotTo ? (b.slotFrom || '—') + ' → ' + (b.slotTo || '—') : '—') +
              ' | ' + (ext.length ? 'до ' + ext[ext.length - 1] + (ext.length > 1 ? ' · ' + ext.length + ' раза' : '') : '—') +
@@ -3232,7 +3300,7 @@ function buildWeekReport(){
     out += '\n| Пункт | Дней делом дня | Минут всего | Дней с полным слотом | Начал первым |\n|---|---|---|---|---|\n';
     Object.keys(byItem).forEach(k => {
       const a = byItem[k];
-      const nm = (k !== '__none__' && ITEM_INDEX[k]) ? code(k) + ' ' + ITEM_INDEX[k].item.name : '— пункт не выбран';
+      const nm = (k !== '__none__' && ITEM_INDEX[k]) ? label(k) : '— пункт не выбран';
       out += '| ' + nm + ' | ' + a.days + ' | ' + a.min + ' | ' + a.full + ' | ' + a.first + ' |\n';
     });
 
@@ -3325,43 +3393,58 @@ function buildWeekReport(){
     });
   }
 
+  /* дни без отметок выведены из знаменателя: иначе «учёт не вёлся» читается как «не сделано» */
+  const liveDays = DAYS.filter(d => !(store[d.id] && store[d.id].blank));
   out += '\n### Привычки\n\n| Привычка | ' + DAYS.map(d => d.label + ' ' + d.id).join(' | ') + ' | Итог |\n|---|' +
          DAYS.map(() => '---').join('|') + '|---|\n';
   SECTIONS.find(s => s.key === 'habits').items.forEach(i => {
     const cells = DAYS.map(d => {
+      if(store[d.id] && store[d.id].blank) return '·';
       const s = (store[d.id] && store[d.id].status[i.id]) || '';
       return s === 'done' ? '✅' : s === 'wip' ? '⏳' : s === 'fail' ? '❌' : '';
     });
-    out += '| ' + i.name + ' | ' + cells.join(' | ') + ' | ' + cells.filter(c => c === '✅').length + ' |\n';
+    out += '| ' + i.name + ' | ' + cells.join(' | ') + ' | ' + cells.filter(c => c === '✅').length + ' из ' + liveDays.length + ' |\n';
   });
+  if(liveDays.length < DAYS.length) out += '\n- Знаменатель ' + liveDays.length + ', а не 7: дни без отметок выведены. Точка «·» — такой день\n';
 
-  out += '\n### Задачи\n\n| # | Задача | Статус | Закрыто | Комментарий |\n|---|---|---|---|---|\n';
+  out += '\n### Задачи' + (limitLine() ? ' — ' + limitLine() : '') +
+         '\n\n| # | Задача | Статус | Закрыто | Комментарий |\n|---|---|---|---|---|\n';
   SECTIONS.filter(s => s.type === 'task').forEach(sec => sec.items.forEach(i => {
     const st = w.status[i.id];
-    out += '| ' + code(i.id) + ' | ' + i.name + ' | ' + (st ? LBL[st] : '— не отмечено') + ' | ' +
+    const cr = crowdOf(i.id);
+    out += '| ' + code(i.id) + ' | ' + i.name + (cr ? ' · вытеснено вводной «' + cr.src + '» ' + cr.day : '') +
+           ' | ' + (st ? LBL[st] : '— не отмечено') + ' | ' +
            (w.closed[i.id] || '—') + ' | ' + (cmtList(w, i.id).length || '—') + ' |\n';
   }));
+  const mainSec = taskSec();
+  if(mainSec && taskLimit()){
+    const inLimit = mainSec.items.filter(i => !i.trig && !crowdOf(i.id));
+    const closedN = inLimit.filter(i => w.status[i.id] === 'done').length;
+    out += '\n- **Закрыто ' + closedN + ' из ' + inLimit.length + ' при лимите ' + taskLimit() +
+           ' и зачёте ' + taskPass() + ' — ' + (closedN >= taskPass() ? 'зачёт взят ✅' : 'зачёт не взят 🔴') + '**\n';
+  }
 
   out += '\n### Ритуалы\n\n| Ритуал | Факт | Норма | Комментарий |\n|---|---|---|---|\n';
   SECTIONS.find(s => s.key === 'rituals').items.forEach(i => {
     out += '| ' + i.name + ' | ' + (w.tally[i.id] || 0) + ' | ' + i.norm + ' | ' + (cmtList(w, i.id).length || '—') + ' |\n';
   });
 
-  /* ПРАВКА 28.09.2026. Длинный такт считается скользящим окном 30 дней и неделей не обнуляется */
+  /* ПРАВКА 05.10.2026 (решение 181). Длинный такт считается календарным месяцем, обнуление 1 числа.
+     Отметка стоит датой события, поэтому цифра месяца отражает, когда это происходило на самом деле. */
   const longSec = SECTIONS.find(s => s.key === 'rituals_long');
   const lastDay = DAYS[DAYS.length - 1].id;
   if(longSec && longSec.items.length){
-    out += '\n### Ритуалы длинного такта — скользящее окно\n\n';
-    out += '| Ритуал | Окно | В окне | Норма | Последняя отметка | Отметки в окне |\n|---|---|---|---|---|---|\n';
+    out += '\n### Ритуалы длинного такта — календарный месяц\n\n';
+    out += '| Ритуал | Месяц | За месяц | Норма | Последняя отметка | Даты отметок |\n|---|---|---|---|---|---|\n';
     longSec.items.forEach(i => {
       const marks = longMarks(i.id, lastDay);
       const n = marks.length;
-      out += '| ' + i.name + ' | ' + longWin(i.id) + ' дн. | ' + n + (n >= i.norm ? ' ✅' : n ? ' ⏳' : ' ⬜') + ' | ' + i.norm + ' | ' +
+      out += '| ' + i.name + ' | ' + longMonthName(lastDay) + ' | ' + n + (n >= i.norm ? ' ✅' : n ? ' ⏳' : ' ⬜') + ' | ' + i.norm + ' | ' +
              (marks.length ? longFmt(marks[0].iso) : '—') + ' | ' +
              (marks.length ? marks.map(x => longFmt(x.iso)).join(', ') : '—') + ' |\n';
     });
-    out += '\n- Окно считается назад от ' + (DAYS[DAYS.length - 1].date || '—') + '. Недельного нуля у этих ритуалов нет\n';
-    out += '- Длина окна задаётся каталогом полем win у пункта; без него берётся 30 дней\n';
+    out += '\n- Счёт идёт за ' + longMonthName(lastDay) + ' и обнуляется первого числа. Недельного нуля у этих ритуалов нет\n';
+    out += '- Отметка ставится датой события: кнопка «+» спрашивает дату, кнопка «−» снимает отметку названной даты\n';
   }
 
   /* Перенос пунктов между днями — видно, что ушло дальше, а не провалилось */
@@ -3371,7 +3454,7 @@ function buildWeekReport(){
     if(!b2 || !b2.moved) return;
     Object.keys(b2.moved).forEach(id => {
       if(!ITEM_INDEX[id]) return;
-      mvRows.push('| ' + d.label + ' ' + d.date + ' | ' + code(id) + ' ' + ITEM_INDEX[id].item.name + ' | ' + b2.moved[id] + ' |');
+      mvRows.push('| ' + d.label + ' ' + d.date + ' | ' + label(id) + ' | ' + b2.moved[id] + ' |');
     });
   });
   if(mvRows.length){
@@ -3433,11 +3516,11 @@ function slimBox(b){
   ['focus','notesList','chron','exported'].forEach(m => {
     if(Array.isArray(b[m]) && b[m].length) o[m] = b[m];
   });
-  ['bed','wake','en1','en2','en3','ez1','ez2','ez3','pain','stool','phrase','notes','duty','dutyId',
-   'slotLvl','slotFrom','slotTo',
-   'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => { if(b[k]) o[k] = b[k]; });
-  ['prom','hit','phraseN','dutyMin','dutyFirst',
-   'st1','st2','st3'].forEach(k => { if(b[k]) o[k] = b[k]; });
+  ['bed','wake','pain','stool','phrase','notes','duty','dutyId',
+   'slotLvl','slotFrom','slotTo'].forEach(k => { if(b[k]) o[k] = b[k]; });
+  ['phraseN','dutyMin','dutyFirst','blank','quiet'].forEach(k => { if(b[k]) o[k] = b[k]; });
+  if(b.reduced) o.reduced = b.reduced;
+  if(Array.isArray(b.crowd) && b.crowd.length) o.crowd = b.crowd.slice();
   if(Array.isArray(b.slotExt) && b.slotExt.length) o.slotExt = b.slotExt.slice();
   if(b.meas && Object.keys(b.meas).length) o.meas = b.meas;
   if(b.probes && Object.keys(b.probes).length) o.probes = b.probes;
@@ -3485,13 +3568,12 @@ function cleanBox(raw){
   b.meas = (raw && raw.meas && typeof raw.meas === 'object') ? raw.meas : {};
   b.tried = (raw && raw.tried && typeof raw.tried === 'object') ? raw.tried : {};
   b.moved = (raw && raw.moved && typeof raw.moved === 'object') ? raw.moved : {};
-  ['bed','wake','sleep','en1','en2','en3','ez1','ez2','ez3','pain','stool','notes','phrase','duty','dutyId',
-   'slotLvl','slotFrom','slotTo',
-   'segv1','segv2','segv3','segt1','segt2','segt3'].forEach(k => {
+  b.crowd = (raw && Array.isArray(raw.crowd)) ? raw.crowd.filter(x => x && knownId(x.id)) : [];
+  ['bed','wake','sleep','pain','stool','notes','phrase','duty','dutyId','reduced',
+   'slotLvl','slotFrom','slotTo'].forEach(k => {
     b[k] = (raw && typeof raw[k] === 'string') ? raw[k] : '';
   });
-  ['prom','hit','phraseN','phraseTill','dutyMin','dutyFirst',
-   'st1','st2','st3'].forEach(k => { b[k] = (raw && typeof raw[k] === 'number') ? raw[k] : 0; });
+  ['phraseN','phraseTill','dutyMin','dutyFirst','blank','quiet'].forEach(k => { b[k] = (raw && typeof raw[k] === 'number') ? raw[k] : 0; });
   b.slotExt = (raw && Array.isArray(raw.slotExt)) ? raw.slotExt.filter(x => typeof x === 'string') : [];
   if(b.dutyId && !knownId(b.dutyId)) b.dutyId = '';
   ['photo','ext'].forEach(k => { b[k] = !!(raw && raw[k]); });
